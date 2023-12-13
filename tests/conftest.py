@@ -1,5 +1,5 @@
 from asyncio import get_event_loop_policy, AbstractEventLoop
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Generator, Any
 
 import pytest
 import pytest_asyncio
@@ -13,11 +13,11 @@ from src.database.redis import init_redis
 from src.main import app
 
 
-PGURLTEST = (f'postgresql+asyncpg://{settings.PGUSERTEST}:{settings.PGPASSWORDTEST}@'
-             f'{settings.PGHOSTTEST}:{settings.PGPORTTEST}/{settings.PGDBTEST}')
+PG_URL_TEST = (f'postgresql+asyncpg://{settings.PG_USER_TEST}:{settings.PG_PASSWORD_TEST}@'
+               f'{settings.PG_HOST_TEST}:{settings.PG_PORT_TEST}/{settings.PG_DB_TEST}')
 
 
-test_async_engine = create_async_engine(url=PGURLTEST,
+test_async_engine = create_async_engine(url=PG_URL_TEST,
                                         echo=False,
                                         pool_pre_ping=True,
                                         pool_size=10,
@@ -37,7 +37,7 @@ app.dependency_overrides[get_session] = override_get_session
 
 
 @pytest_asyncio.fixture(autouse=True, scope='session')
-async def prepare_db() -> None:
+async def prepare_db() -> AsyncGenerator[Any, None]:
     await init_redis()
     async with test_async_engine.begin() as conn:
         await conn.run_sync(BaseModelDB.metadata.drop_all)
@@ -48,7 +48,7 @@ async def prepare_db() -> None:
 
 
 @pytest.fixture(scope='session')
-def event_loop() -> AbstractEventLoop:
+def event_loop() -> Generator[AbstractEventLoop, Any, None]:
     loop = get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()

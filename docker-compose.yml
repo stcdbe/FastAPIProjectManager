@@ -9,13 +9,13 @@ services:
     env_file:
       - .env
     environment:
-      - POSTGRES_PASSWORD=${PGPASSWORD}
-      - POSTGRES_USER=${PGUSER}
-      - POSTGRES_DB=${PGDB}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_DB=${PG_DB}
     ports:
-        - ${PGPORT}:${PGPORT}
+        - ${PG_PORT}:${PG_PORT}
     expose:
-        - ${PGPORT}
+        - ${PG_PORT}
     networks:
       - custom
 
@@ -26,9 +26,9 @@ services:
     env_file:
       - .env
     ports:
-      - ${REDISPORT}:${REDISPORT}
+      - ${REDIS_PORT}:${REDIS_PORT}
     expose:
-      - ${REDISPORT}
+      - ${REDIS_PORT}
     networks:
       - custom
 

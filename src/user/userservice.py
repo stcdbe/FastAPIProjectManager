@@ -15,7 +15,7 @@ async def get_user_by_username_db(session: AsyncSession, username: str) -> UserD
     return (await session.execute(stmt)).scalars().first()
 
 
-async def get_user_db(session: AsyncSession, user_id: str | UUID) -> UserDB | None:
+async def get_user_db(session: AsyncSession, user_id: UUID) -> UserDB | None:
     try:
         stmt = select(UserDB).where(UserDB.id == user_id)
         return (await session.execute(stmt)).scalars().first()
@@ -27,7 +27,7 @@ async def get_some_users_db(session: AsyncSession,
                             offset: int,
                             limit: int,
                             ordering: str,
-                            reverse: bool = False) -> list[UserDB] | list[None]:
+                            reverse: bool = False) -> list[UserDB]:
     if reverse:
         stmt = (select(UserDB)
                 .offset(offset)
@@ -43,7 +43,7 @@ async def get_some_users_db(session: AsyncSession,
 
 async def create_user_db(session: AsyncSession, user_data: UserCreate) -> UserDB | None:
     user_data.email = user_data.email.lower()
-    user_data.password = await Hasher.get_psw_hash(psw=user_data.password)
+    user_data.password = Hasher.get_psw_hash(psw=user_data.password)
 
     new_user = UserDB()
     for key, val in user_data.model_dump().items():
@@ -64,7 +64,7 @@ async def patch_user_db(session: AsyncSession,
     if upd_user_data.email:
         upd_user_data.email = upd_user_data.email.lower()
     if upd_user_data.password:
-        upd_user_data.password = await Hasher.get_psw_hash(psw=upd_user_data.password)
+        upd_user_data.password = Hasher.get_psw_hash(psw=upd_user_data.password)
 
     for key, val in upd_user_data.model_dump(exclude_unset=True).items():
         setattr(user, key, val)

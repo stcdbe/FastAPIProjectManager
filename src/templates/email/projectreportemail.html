@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+</head>
+
+<body>
+<h2>FastAPIProjectManager project report</h2>
+
+<h3>Project '{{ project.project_title }}'</h3>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col" align="left">Field</th>
+      <th scope="col" align="left">Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Project id</td>
+      <td>{{ project.id }}</td>
+    </tr>
+    <tr>
+      <td>Title</td>
+      <td>{{ project.project_title }}</td>
+    </tr>
+    <tr>
+      <td>Description</td>
+      <td>{{ project.project_description }}</td>
+    </tr>
+    <tr>
+      <td>Tech stack</td>
+      <td>{%for tech in project.tech_stack %}{{ tech }} {% endfor %}</td>
+    </tr>
+    <tr>
+      <td>Creator id</td>
+      <td>{{ project.creator_id }}</td>
+    </tr>
+    <tr>
+      <td>Mentor id</td>
+      <td>{% if project.mentor_id %}{{ project.mentor_id }}{% else %}{% endif %}</td>
+    </tr>
+    <tr>
+      <td>Start date</td>
+      <td>{{ project.start_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+    </tr>
+    <tr>
+      <td>Constraint date</td>
+      <td>{{ project.constraint_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+    </tr>
+    <tr>
+      <td>Created at</td>
+      <td>{{ project.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+    </tr>
+    <tr>
+      <td>Tasks count</td>
+      <td>{{ project.tasks|length }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Project '{{ project.project_title }}' tasks</h3>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col" align="left">Task id</th>
+      <th scope="col" align="left">Task title</th>
+      <th scope="col" align="left">Task description</th>
+      <th scope="col" align="left">Completed</th>
+      <th scope="col" align="left">Executor id</th>
+      <th scope="col" align="left">Created at</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for task in project.tasks %}
+    <tr>
+      <td>{{ task.id }}</td>
+      <td>{{ task.task_title }}</td>
+      <td>{{ task.task_description }}</td>
+      <td>{{ task.is_completed }}</td>
+      <td>{{ task.executor_id }}</td>
+      <td>{{ task.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+</body>
+
+</html>

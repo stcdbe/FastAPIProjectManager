@@ -26,10 +26,9 @@ async def create_token(session: Annotated[AsyncSession, Depends(get_session)],
     if not user:
         raise HTTPException(status_code=404, detail='User not found')
 
-    if not await Hasher.verify_psw(psw_to_check=form_data.password, hashed_psw=user.password):
+    if not Hasher.verify_psw(psw_to_check=form_data.password, hashed_psw=user.password):
         raise HTTPException(status_code=400, detail='Incorrect username or password')
 
     token = await generate_token(user_id=str(user.id),
-                                 expires_delta=timedelta(minutes=settings.ACCESSTOKENEXPIRESIN))
-    return {'access_token': token,
-            'token_type': 'bearer'}
+                                 expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRES))
+    return {'access_token': token, 'token_type': 'bearer'}

@@ -33,7 +33,7 @@ async def get_some_projects_db(session: AsyncSession,
                                offset: int,
                                limit: int,
                                ordering: str,
-                               reverse: bool = False) -> list[ProjectDB] | list[None]:
+                               reverse: bool = False) -> list[ProjectDB]:
     if reverse:
         stmt = (select(ProjectDB)
                 .offset(offset)
@@ -49,13 +49,15 @@ async def get_some_projects_db(session: AsyncSession,
 
 async def create_project_db(session: AsyncSession,
                             project_data: ProjectCreate,
-                            creator_id: str | UUID) -> ProjectDB:
-    new_thread = ProjectDB(creator_id=creator_id)
+                            creator_id: UUID) -> ProjectDB:
+    new_project = ProjectDB(creator_id=creator_id)
+
     for key, val in project_data.model_dump().items():
-        setattr(new_thread, key, val)
-    session.add(new_thread)
+        setattr(new_project, key, val)
+
+    session.add(new_project)
     await session.commit()
-    return new_thread
+    return new_project
 
 
 async def patch_project_db(session: AsyncSession,
@@ -96,7 +98,7 @@ async def patch_project_task_db(session: AsyncSession,
                                 task_id: UUID,
                                 upd_task_data: TaskPatch) -> ProjectDB | None:
     for task in project.tasks:
-        if str(task.id) == str(task_id):
+        if task.id == task_id:
             for key, val in upd_task_data.model_dump(exclude_none=True, exclude_unset=True).items():
                 setattr(task, key, val)
             await session.commit()
@@ -110,7 +112,7 @@ async def del_project_task_db(session: AsyncSession,
                               project: ProjectDB,
                               task_id: UUID) -> bool:
     for index, task in enumerate(project.tasks):
-        if str(task.id) == str(task_id):
+        if task.id == task_id:
             del project.tasks[index]
             await session.commit()
             return True

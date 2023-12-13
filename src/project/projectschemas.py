@@ -1,3 +1,4 @@
+from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import Annotated
 
@@ -12,7 +13,7 @@ class TaskCreate(BaseModel):
     task_description: Annotated[str, StringConstraints(strip_whitespace=True,
                                                        min_length=5,
                                                        max_length=250)]
-    is_completed: bool
+    is_completed: bool = False
     executor_id: UUID4
 
 
@@ -50,15 +51,15 @@ class ProjectCreate(Project):
     @field_validator('start_date', 'constraint_date')
     @classmethod
     def validate_date_range(cls, v: datetime) -> datetime:
-        date = v.replace(tzinfo=None)
-        if date < datetime.utcnow() - timedelta(days=1):
+        v = v.replace(tzinfo=None)
+        if v < datetime.utcnow() - timedelta(days=1):
             raise ValueError('Project dates cannot be in the past')
-        return date
+        return v
 
     @model_validator(mode='after')
-    def validate_projects_dates(self):
+    def validate_projects_dates(self) -> ProjectCreate:
         if self.start_date > self.constraint_date:
-            raise ValueError('start_date cannot be older than constraint_date')
+            raise ValueError('Project start_date cannot be older than project constraint_date')
         return self
 
 
@@ -82,4 +83,4 @@ class ProjectGet(Project):
 
 
 class ProjectWithTasksGet(ProjectGet):
-    tasks: list[TaskGet] | list[None]
+    tasks: list[TaskGet]

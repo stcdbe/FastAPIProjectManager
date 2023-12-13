@@ -1,5 +1,4 @@
 from datetime import datetime
-from enum import Enum
 from uuid import uuid4
 
 from sqlalchemy import UUID, ForeignKey, String, text
@@ -8,10 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.sql.expression import false
 from sqlalchemy.dialects.postgresql import ARRAY
 
-
-class Sex(str, Enum):
-    M = 'M'
-    F = 'F'
+from src.database.enums import Sex
 
 
 class BaseModelDB(DeclarativeBase, AsyncAttrs):

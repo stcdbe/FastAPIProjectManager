@@ -1,6 +1,8 @@
 import pytest
 from httpx import AsyncClient
 
+from src.config import settings
+
 
 @pytest.mark.asyncio
 async def test_get_some_projects(client: AsyncClient) -> None:
@@ -42,7 +44,6 @@ async def test_get_project(client: AsyncClient, test_project_uuid: str) -> None:
 
 
 @pytest.mark.asyncio
-@pytest.mark.asyncio
 async def test_patch_project(client: AsyncClient,
                              test_user_uuid: str,
                              test_project_uuid: str,
@@ -78,9 +79,9 @@ async def test_create_project_task(client: AsyncClient,
     project_with_new_task = res.json()
     assert res.status_code == 201
     assert project_with_new_task
-    assert test_task_data['task_title'] in [task['task_title'] for task in project_with_new_task['tasks']]
-    assert test_task_data['task_description'] in [task['task_description'] for task in project_with_new_task['tasks']]
-    assert test_task_data['executor_id'] in [task['executor_id'] for task in project_with_new_task['tasks']]
+    assert test_task_data['task_title'] in {task['task_title'] for task in project_with_new_task['tasks']}
+    assert test_task_data['task_description'] in {task['task_description'] for task in project_with_new_task['tasks']}
+    assert test_task_data['executor_id'] in {task['executor_id'] for task in project_with_new_task['tasks']}
 
 
 @pytest.mark.asyncio
@@ -98,8 +99,8 @@ async def test_patch_project_task(client: AsyncClient,
     project_with_upd_task = res.json()
     assert res.status_code == 200
     assert project_with_upd_task
-    assert test_patch_task_data['task_title'] in [task['task_title'] for task in project_with_upd_task['tasks']]
-    assert test_patch_task_data['task_description'] in [task['task_description'] for task in project_with_upd_task['tasks']]
+    assert test_patch_task_data['task_title'] in {task['task_title'] for task in project_with_upd_task['tasks']}
+    assert test_patch_task_data['task_description'] in {task['task_description'] for task in project_with_upd_task['tasks']}
 
 
 @pytest.mark.asyncio
@@ -110,6 +111,15 @@ async def test_del_project_task(client: AsyncClient,
     res = await client.delete(f'/api/projects/{test_project_uuid}/tasks/{test_task_uuid}',
                               headers=user_token_headers)
     assert res.status_code == 204
+
+
+@pytest.mark.asyncio
+async def test_send_project_report(client: AsyncClient,
+                                   test_project_uuid: str,
+                                   user_token_headers: dict[str, str]) -> None:
+    res = await client.post(f'/api/projects/{test_project_uuid}/send_as_report/{settings.TEST_EMAIL_RECEIVER}',
+                            headers=user_token_headers)
+    assert res.status_code == 202
 
 
 @pytest.mark.asyncio

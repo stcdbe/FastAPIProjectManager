@@ -1,0 +1,31 @@
+from pathlib import Path
+from typing import Any
+
+from fastapi_mail import ConnectionConfig, MessageSchema, MessageType, FastMail
+from pydantic import EmailStr
+
+from src.config import settings
+
+
+mail_config = ConnectionConfig(MAIL_USERNAME=settings.EMAIL_USERNAME,
+                               MAIL_PASSWORD=settings.EMAIL_PASSWORD,
+                               MAIL_FROM=settings.EMAIL_SENDER,
+                               MAIL_PORT=settings.EMAIL_PORT,
+                               MAIL_SERVER=settings.EMAIL_HOST,
+                               MAIL_STARTTLS=False,
+                               MAIL_SSL_TLS=True,
+                               USE_CREDENTIALS=True,
+                               VALIDATE_CERTS=True,
+                               TEMPLATE_FOLDER=Path(__file__).parent / 'templates/email')
+
+
+async def send_email(email_subject: str,
+                     email_receivers: list[EmailStr],
+                     email_template: str,
+                     **kwargs: dict[str, Any]) -> None:
+    email = MessageSchema(subject=email_subject,
+                          recipients=email_receivers,
+                          template_body=kwargs,
+                          subtype=MessageType.html)
+    fm = FastMail(mail_config)
+    await fm.send_message(email, template_name=email_template)

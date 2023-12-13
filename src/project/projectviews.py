@@ -1,8 +1,9 @@
 from typing import Any, Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Query, Depends, HTTPException
+from fastapi import APIRouter, Query, Depends, HTTPException, BackgroundTasks
 from fastapi_cache.decorator import cache
+from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.authutils import get_current_user
@@ -12,7 +13,9 @@ from src.project.projectschemas import (ProjectGet,
                                         ProjectCreate,
                                         ProjectWithTasksGet,
                                         TaskCreate,
-                                        ProjectPatch, TaskPatch)
+                                        ProjectPatch,
+                                        TaskPatch)
+from src.schemas import Message
 from src.project.projectservice import (get_some_projects_db,
                                         create_project_db,
                                         get_project_with_tasks_db,
@@ -22,6 +25,7 @@ from src.project.projectservice import (get_some_projects_db,
                                         patch_project_db,
                                         del_project_task_db,
                                         patch_project_task_db)
+from src.utils import send_email
 from src.user.userservice import get_user_db
 
 
@@ -144,6 +148,28 @@ async def del_project(current_user: Annotated[UserDB, Depends(get_current_user)]
     await del_project_db(session=session, project=project)
 
 
+@project_router.post('/{project_id}/send_as_report/{email}',
+                     status_code=202,
+                     response_model=Message,
+                     name='Send the project by email')
+async def send_project_report(current_user: Annotated[UserDB, Depends(get_current_user)],
+                              session: Annotated[AsyncSession, Depends(get_session)],
+                              project_id: UUID,
+                              email: EmailStr,
+                              bg_tasks: BackgroundTasks) -> Any:
+    project = await get_project_with_tasks_db(session=session, project_id=project_id)
+
+    if not project:
+        raise HTTPException(status_code=404, detail='Project not found')
+
+    bg_tasks.add_task(send_email,
+                      email_subject='(FastAPIProjectManager) Project report',
+                      email_receivers=[email],
+                      email_template='projectreportemail.html',
+                      **{'project': project})
+    return {'message': 'Email sent successfully'}
+
+
 @project_router.patch('/{project_id}/tasks/{task_id}',
                       status_code=200,
                       response_model=ProjectWithTasksGet,
@@ -191,9 +217,9 @@ async def del_project_task(current_user: Annotated[UserDB, Depends(get_current_u
     if current_user.id not in {project.creator_id, project.mentor_id}:
         raise HTTPException(status_code=403, detail='Forbidden request')
 
-    success_deletion = await del_project_task_db(session=session,
-                                                 project=project,
-                                                 task_id=task_id)
+    success_del = await del_project_task_db(session=session,
+                                            project=project,
+                                            task_id=task_id)
 
-    if not success_deletion:
+    if not success_del:
         raise HTTPException(status_code=400, detail='Incorrect task id')
