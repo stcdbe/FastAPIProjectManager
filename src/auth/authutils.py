@@ -1,5 +1,6 @@
 from datetime import timedelta, datetime
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
@@ -33,8 +34,8 @@ async def get_current_user(session: Annotated[AsyncSession, Depends(get_session)
         payload = decode(jwt=token,
                          key=settings.JWT_SECRET_KEY,
                          algorithms=[settings.JWT_ALGORITHM])
-        user_id = payload['sub']
-    except (InvalidTokenError, DecodeError, KeyError) as e:
+        user_id = UUID(payload['sub'])
+    except (InvalidTokenError, DecodeError, KeyError, ValueError) as e:
         raise exception from e
 
     if user := await get_user_db(session=session, user_id=user_id):

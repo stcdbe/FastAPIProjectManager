@@ -1,9 +1,8 @@
 from typing import Any, Annotated
-from uuid import UUID
 
 from fastapi import APIRouter, Query, Depends, HTTPException, BackgroundTasks
 from fastapi_cache.decorator import cache
-from pydantic import EmailStr
+from pydantic import EmailStr, UUID4
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.authutils import get_current_user
@@ -38,10 +37,11 @@ project_router = APIRouter()
                     name='Get some projects')
 @cache(expire=60)
 async def get_some_projects(session: Annotated[AsyncSession, Depends(get_session)],
-                            offset: int = Query(default=0, ge=0, le=5),
+                            page: int = Query(default=1, ge=1),
                             limit: int = Query(default=5, gt=0, le=5),
                             ordering: str = Query('project_title', enum=list(ProjectGet.model_fields)),
                             reverse: bool = False) -> Any:
+    offset = (page - 1) * limit
     return await get_some_projects_db(session=session,
                                       offset=offset,
                                       limit=limit,
@@ -72,7 +72,7 @@ async def create_project(current_user: Annotated[UserDB, Depends(get_current_use
                     name='Get the project')
 @cache(expire=60)
 async def get_project(session: Annotated[AsyncSession, Depends(get_session)],
-                      project_id: UUID) -> Any:
+                      project_id: UUID4) -> Any:
     project = await get_project_with_tasks_db(session=session, project_id=project_id)
 
     if not project:
@@ -87,7 +87,7 @@ async def get_project(session: Annotated[AsyncSession, Depends(get_session)],
                      name='Add a task to the project')
 async def add_project_task(current_user: Annotated[UserDB, Depends(get_current_user)],
                            session: Annotated[AsyncSession, Depends(get_session)],
-                           project_id: UUID,
+                           project_id: UUID4,
                            new_task_data: TaskCreate) -> Any:
     project = await get_project_with_tasks_db(session=session, project_id=project_id)
 
@@ -112,7 +112,7 @@ async def add_project_task(current_user: Annotated[UserDB, Depends(get_current_u
                       name='Patch the project')
 async def patch_project(current_user: Annotated[UserDB, Depends(get_current_user)],
                         session: Annotated[AsyncSession, Depends(get_session)],
-                        project_id: UUID,
+                        project_id: UUID4,
                         upd_project_data: ProjectPatch) -> Any:
     project = await get_project_db(session=session, project_id=project_id)
 
@@ -136,7 +136,7 @@ async def patch_project(current_user: Annotated[UserDB, Depends(get_current_user
                        name='Delete the project')
 async def del_project(current_user: Annotated[UserDB, Depends(get_current_user)],
                       session: Annotated[AsyncSession, Depends(get_session)],
-                      project_id: UUID) -> None:
+                      project_id: UUID4) -> None:
     project = await get_project_db(session=session, project_id=project_id)
 
     if not project:
@@ -151,10 +151,10 @@ async def del_project(current_user: Annotated[UserDB, Depends(get_current_user)]
 @project_router.post('/{project_id}/send_as_report/{email}',
                      status_code=202,
                      response_model=Message,
-                     name='Send the project by email')
+                     name='Send the project report by email')
 async def send_project_report(current_user: Annotated[UserDB, Depends(get_current_user)],
                               session: Annotated[AsyncSession, Depends(get_session)],
-                              project_id: UUID,
+                              project_id: UUID4,
                               email: EmailStr,
                               bg_tasks: BackgroundTasks) -> Any:
     project = await get_project_with_tasks_db(session=session, project_id=project_id)
@@ -176,8 +176,8 @@ async def send_project_report(current_user: Annotated[UserDB, Depends(get_curren
                       name='Patch the project task')
 async def patch_project_task(current_user: Annotated[UserDB, Depends(get_current_user)],
                              session: Annotated[AsyncSession, Depends(get_session)],
-                             project_id: UUID,
-                             task_id: UUID,
+                             project_id: UUID4,
+                             task_id: UUID4,
                              upd_task_data: TaskPatch) -> Any:
     project = await get_project_with_tasks_db(session=session, project_id=project_id)
 
@@ -187,19 +187,17 @@ async def patch_project_task(current_user: Annotated[UserDB, Depends(get_current
     if current_user.id not in {project.creator_id, project.mentor_id}:
         raise HTTPException(status_code=403, detail='Forbidden request')
 
+    if task_id not in {task.id for task in project.tasks}:
+        raise HTTPException(status_code=409, detail='Incorrect task id')
+
     if upd_task_data.executor_id:
         if not await get_user_db(session=session, user_id=upd_task_data.executor_id):
             raise HTTPException(status_code=404, detail='Executor not found')
 
-    project_with_upd_task = await patch_project_task_db(session=session,
-                                                        project=project,
-                                                        task_id=task_id,
-                                                        upd_task_data=upd_task_data)
-
-    if not project_with_upd_task:
-        raise HTTPException(status_code=400, detail='Incorrect task id')
-
-    return project_with_upd_task
+    return await patch_project_task_db(session=session,
+                                       project=project,
+                                       task_id=task_id,
+                                       upd_task_data=upd_task_data)
 
 
 @project_router.delete('/{project_id}/tasks/{task_id}',
@@ -207,8 +205,8 @@ async def patch_project_task(current_user: Annotated[UserDB, Depends(get_current
                        name='Delete the project task')
 async def del_project_task(current_user: Annotated[UserDB, Depends(get_current_user)],
                            session: Annotated[AsyncSession, Depends(get_session)],
-                           project_id: UUID,
-                           task_id: UUID) -> None:
+                           project_id: UUID4,
+                           task_id: UUID4) -> None:
     project = await get_project_with_tasks_db(session=session, project_id=project_id)
 
     if not project:
@@ -217,9 +215,9 @@ async def del_project_task(current_user: Annotated[UserDB, Depends(get_current_u
     if current_user.id not in {project.creator_id, project.mentor_id}:
         raise HTTPException(status_code=403, detail='Forbidden request')
 
-    success_del = await del_project_task_db(session=session,
-                                            project=project,
-                                            task_id=task_id)
+    if task_id not in {task.id for task in project.tasks}:
+        raise HTTPException(status_code=409, detail='Incorrect task id')
 
-    if not success_del:
-        raise HTTPException(status_code=400, detail='Incorrect task id')
+    await del_project_task_db(session=session,
+                              project=project,
+                              task_id=task_id)

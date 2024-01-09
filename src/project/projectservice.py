@@ -65,6 +65,7 @@ async def patch_project_db(session: AsyncSession,
                            upd_project_data: ProjectPatch) -> ProjectDB:
     for key, val in upd_project_data.model_dump(exclude_none=True, exclude_unset=True).items():
         setattr(project, key, val)
+
     await session.commit()
     await session.refresh(project)
     return project
@@ -96,25 +97,22 @@ async def create_project_task_db(session: AsyncSession,
 async def patch_project_task_db(session: AsyncSession,
                                 project: ProjectDB,
                                 task_id: UUID,
-                                upd_task_data: TaskPatch) -> ProjectDB | None:
+                                upd_task_data: TaskPatch) -> ProjectDB:
     for task in project.tasks:
         if task.id == task_id:
             for key, val in upd_task_data.model_dump(exclude_none=True, exclude_unset=True).items():
                 setattr(task, key, val)
-            await session.commit()
-            await session.refresh(project)
-            return project
-    else:
-        return
+            break
+    await session.commit()
+    await session.refresh(project)
+    return project
 
 
 async def del_project_task_db(session: AsyncSession,
                               project: ProjectDB,
-                              task_id: UUID) -> bool:
+                              task_id: UUID) -> None:
     for index, task in enumerate(project.tasks):
         if task.id == task_id:
             del project.tasks[index]
-            await session.commit()
-            return True
-    else:
-        return False
+            break
+    await session.commit()

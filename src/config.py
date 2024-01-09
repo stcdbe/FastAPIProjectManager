@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     REDIS_HOST: str
     REDIS_PORT: str
 
-    EMAIL_HOST: str
+    EMAIL_SMTP_SERVER: str
     EMAIL_PORT: int
     EMAIL_USERNAME: str
     EMAIL_PASSWORD: str

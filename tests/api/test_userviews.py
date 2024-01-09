@@ -2,33 +2,29 @@ import pytest
 from httpx import AsyncClient
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope='session')
 async def test_get_some_users(client: AsyncClient) -> None:
-    params = {'offset': 0,
-              'limit': 5,
-              'ordering': 'username',
-              'reverse': False}
-    res = await client.get('/api/users', params=params)
+    res = await client.get('/api/users')
     assert res.status_code == 200
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope='session')
 async def test_create_user(client: AsyncClient) -> None:
     user_data = {'username': 'test_username',
                  'email': 'test_email@example.com',
                  'password': 'passwordpassword'}
     res = await client.post('/api/users', json=user_data)
-    created_user = res.json()
+    new_user = res.json()
     assert res.status_code == 201
-    assert created_user
-    assert created_user.get('password') is None
-    assert created_user['username'] == user_data['username']
-    assert created_user['email'] == user_data['email']
-    assert created_user['join_date']
-    assert created_user['id']
+    assert new_user
+    assert new_user.get('password') is None
+    assert new_user['username'] == user_data['username']
+    assert new_user['email'] == user_data['email']
+    assert new_user['join_date']
+    assert new_user['id']
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope='session')
 async def test_get_me(client: AsyncClient, user_token_headers: dict[str, str]) -> None:
     res = await client.get('/api/users/me', headers=user_token_headers)
     current_user = res.json()
@@ -36,7 +32,7 @@ async def test_get_me(client: AsyncClient, user_token_headers: dict[str, str]) -
     assert current_user
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope='session')
 async def test_patch_me(client: AsyncClient, user_token_headers: dict[str, str]) -> None:
     patch_user_data = {'username': 'test_patch_username',
                        'email': 'test_patch_user@example.com',
@@ -58,9 +54,10 @@ async def test_patch_me(client: AsyncClient, user_token_headers: dict[str, str])
         assert upd_user[key] == val
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope='session')
 async def test_get_user(client: AsyncClient, test_user_uuid: str) -> None:
     res = await client.get(f'/api/users/{test_user_uuid}')
     user = res.json()
     assert res.status_code == 200
+    assert user
     assert user['id'] == test_user_uuid

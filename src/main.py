@@ -16,7 +16,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[Any, None]:
     yield
 
 
-app = FastAPI(debug=False, title='FastAPI Project Manager', version='0.1.1', lifespan=lifespan)
+app = FastAPI(debug=False, title='FastAPI Project Manager', version='0.1.2', lifespan=lifespan)
 
 
 main_api_router = APIRouter()

@@ -1,8 +1,8 @@
 from typing import Annotated, Any
-from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, HTTPException
 from fastapi_cache.decorator import cache
+from pydantic import UUID4
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.authutils import get_current_user
@@ -21,10 +21,11 @@ user_router = APIRouter()
                  name='Get some user')
 @cache(expire=60)
 async def get_some_users(session: Annotated[AsyncSession, Depends(get_session)],
-                         offset: int = Query(default=0, ge=0),
+                         page: int = Query(default=1, ge=1),
                          limit: int = Query(default=5, gt=0, le=10),
                          ordering: str = Query('username', enum=list(UserGet.model_fields)),
                          reverse: bool = False) -> Any:
+    offset = (page - 1) * limit
     return await get_some_users_db(session=session,
                                    offset=offset,
                                    limit=limit,
@@ -36,11 +37,12 @@ async def get_some_users(session: Annotated[AsyncSession, Depends(get_session)],
                   status_code=201,
                   response_model=UserGet,
                   name='Create a new user')
-async def create_user(session: Annotated[AsyncSession, Depends(get_session)], user_data: UserCreate) -> Any:
+async def create_user(session: Annotated[AsyncSession, Depends(get_session)],
+                      user_data: UserCreate) -> Any:
     new_user = await create_user_db(user_data=user_data, session=session)
 
     if not new_user:
-        raise HTTPException(status_code=400, detail='The user with this username or email already exists')
+        raise HTTPException(status_code=409, detail='The user with this username or email already exists')
 
     return new_user
 
@@ -65,7 +67,7 @@ async def patch_me(current_user: Annotated[UserDB, Depends(get_current_user)],
                                    upd_user_data=patch_data)
 
     if not upd_user:
-        raise HTTPException(status_code=400, detail='The user with this username or email already exists')
+        raise HTTPException(status_code=409, detail='The user with this username or email already exists')
 
     return upd_user
 
@@ -74,7 +76,8 @@ async def patch_me(current_user: Annotated[UserDB, Depends(get_current_user)],
                  status_code=200,
                  response_model=UserGet,
                  name='Get the user')
-async def get_user(session: Annotated[AsyncSession, Depends(get_session)], user_id: UUID) -> Any:
+async def get_user(session: Annotated[AsyncSession, Depends(get_session)],
+                   user_id: UUID4) -> Any:
     user = await get_user_db(session=session, user_id=user_id)
 
     if not user:

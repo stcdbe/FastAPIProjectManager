@@ -24,7 +24,7 @@ ___
 $ pip install -r requirements/dev.txt 
 ````
 + configure environment variables in `.env` file
-+ create tables in db
++ create migration in db
 ````
 $ alembic upgrade head 
 ````
@@ -62,7 +62,7 @@ ____
 | `PG_DB_TEST`           | PGSQL test database                              |
 | `REDIS_HOST`           | hostname or an IP address Redis database         |
 | `REDIS_PORT`           | port from Redis database                         |
-| `EMAIL_HOST`           | email SMTP server                                |
+| `EMAIL_SMTP_SERVER`    | email SMTP server                                |
 | `EMAIL_PORT`           | email port                                       |
 | `EMAIL_USERNAME`       | email address                                    |
 | `EMAIL_PASSWORD`       | email password                                   |

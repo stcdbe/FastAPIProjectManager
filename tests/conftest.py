@@ -1,7 +1,5 @@
-from asyncio import get_event_loop_policy, AbstractEventLoop
-from typing import AsyncGenerator, Generator, Any
+from typing import AsyncGenerator, Any
 
-import pytest
 import pytest_asyncio
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -47,13 +45,6 @@ async def prepare_db() -> AsyncGenerator[Any, None]:
         await conn.run_sync(BaseModelDB.metadata.drop_all)
 
 
-@pytest.fixture(scope='session')
-def event_loop() -> Generator[AbstractEventLoop, Any, None]:
-    loop = get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
-
-
 @pytest_asyncio.fixture(scope='session')
 async def client() -> AsyncGenerator[AsyncClient, None]:
     async with AsyncClient(app=app, base_url='http://test') as cli:
@@ -67,8 +58,8 @@ async def user_token_headers(client: AsyncClient) -> dict[str, str]:
                  'password': 'passwordpassword'}
     await client.post('/api/users', json=user_data)
 
-    auth_form_data = {'username': user_data['username'], 'password': user_data['password']}
-    res = await client.post('/api/auth/create_token', data=auth_form_data)
+    user_data.pop('email')
+    res = await client.post('/api/auth/create_token', data=user_data)
 
     access_token = res.json()['access_token']
     return {'Authorization': f'Bearer {access_token}'}
@@ -103,7 +94,6 @@ async def test_task_uuid(client: AsyncClient,
                  'task_description': 'task_description',
                  'is_completed': False,
                  'executor_id': test_user_uuid}
-
     res = await client.post(f'/api/projects/{test_project_uuid}',
                             json=task_data,
                             headers=user_token_headers)

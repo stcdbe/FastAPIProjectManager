@@ -1,7 +1,7 @@
 from datetime import datetime
-from uuid import uuid4
+from uuid import uuid4, UUID
 
-from sqlalchemy import UUID, ForeignKey, String, text
+from sqlalchemy import ForeignKey, String, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.sql.expression import false
@@ -12,10 +12,7 @@ from src.database.enums import Sex
 
 class BaseModelDB(DeclarativeBase, AsyncAttrs):
     __abstract__ = True
-    id: Mapped[UUID] = mapped_column(UUID(as_uuid=True),
-                                     primary_key=True,
-                                     default=uuid4,
-                                     index=True)
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4, index=True)
 
     def __repr__(self) -> str:
         return str(self.id)
@@ -52,12 +49,10 @@ class ProjectDB(BaseModelDB):
     constraint_date: Mapped[datetime]
     created_at: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"),
                                                  default=datetime.utcnow)
-    creator_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True),
-                                             ForeignKey('user.id'))
+    creator_id: Mapped[UUID] = mapped_column(ForeignKey('user.id'))
     creator: Mapped['UserDB'] = relationship(back_populates='created_projects',
                                              foreign_keys=[creator_id])
-    mentor_id: Mapped[UUID | None] = mapped_column(UUID(as_uuid=True),
-                                                   ForeignKey('user.id'))
+    mentor_id: Mapped[UUID | None] = mapped_column(ForeignKey('user.id'))
     mentor: Mapped['UserDB'] = relationship(back_populates='mentioned_projects',
                                             foreign_keys=[mentor_id])
     tasks: Mapped[list['TaskDB']] = relationship(back_populates='project',
@@ -73,6 +68,6 @@ class TaskDB(BaseModelDB):
     created_at: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"),
                                                  default=datetime.utcnow)
     project: Mapped['ProjectDB'] = relationship(back_populates='tasks')
-    project_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey('project.id'))
+    project_id: Mapped[UUID] = mapped_column(ForeignKey('project.id'))
     executor: Mapped['UserDB'] = relationship(back_populates='tasks')
-    executor_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey('user.id'))
+    executor_id: Mapped[UUID] = mapped_column(ForeignKey('user.id'))
