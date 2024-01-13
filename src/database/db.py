@@ -2,10 +2,10 @@ from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
-from src.config import PG_URL
+from src.config import settings
 
 
-async_engine = create_async_engine(url=PG_URL,
+async_engine = create_async_engine(url=settings.PG_URL,
                                    echo=False,
                                    pool_pre_ping=True,
                                    pool_size=10,

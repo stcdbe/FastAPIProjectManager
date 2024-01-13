@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import AsyncGenerator, Any
 
 import pytest_asyncio
@@ -11,11 +12,7 @@ from src.database.redis import init_redis
 from src.main import app
 
 
-PG_URL_TEST = (f'postgresql+asyncpg://{settings.PG_USER_TEST}:{settings.PG_PASSWORD_TEST}@'
-               f'{settings.PG_HOST_TEST}:{settings.PG_PORT_TEST}/{settings.PG_DB_TEST}')
-
-
-test_async_engine = create_async_engine(url=PG_URL_TEST,
+test_async_engine = create_async_engine(url=settings.PG_URL_TEST,
                                         echo=False,
                                         pool_pre_ping=True,
                                         pool_size=10,
@@ -76,8 +73,8 @@ async def test_project_uuid(client: AsyncClient, user_token_headers: dict[str, s
     project_data = {'project_title': 'project_title',
                     'project_description': 'project_description',
                     'tech_stack': ['string1'],
-                    'start_date': '2050-01-01T00:00:00.000Z',
-                    'constraint_date': '2051-01-01T00:00:00.000Z',
+                    'start_date': (datetime.utcnow() + timedelta(days=1)).isoformat(),
+                    'constraint_date': (datetime.utcnow() + timedelta(days=365)).isoformat(),
                     'mentor_id': None}
     res = await client.post('/api/projects',
                             json=project_data,

@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 import pytest
 from httpx import AsyncClient
 
@@ -15,8 +17,8 @@ async def test_create_project(client: AsyncClient, user_token_headers: dict[str,
     test_project_data = {'project_title': 'test_title',
                          'project_description': 'test_description',
                          'tech_stack': ['string'],
-                         'start_date': '2050-01-01T00:00:00',
-                         'constraint_date': '2051-01-01T00:00:00',
+                         'start_date': (datetime.utcnow() + timedelta(days=1)).isoformat(),
+                         'constraint_date': (datetime.utcnow() + timedelta(days=365)).isoformat(),
                          'mentor_id': None}
     res = await client.post('/api/projects',
                             json=test_project_data,
@@ -47,8 +49,8 @@ async def test_patch_project(client: AsyncClient,
     test_patch_project_data = {'project_title': 'test_patch_title',
                                'project_description': 'test_patch_description',
                                'tech_stack': ['patch_string'],
-                               'start_date': '2051-01-01T00:00:00',
-                               'constraint_date': '2054-01-01T00:00:00',
+                               'start_date': (datetime.utcnow() + timedelta(days=1)).isoformat(),
+                               'constraint_date': (datetime.utcnow() + timedelta(days=365)).isoformat(),
                                'mentor_id': test_user_uuid}
     res = await client.patch(f'/api/projects/{test_project_uuid}',
                              json=test_patch_project_data,
@@ -87,7 +89,7 @@ async def test_patch_project_task(client: AsyncClient,
                                   user_token_headers: dict[str, str]) -> None:
     test_patch_task_data = {'task_title': 'test_patch_title',
                             'task_description': 'test_patch_description',
-                            'is_completed': True,
+                            'is_completed': None,
                             'executor_id': None}
     res = await client.patch(f'/api/projects/{test_project_uuid}/tasks/{test_task_uuid}',
                              json=test_patch_task_data,

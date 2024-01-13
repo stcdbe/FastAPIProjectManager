@@ -31,13 +31,19 @@ class Settings(BaseSettings):
     EMAIL_SENDER: EmailStr
     TEST_EMAIL_RECEIVER: EmailStr
 
+    @property
+    def PG_URL(self) -> str:
+        return f'postgresql+asyncpg://{self.PG_USER}:{self.PG_PASSWORD}@{self.PG_HOST}:{self.PG_PORT}/{self.PG_DB}'
+
+    @property
+    def PG_URL_TEST(self) -> str:
+        return f'postgresql+asyncpg://{self.PG_USER_TEST}:{self.PG_PASSWORD_TEST}@{self.PG_HOST_TEST}:{self.PG_PORT_TEST}/{self.PG_DB_TEST}'
+
+    @property
+    def REDIS_URL(self) -> str:
+        return f'redis://{self.REDIS_HOST}:{self.REDIS_PORT}'
+
     model_config = SettingsConfigDict(env_file='./.env', case_sensitive=True)
 
 
 settings = Settings()
-
-
-PG_URL = (f'postgresql+asyncpg://{settings.PG_USER}:{settings.PG_PASSWORD}@'
-          f'{settings.PG_HOST}:{settings.PG_PORT}/{settings.PG_DB}')
-
-REDIS_URL = f'redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}'
