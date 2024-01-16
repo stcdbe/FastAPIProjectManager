@@ -20,7 +20,7 @@ async def get_user_db(session: AsyncSession, user_id: UUID) -> UserDB | None:
         stmt = select(UserDB).where(UserDB.id == user_id)
         return (await session.execute(stmt)).scalars().first()
     except (DBAPIError, DataError):
-        return
+        await session.rollback()
 
 
 async def get_some_users_db(session: AsyncSession,
@@ -28,16 +28,13 @@ async def get_some_users_db(session: AsyncSession,
                             limit: int,
                             ordering: str,
                             reverse: bool = False) -> list[UserDB]:
+    stmt = (select(UserDB)
+            .offset(offset)
+            .limit(limit))
     if reverse:
-        stmt = (select(UserDB)
-                .offset(offset)
-                .limit(limit)
-                .order_by(desc(ordering)))
+        stmt = stmt.order_by(desc(ordering))
     else:
-        stmt = (select(UserDB)
-                .offset(offset)
-                .limit(limit)
-                .order_by(ordering))
+        stmt = stmt.order_by(ordering)
     return list((await session.execute(stmt)).scalars().all())
 
 
@@ -55,7 +52,6 @@ async def create_user_db(session: AsyncSession, user_data: UserCreate) -> UserDB
         return new_user
     except IntegrityError:
         await session.rollback()
-        return
 
 
 async def patch_user_db(session: AsyncSession,
@@ -75,4 +71,3 @@ async def patch_user_db(session: AsyncSession,
         return user
     except IntegrityError:
         await session.rollback()
-        return

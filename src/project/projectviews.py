@@ -37,9 +37,9 @@ project_router = APIRouter()
                     name='Get some projects')
 @cache(expire=60)
 async def get_some_projects(session: Annotated[AsyncSession, Depends(get_session)],
-                            page: int = Query(default=1, ge=1),
-                            limit: int = Query(default=5, gt=0, le=5),
-                            ordering: str = Query('project_title', enum=list(ProjectGet.model_fields)),
+                            page: Annotated[int,  Query(gt=0)] = 1,
+                            limit: Annotated[int,  Query(gt=0, le=5)] = 5,
+                            ordering: Annotated[str, Query(enum=list(ProjectGet.model_fields))] = 'project_title',
                             reverse: bool = False) -> Any:
     offset = (page - 1) * limit
     return await get_some_projects_db(session=session,

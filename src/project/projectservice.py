@@ -16,7 +16,7 @@ async def get_project_db(session: AsyncSession, project_id: UUID) -> ProjectDB |
     try:
         return (await session.execute(stmt)).scalars().first()
     except (DBAPIError, DataError):
-        return
+        await session.rollback()
 
 
 async def get_project_with_tasks_db(session: AsyncSession, project_id: UUID) -> ProjectDB | None:
@@ -26,7 +26,7 @@ async def get_project_with_tasks_db(session: AsyncSession, project_id: UUID) -> 
     try:
         return (await session.execute(stmt)).scalars().first()
     except (DBAPIError, DataError):
-        return
+        await session.rollback()
 
 
 async def get_some_projects_db(session: AsyncSession,
@@ -34,16 +34,13 @@ async def get_some_projects_db(session: AsyncSession,
                                limit: int,
                                ordering: str,
                                reverse: bool = False) -> list[ProjectDB]:
+    stmt = (select(ProjectDB)
+            .offset(offset)
+            .limit(limit))
     if reverse:
-        stmt = (select(ProjectDB)
-                .offset(offset)
-                .limit(limit)
-                .order_by(desc(ordering)))
+        stmt = stmt.order_by(desc(ordering))
     else:
-        stmt = (select(ProjectDB)
-                .offset(offset)
-                .limit(limit)
-                .order_by(ordering))
+        stmt = stmt.order_by(ordering)
     return list((await session.execute(stmt)).scalars().all())
 
 

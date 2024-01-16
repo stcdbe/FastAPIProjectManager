@@ -21,9 +21,9 @@ user_router = APIRouter()
                  name='Get some user')
 @cache(expire=60)
 async def get_some_users(session: Annotated[AsyncSession, Depends(get_session)],
-                         page: int = Query(default=1, ge=1),
-                         limit: int = Query(default=5, gt=0, le=10),
-                         ordering: str = Query('username', enum=list(UserGet.model_fields)),
+                         page: Annotated[int, Query(gt=0)] = 1,
+                         limit: Annotated[int, Query(gt=0, le=10)] = 5,
+                         ordering: Annotated[str, Query(enum=list(UserGet.model_fields))] = 'username',
                          reverse: bool = False) -> Any:
     offset = (page - 1) * limit
     return await get_some_users_db(session=session,
