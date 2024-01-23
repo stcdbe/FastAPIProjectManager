@@ -18,7 +18,7 @@ class User(BaseModel):
     company: Annotated[str, StringConstraints(strip_whitespace=True, max_length=100)] | None = None
     job_title: Annotated[str, StringConstraints(strip_whitespace=True, max_length=100)] | None = None
     fullname: Annotated[str, StringConstraints(strip_whitespace=True, max_length=100)] | None = None
-    age: Annotated[int, Ge(18), Le(99)] | None = 20
+    age: Annotated[int, Ge(18), Le(99)] | None = None
     sex: Sex | None = None
 
 

@@ -46,6 +46,7 @@ ____
 #### Environment variables
 | variables              | description                                      |
 |:-----------------------|:-------------------------------------------------|
+| `DEBUG`                | debug mode, only allowed 1(True)/0(False)        |
 | `PORT`                 | app port                                         |
 | `JWT_SECRET_KEY`       | a secret key for jwt encoding                    |
 | `JWT_ALGORITHM`        | jwt encoding algorithm                           |

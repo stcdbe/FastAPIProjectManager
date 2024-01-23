@@ -8,6 +8,7 @@ from src.auth.authviews import login_router
 from src.database.redis import init_redis
 from src.user.userviews import user_router
 from src.project.projectviews import project_router
+from src.config import settings
 
 
 @asynccontextmanager
@@ -16,8 +17,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[Any, None]:
     yield
 
 
-app = FastAPI(debug=False, title='FastAPI Project Manager', version='0.1.2', lifespan=lifespan)
-
+app = FastAPI(debug=settings.DEBUG,
+              title='FastAPI Project Manager',
+              version='0.1.2',
+              lifespan=lifespan)
 
 main_api_router = APIRouter()
 
