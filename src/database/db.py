@@ -11,9 +11,7 @@ async_engine = create_async_engine(url=settings.PG_URL,
                                    pool_size=10,
                                    pool_recycle=3600)
 
-async_session = async_sessionmaker(bind=async_engine,
-                                   expire_on_commit=False,
-                                   class_=AsyncSession)
+async_session = async_sessionmaker(bind=async_engine, expire_on_commit=False)
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:

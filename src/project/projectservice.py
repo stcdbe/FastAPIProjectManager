@@ -1,31 +1,28 @@
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import select, desc
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.exc import UnmappedInstanceError
-from sqlalchemy.exc import DBAPIError
+from sqlalchemy.exc import DBAPIError, InvalidRequestError
 from asyncpg.exceptions import DataError
 
-from src.database.dbmodels import ProjectDB, TaskDB
+from src.project.projectmodels import ProjectDB, TaskDB
 from src.project.projectschemas import ProjectCreate, TaskCreate, ProjectPatch, TaskPatch
 
 
-async def get_project_db(session: AsyncSession, project_id: UUID) -> ProjectDB | None:
-    stmt = select(ProjectDB).where(ProjectDB.id == project_id)
+async def get_project_db(session: AsyncSession,
+                         get_tasks: bool = False,
+                         **kwargs: Any) -> ProjectDB | None:
+    stmt = select(ProjectDB).filter_by(**kwargs)
+
+    if get_tasks:
+        stmt = stmt.options(selectinload(ProjectDB.tasks))
+
     try:
         return (await session.execute(stmt)).scalars().first()
-    except (DBAPIError, DataError):
-        await session.rollback()
-
-
-async def get_project_with_tasks_db(session: AsyncSession, project_id: UUID) -> ProjectDB | None:
-    stmt = (select(ProjectDB)
-            .where(ProjectDB.id == project_id)
-            .options(selectinload(ProjectDB.tasks)))
-    try:
-        return (await session.execute(stmt)).scalars().first()
-    except (DBAPIError, DataError):
+    except (DBAPIError, DataError, InvalidRequestError):
         await session.rollback()
 
 

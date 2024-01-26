@@ -1,8 +1,8 @@
-"""Initial
+"""initial
 
-Revision ID: 43434fae4787
+Revision ID: 064e9f04ae66
 Revises: 
-Create Date: 2023-11-29 20:12:38.433556
+Create Date: 2024-01-26 15:06:47.601706
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '43434fae4787'
+revision: str = '064e9f04ae66'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -30,7 +30,7 @@ def upgrade() -> None:
     sa.Column('fullname', sa.String(), nullable=True),
     sa.Column('age', sa.Integer(), nullable=True),
     sa.Column('sex', sa.Enum('M', 'F', name='sex'), nullable=True),
-    sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('id', sa.Uuid(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
     )
@@ -43,9 +43,10 @@ def upgrade() -> None:
     sa.Column('start_date', sa.DateTime(), nullable=False),
     sa.Column('constraint_date', sa.DateTime(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text("TIMEZONE('utc', now())"), nullable=False),
-    sa.Column('creator_id', sa.UUID(), nullable=False),
-    sa.Column('mentor_id', sa.UUID(), nullable=True),
-    sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text("TIMEZONE('utc', now())"), nullable=False),
+    sa.Column('creator_id', sa.Uuid(), nullable=False),
+    sa.Column('mentor_id', sa.Uuid(), nullable=True),
+    sa.Column('id', sa.Uuid(), nullable=False),
     sa.ForeignKeyConstraint(['creator_id'], ['user.id'], ),
     sa.ForeignKeyConstraint(['mentor_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -56,9 +57,10 @@ def upgrade() -> None:
     sa.Column('task_description', sa.String(), nullable=False),
     sa.Column('is_completed', sa.Boolean(), server_default=sa.text('false'), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text("TIMEZONE('utc', now())"), nullable=False),
-    sa.Column('project_id', sa.UUID(), nullable=False),
-    sa.Column('executor_id', sa.UUID(), nullable=False),
-    sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text("TIMEZONE('utc', now())"), nullable=False),
+    sa.Column('project_id', sa.Uuid(), nullable=False),
+    sa.Column('executor_id', sa.Uuid(), nullable=False),
+    sa.Column('id', sa.Uuid(), nullable=False),
     sa.ForeignKeyConstraint(['executor_id'], ['user.id'], ),
     sa.ForeignKeyConstraint(['project_id'], ['project.id'], ),
     sa.PrimaryKeyConstraint('id')

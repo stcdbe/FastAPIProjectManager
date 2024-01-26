@@ -1,43 +1,14 @@
 from datetime import datetime
-from uuid import uuid4, UUID
+from typing import TYPE_CHECKING
+from uuid import UUID
 
-from sqlalchemy import ForeignKey, String, text
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from sqlalchemy.ext.asyncio import AsyncAttrs
-from sqlalchemy.sql.expression import false
+from sqlalchemy import String, text, ForeignKey, false
 from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.database.enums import Sex
-
-
-class BaseModelDB(DeclarativeBase, AsyncAttrs):
-    __abstract__ = True
-    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4, index=True)
-
-    def __repr__(self) -> str:
-        return str(self.id)
-
-
-class UserDB(BaseModelDB):
-    __tablename__ = 'user'
-    username: Mapped[str] = mapped_column(unique=True, index=True)
-    email: Mapped[str] = mapped_column(unique=True)
-    password: Mapped[str]
-    join_date: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"),
-                                                default=datetime.utcnow)
-    company: Mapped[str | None]
-    job_title: Mapped[str | None]
-    fullname: Mapped[str | None]
-    age: Mapped[int | None]
-    sex: Mapped[Sex | None]
-    created_projects: Mapped[list['ProjectDB']] = relationship(back_populates='creator',
-                                                               cascade='all, delete-orphan',
-                                                               foreign_keys='ProjectDB.creator_id')
-    mentioned_projects: Mapped[list['ProjectDB']] = relationship(back_populates='mentor',
-                                                                 cascade='all, delete-orphan',
-                                                                 foreign_keys='ProjectDB.mentor_id')
-    tasks: Mapped[list['TaskDB']] = relationship(back_populates='executor',
-                                                 cascade='all, delete-orphan')
+from src.models import BaseModelDB
+if TYPE_CHECKING:
+    from src.user.usermodels import UserDB
 
 
 class ProjectDB(BaseModelDB):
@@ -49,6 +20,9 @@ class ProjectDB(BaseModelDB):
     constraint_date: Mapped[datetime]
     created_at: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"),
                                                  default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"),
+                                                 default=datetime.utcnow,
+                                                 onupdate=datetime.utcnow)
     creator_id: Mapped[UUID] = mapped_column(ForeignKey('user.id'))
     creator: Mapped['UserDB'] = relationship(back_populates='created_projects',
                                              foreign_keys=[creator_id])
@@ -67,6 +41,9 @@ class TaskDB(BaseModelDB):
     is_completed: Mapped[bool] = mapped_column(server_default=false(), default=False)
     created_at: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"),
                                                  default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"),
+                                                 default=datetime.utcnow,
+                                                 onupdate=datetime.utcnow)
     project: Mapped['ProjectDB'] = relationship(back_populates='tasks')
     project_id: Mapped[UUID] = mapped_column(ForeignKey('project.id'))
     executor: Mapped['UserDB'] = relationship(back_populates='tasks')

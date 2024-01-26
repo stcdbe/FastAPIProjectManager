@@ -6,7 +6,9 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
-from src.database.dbmodels import BaseModelDB # upd
+from src.models import BaseModelDB
+from src.user.usermodels import UserDB
+from src.project.projectmodels import ProjectDB, TaskDB
 from src.config import settings # upd
 
 

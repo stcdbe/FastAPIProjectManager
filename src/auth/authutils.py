@@ -1,20 +1,9 @@
 from datetime import timedelta, datetime
-from typing import Annotated
-from uuid import UUID
 
-from fastapi import Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
-from jwt import encode, decode
-from jwt.exceptions import InvalidTokenError, DecodeError
-from sqlalchemy.ext.asyncio import AsyncSession
+import bcrypt
+from jwt import encode
 
 from src.config import settings
-from src.database.db import get_session
-from src.user.userservice import get_user_db
-from src.database.dbmodels import UserDB
-
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='api/auth/create_token')
 
 
 async def generate_token(user_id: str, expires_delta: timedelta) -> str:
@@ -26,18 +15,11 @@ async def generate_token(user_id: str, expires_delta: timedelta) -> str:
     return encoded_jwt
 
 
-async def get_current_user(session: Annotated[AsyncSession, Depends(get_session)],
-                           token: Annotated[str, Depends(oauth2_scheme)]) -> UserDB:
-    exception = HTTPException(status_code=401, detail='Could not validate credentials')
+class Hasher:
+    @staticmethod
+    def get_psw_hash(psw: str) -> str:
+        return (bcrypt.hashpw(password=psw.encode(), salt=bcrypt.gensalt())).decode()
 
-    try:
-        payload = decode(jwt=token,
-                         key=settings.JWT_SECRET_KEY,
-                         algorithms=[settings.JWT_ALGORITHM])
-        user_id = UUID(payload['sub'])
-    except (InvalidTokenError, DecodeError, KeyError, ValueError) as e:
-        raise exception from e
-
-    if user := await get_user_db(session=session, user_id=user_id):
-        return user
-    raise exception
+    @staticmethod
+    def verify_psw(psw_to_check: str, hashed_psw: str) -> bool:
+        return bcrypt.checkpw(password=psw_to_check.encode(), hashed_password=hashed_psw.encode())

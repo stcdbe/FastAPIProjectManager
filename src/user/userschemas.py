@@ -4,7 +4,7 @@ from typing import Annotated
 from annotated_types import Ge, Le
 from pydantic import BaseModel, ConfigDict, EmailStr, StringConstraints, UUID4
 
-from src.database.enums import Sex
+from src.user.userenums import Sex
 
 
 class User(BaseModel):

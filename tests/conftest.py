@@ -6,7 +6,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from src.config import settings
-from src.database.dbmodels import BaseModelDB
+from src.models import BaseModelDB
 from src.database.db import get_session
 from src.database.redis import init_redis
 from src.main import app

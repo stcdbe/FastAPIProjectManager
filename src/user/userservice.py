@@ -1,25 +1,25 @@
-from uuid import UUID
+from typing import Any
 
-from sqlalchemy import select, desc
+from sqlalchemy import select, desc, func
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import DBAPIError, IntegrityError
+from sqlalchemy.exc import DBAPIError, IntegrityError, InvalidRequestError
 from asyncpg.exceptions import DataError
 
-from src.database.dbmodels import UserDB
+from src.user.usermodels import UserDB
 from src.user.userschemas import UserCreate, UserPatch
-from src.auth.hasher import Hasher
+from src.auth.authutils import Hasher
 
 
-async def get_user_by_username_db(session: AsyncSession, username: str) -> UserDB | None:
-    stmt = select(UserDB).where(UserDB.username == username)
-    return (await session.execute(stmt)).scalars().first()
+async def count_users_db(session: AsyncSession, **kwargs: Any) -> int:
+    stmt = select(func.count('*')).select_from(UserDB).filter_by(**kwargs)
+    return (await session.execute(stmt)).scalar()
 
 
-async def get_user_db(session: AsyncSession, user_id: UUID) -> UserDB | None:
+async def get_user_db(session: AsyncSession, **kwargs: Any) -> UserDB | None:
     try:
-        stmt = select(UserDB).where(UserDB.id == user_id)
+        stmt = select(UserDB).filter_by(**kwargs)
         return (await session.execute(stmt)).scalars().first()
-    except (DBAPIError, DataError):
+    except (DBAPIError, DataError, InvalidRequestError):
         await session.rollback()
 
 
@@ -54,9 +54,7 @@ async def create_user_db(session: AsyncSession, user_data: UserCreate) -> UserDB
         await session.rollback()
 
 
-async def patch_user_db(session: AsyncSession,
-                        user: UserDB,
-                        upd_user_data: UserPatch) -> UserDB | None:
+async def patch_user_db(session: AsyncSession, user: UserDB, upd_user_data: UserPatch) -> UserDB | None:
     if upd_user_data.email:
         upd_user_data.email = upd_user_data.email.lower()
     if upd_user_data.password:
