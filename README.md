@@ -19,9 +19,9 @@ The goal of the application is to develop a scalable and high-performance web ap
 ___
 ### Getting Started
 #### Running on Local Machine
-+ install dependencies using PIP
++ install dependencies using Poetry
 ````
-$ pip install -r requirements/dev.txt 
+$ poetry install
 ````
 + configure environment variables in `.env` file
 + create migration in db
