@@ -6,7 +6,7 @@ from pydantic import EmailStr
 
 from src.config import settings
 
-template_folder_path = (Path(__file__).parent.parent / 'templates/email')
+template_folder_path = (Path(__file__).parent.parent / 'templates' / 'email')
 
 mail_config = ConnectionConfig(MAIL_USERNAME=settings.EMAIL_USERNAME,
                                MAIL_PASSWORD=settings.EMAIL_PASSWORD,

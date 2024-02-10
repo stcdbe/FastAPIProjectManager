@@ -1,6 +1,6 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class Sex(str, Enum):
+class Sex(StrEnum):
     M = 'M'
     F = 'F'

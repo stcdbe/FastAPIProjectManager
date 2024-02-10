@@ -9,7 +9,7 @@ COPY . .
 
 RUN pip install --no-cache-dir --upgrade setuptools && \
     pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir poetry &&\
+    pip install --no-cache-dir poetry && \
     poetry config virtualenvs.create false && \
     poetry install --no-root --no-interaction --no-ansi
 

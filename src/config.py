@@ -5,6 +5,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     DEBUG: bool
     PORT: int
+    DOCS_URL: str | None = None
+    REDOC_URL: str | None = None
 
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str

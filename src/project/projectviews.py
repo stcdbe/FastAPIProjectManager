@@ -5,10 +5,10 @@ from fastapi_cache.decorator import cache
 from pydantic import EmailStr, UUID4
 
 from src.auth.authdependencies import CurrentUserDep
-from src.project.projectdependencies import (validate_project_id,
-                                             validate_project_with_tasks_id,
-                                             get_project_list_params,
-                                             ProjectServiceDep)
+from src.project.projectdependencies import (get_project_list_params,
+                                             ProjectServiceDep,
+                                             ProjectDep,
+                                             ProjectWithTasksDep)
 from src.project.projectmodels import ProjectDB
 from src.project.projectschemas import (ProjectGet,
                                         ProjectCreate,
@@ -53,7 +53,7 @@ async def create_project(current_user: CurrentUserDep,
                     response_model=ProjectWithTasksGet,
                     name='Get the project')
 @cache(expire=60)
-async def get_project(project: Annotated[ProjectDB, Depends(validate_project_with_tasks_id)]) -> ProjectDB:
+async def get_project(project: ProjectWithTasksDep) -> ProjectDB:
     return project
 
 
@@ -63,12 +63,12 @@ async def get_project(project: Annotated[ProjectDB, Depends(validate_project_wit
                      name='Add a task to the project')
 async def create_project_task(current_user: CurrentUserDep,
                               project_service: ProjectServiceDep,
-                              project: Annotated[ProjectDB, Depends(validate_project_with_tasks_id)],
+                              project: ProjectWithTasksDep,
                               task_data: TaskCreate) -> ProjectDB:
     if current_user.id not in {project.creator_id, project.mentor_id}:
         raise HTTPException(status_code=403, detail='Forbidden request')
 
-    upd_project = await project_service.add_task(project=project, task_data=task_data)
+    upd_project = await project_service.create_task(project=project, task_data=task_data)
 
     if not upd_project:
         raise HTTPException(status_code=404, detail='Task executor must be registered user')
@@ -82,7 +82,7 @@ async def create_project_task(current_user: CurrentUserDep,
                       name='Patch the project')
 async def patch_project(current_user: CurrentUserDep,
                         project_service: ProjectServiceDep,
-                        project: Annotated[ProjectDB, Depends(validate_project_id)],
+                        project: ProjectDep,
                         upd_project_data: ProjectPatch) -> ProjectDB:
     if current_user.id not in {project.creator_id, project.mentor_id}:
         raise HTTPException(status_code=403, detail='Forbidden request')
@@ -100,7 +100,7 @@ async def patch_project(current_user: CurrentUserDep,
                        name='Delete the project')
 async def del_project(current_user: CurrentUserDep,
                       project_service: ProjectServiceDep,
-                      project: Annotated[ProjectDB, Depends(validate_project_id)]) -> None:
+                      project: ProjectDep) -> None:
     if current_user.id not in {project.creator_id, project.mentor_id}:
         raise HTTPException(status_code=403, detail='Forbidden request')
 
@@ -112,7 +112,7 @@ async def del_project(current_user: CurrentUserDep,
                      response_model=Message,
                      name='Send the project report by email')
 async def send_project_report(current_user: CurrentUserDep,
-                              project: Annotated[ProjectDB, Depends(validate_project_with_tasks_id)],
+                              project: ProjectWithTasksDep,
                               email: EmailStr,
                               bg_tasks: BackgroundTasks) -> dict[str, str]:
     bg_tasks.add_task(send_email,
@@ -129,7 +129,7 @@ async def send_project_report(current_user: CurrentUserDep,
                       name='Patch the project task')
 async def patch_project_task(current_user: CurrentUserDep,
                              project_service: ProjectServiceDep,
-                             project: Annotated[ProjectDB, Depends(validate_project_with_tasks_id)],
+                             project: ProjectWithTasksDep,
                              task_id: UUID4,
                              upd_task_data: TaskPatch) -> ProjectDB:
     if current_user.id not in {project.creator_id, project.mentor_id}:
@@ -153,7 +153,7 @@ async def patch_project_task(current_user: CurrentUserDep,
                        name='Delete the project task')
 async def del_project_task(current_user: CurrentUserDep,
                            project_service: ProjectServiceDep,
-                           project: Annotated[ProjectDB, Depends(validate_project_with_tasks_id)],
+                           project: ProjectWithTasksDep,
                            task_id: UUID4) -> None:
     if current_user.id not in {project.creator_id, project.mentor_id}:
         raise HTTPException(status_code=403, detail='Forbidden request')

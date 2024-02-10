@@ -48,6 +48,8 @@ ____
 |:-----------------------|:-------------------------------------------------|
 | `DEBUG`                | debug mode, only allowed 1(True)/0(False)        |
 | `PORT`                 | app port                                         |
+| `DOCS_URL`             | docs url, undefined by default                   |
+| `REDOC_URL`            | redoc url, undefined by default                  |
 | `JWT_SECRET_KEY`       | a secret key for jwt encoding                    |
 | `JWT_ALGORITHM`        | jwt encoding algorithm                           |
 | `ACCESS_TOKEN_EXPIRES` | access token lifetime in minutes                 |

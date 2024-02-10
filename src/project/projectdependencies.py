@@ -1,4 +1,4 @@
-from typing import Annotated, Any
+from typing import Annotated, Any, Callable, Awaitable
 
 from fastapi import HTTPException, Query, Depends
 from pydantic import UUID4
@@ -6,7 +6,6 @@ from pydantic import UUID4
 from src.project.projectmodels import ProjectDB
 from src.project.projectschemas import ProjectGet
 from src.project.projectservice import ProjectService
-
 
 ProjectServiceDep = Annotated[ProjectService, Depends()]
 
@@ -21,19 +20,17 @@ async def get_project_list_params(page: Annotated[int, Query(gt=0)] = 1,
             'reverse': reverse}
 
 
-async def validate_project_id(project_service: ProjectServiceDep, project_id: UUID4) -> ProjectDB:
-    project = await project_service.get_one(id=project_id)
+def project_dep_factory(load_tasks: bool = False) -> Callable[[ProjectServiceDep, UUID4], Awaitable[ProjectDB]]:
+    async def validate_project_id(project_service: ProjectServiceDep, project_id: UUID4):
+        project = await project_service.get_one(load_tasks=load_tasks, id=project_id)
 
-    if not project:
-        raise HTTPException(status_code=404, detail='Not found')
+        if not project:
+            raise HTTPException(status_code=404, detail='Not found')
 
-    return project
+        return project
+
+    return validate_project_id
 
 
-async def validate_project_with_tasks_id(project_service: ProjectServiceDep, project_id: UUID4) -> ProjectDB:
-    project = await project_service.get_one(load_tasks=True, id=project_id)
-
-    if not project:
-        raise HTTPException(status_code=404, detail='Not found')
-
-    return project
+ProjectDep = Annotated[ProjectDB, Depends(project_dep_factory())]
+ProjectWithTasksDep = Annotated[ProjectDB, Depends(project_dep_factory(load_tasks=True))]

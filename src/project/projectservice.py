@@ -21,9 +21,7 @@ class ProjectService:
                                                       ordering=params['ordering'],
                                                       reverse=params['reverse'])
 
-    async def get_one(self,
-                      load_tasks: bool = False,
-                      **kwargs: Any) -> ProjectDB | None:
+    async def get_one(self, load_tasks: bool = False, **kwargs: Any) -> ProjectDB | None:
         return await self.project_repository.get_one(load_tasks=load_tasks, **kwargs)
 
     async def create_one(self,
@@ -47,9 +45,9 @@ class ProjectService:
     async def del_one(self, project: ProjectDB) -> None:
         await self.project_repository.del_one(project=project)
 
-    async def add_task(self,
-                       project: ProjectDB,
-                       task_data: TaskCreate) -> ProjectDB | None:
+    async def create_task(self,
+                          project: ProjectDB,
+                          task_data: TaskCreate) -> ProjectDB | None:
         new_task = TaskDB()
 
         for key, val in task_data.model_dump().items():
