@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import Any
 
 from fastapi_mail import ConnectionConfig, MessageSchema, MessageType, FastMail
@@ -6,7 +5,7 @@ from pydantic import EmailStr
 
 from src.config import settings
 
-template_folder_path = (Path(__file__).parent.parent / 'templates' / 'email')
+templates_folder_path = settings.BASE_DIR / 'templates' / 'email'
 
 mail_config = ConnectionConfig(MAIL_USERNAME=settings.EMAIL_USERNAME,
                                MAIL_PASSWORD=settings.EMAIL_PASSWORD,
@@ -17,13 +16,13 @@ mail_config = ConnectionConfig(MAIL_USERNAME=settings.EMAIL_USERNAME,
                                MAIL_SSL_TLS=True,
                                USE_CREDENTIALS=True,
                                VALIDATE_CERTS=True,
-                               TEMPLATE_FOLDER=template_folder_path)
+                               TEMPLATE_FOLDER=templates_folder_path)
 
 
 async def send_email(email_subject: str,
                      email_receivers: list[EmailStr],
                      email_template: str,
-                     **kwargs: dict[str, Any]) -> None:
+                     **kwargs: Any) -> None:
     email = MessageSchema(subject=email_subject,
                           recipients=email_receivers,
                           template_body=kwargs,

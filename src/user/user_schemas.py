@@ -2,9 +2,10 @@ from datetime import datetime
 from typing import Annotated
 
 from annotated_types import Ge, Le
-from pydantic import BaseModel, ConfigDict, EmailStr, StringConstraints, UUID4
+from pydantic import BaseModel, ConfigDict, EmailStr, StringConstraints, UUID4, Field
 
-from src.user.userenums import Sex
+from src.schemas import AbstractPagination
+from src.user.user_enums import Sex
 
 
 class User(BaseModel):
@@ -45,3 +46,10 @@ class UserPatch(UserCreate):
 class UserGet(User):
     id: UUID4
     join_date: datetime
+
+
+class UserPagination(AbstractPagination):
+    page: int = Field(default=1, gt=0)
+    limit: int = Field(default=5, gt=0, le=10)
+    order_by: str = Field(default='username'),
+    reverse: bool = Field(default=False)

@@ -4,11 +4,12 @@ from typing import TYPE_CHECKING
 from sqlalchemy import text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.project.projectmodels import ProjectDB, TaskDB
-from src.user.userenums import Sex
+from src.project.project_models import ProjectDB, TaskDB
+from src.user.user_enums import Sex
 from src.models import BaseModelDB
+
 if TYPE_CHECKING:
-    from src.project.projectmodels import ProjectDB, TaskDB
+    from src.project.project_models import ProjectDB, TaskDB
 
 
 class UserDB(BaseModelDB):

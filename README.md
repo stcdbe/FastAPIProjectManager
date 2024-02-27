@@ -21,7 +21,7 @@ ___
 #### Running on Local Machine
 + install dependencies using Poetry
 ````
-$ poetry install
+$ poetry install --no-root
 ````
 + configure environment variables in `.env` file
 + create migration in db
@@ -77,5 +77,5 @@ ____
 + `SQLAlchemy` and `Alembic`
 + `Redis`
 + `gunicorn`
-+ `pytest`, `pytest-asyncio` and `httpx` for tests
++ `pytest-asyncio` and `httpx` for tests
 + `docker` and `docker-compose`

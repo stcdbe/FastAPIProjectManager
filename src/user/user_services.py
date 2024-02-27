@@ -2,10 +2,10 @@ from typing import Any, Annotated
 
 from fastapi import Depends
 
-from src.auth.authutils import Hasher
-from src.user.usermodels import UserDB
-from src.user.userrepository import UserRepository
-from src.user.userschemas import UserCreate, UserPatch
+from src.auth.auth_utils import Hasher
+from src.user.user_models import UserDB
+from src.user.user_repositories import UserRepository
+from src.user.user_schemas import UserCreate, UserPatch, UserPagination
 
 
 class UserService:
@@ -17,14 +17,14 @@ class UserService:
     async def get_one(self, **kwargs: Any) -> UserDB | None:
         return await self.user_repository.get_one(**kwargs)
 
-    async def get_list(self, params: dict[str, Any]) -> list[UserDB]:
-        offset = (params['page'] - 1) * params['limit']
-        return await self.user_repository.get_list(limit=params['limit'],
+    async def get_list(self, params: UserPagination) -> list[UserDB]:
+        offset = (params.page - 1) * params.limit
+        return await self.user_repository.get_list(limit=params.limit,
                                                    offset=offset,
-                                                   ordering=params['ordering'],
-                                                   reverse=params['reverse'])
+                                                   order_by=params.order_by,
+                                                   reverse=params.reverse)
 
-    async def create_one(self, user_data: UserCreate) -> UserDB | None:
+    async def create_one(self, user_data: UserCreate) -> UserDB:
         user_data.email = user_data.email.lower()
         user_data.password = Hasher.get_psw_hash(psw=user_data.password)
 
@@ -34,7 +34,7 @@ class UserService:
 
         return await self.user_repository.create_one(new_user)
 
-    async def patch_one(self, user: UserDB, upd_user_data: UserPatch) -> UserDB | None:
+    async def patch_one(self, user: UserDB, upd_user_data: UserPatch) -> UserDB:
         if upd_user_data.email:
             upd_user_data.email = upd_user_data.email.lower()
         if upd_user_data.password:

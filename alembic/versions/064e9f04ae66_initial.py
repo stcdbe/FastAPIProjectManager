@@ -1,7 +1,7 @@
 """initial
 
 Revision ID: 064e9f04ae66
-Revises: 
+Revises:
 Create Date: 2024-01-26 15:06:47.601706
 
 """
@@ -29,7 +29,7 @@ def upgrade() -> None:
     sa.Column('job_title', sa.String(), nullable=True),
     sa.Column('fullname', sa.String(), nullable=True),
     sa.Column('age', sa.Integer(), nullable=True),
-    sa.Column('sex', sa.Enum('M', 'F', name='sex'), nullable=True),
+    sa.Column('sex', sa.Enum('m', 'f', name='sex'), nullable=True),
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')

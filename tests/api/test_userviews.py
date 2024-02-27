@@ -41,7 +41,7 @@ async def test_patch_me(client: AsyncClient, user_token_headers: dict[str, str])
                        'job_title': 'job_title',
                        'fullname': 'fullname',
                        'age': 20,
-                       'sex': 'M'}
+                       'sex': 'm'}
     res = await client.patch('/api/users/me',
                              json=patch_user_data,
                              headers=user_token_headers)

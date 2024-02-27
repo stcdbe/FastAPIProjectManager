@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta
 from typing import Annotated
 
-from pydantic import BaseModel, StringConstraints, ConfigDict, conset, field_validator, UUID4, model_validator
+from pydantic import BaseModel, StringConstraints, ConfigDict, conset, field_validator, UUID4, model_validator, Field
+
+from src.schemas import AbstractPagination
 
 
 class TaskCreate(BaseModel):
@@ -85,3 +87,10 @@ class ProjectGet(Project):
 
 class ProjectWithTasksGet(ProjectGet):
     tasks: list[TaskGet]
+
+
+class ProjectPagination(AbstractPagination):
+    page: int = Field(default=1, gt=0)
+    limit: int = Field(default=5, gt=0, le=10)
+    order_by: str = Field(default='project_title'),
+    reverse: bool = Field(default=False)
