@@ -3,7 +3,7 @@ from typing import Any, NoReturn
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.dependencies import SQLASessionDep
+from src.dependencies import SQLAlchemySessionDep
 
 
 class AbstractRepository(ABC):
@@ -27,5 +27,5 @@ class AbstractRepository(ABC):
 class SQLAlchemyRepository(AbstractRepository, ABC):
     session: AsyncSession
 
-    def __init__(self, session: SQLASessionDep) -> None:
+    def __init__(self, session: SQLAlchemySessionDep) -> None:
         self.session = session

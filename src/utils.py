@@ -5,7 +5,7 @@ from pydantic import EmailStr
 
 from src.config import settings
 
-templates_folder_path = settings.BASE_DIR / 'templates' / 'email'
+template_folder_path = settings.BASE_DIR / 'templates' / 'email'
 
 mail_config = ConnectionConfig(MAIL_USERNAME=settings.EMAIL_USERNAME,
                                MAIL_PASSWORD=settings.EMAIL_PASSWORD,
@@ -16,7 +16,7 @@ mail_config = ConnectionConfig(MAIL_USERNAME=settings.EMAIL_USERNAME,
                                MAIL_SSL_TLS=True,
                                USE_CREDENTIALS=True,
                                VALIDATE_CERTS=True,
-                               TEMPLATE_FOLDER=templates_folder_path)
+                               TEMPLATE_FOLDER=template_folder_path)
 
 
 async def send_email(email_subject: str,

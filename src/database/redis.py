@@ -9,4 +9,4 @@ async def init_redis() -> None:
     redis = aioredis.from_url(settings.REDIS_URL,
                               encoding='utf8',
                               decode_responses=True)
-    FastAPICache.init(RedisBackend(redis), prefix='fastapi-cache')
+    FastAPICache.init(backend=RedisBackend(redis), prefix='fastapi-cache')

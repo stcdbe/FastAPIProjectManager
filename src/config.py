@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str
     ACCESS_TOKEN_EXPIRES: int
 
+    __PG_URL: str = 'postgresql+asyncpg://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}'
+
     PG_USER: str
     PG_PASSWORD: str
     PG_HOST: str
@@ -26,6 +28,8 @@ class Settings(BaseSettings):
     PG_HOST_TEST: str
     PG_PORT_TEST: str
     PG_DB_TEST: str
+
+    __REDIS_URL: str = 'redis://{REDIS_HOST}:{REDIS_PORT}'
 
     REDIS_HOST: str
     REDIS_PORT: str
@@ -39,15 +43,23 @@ class Settings(BaseSettings):
 
     @property
     def PG_URL(self) -> str:
-        return f'postgresql+asyncpg://{self.PG_USER}:{self.PG_PASSWORD}@{self.PG_HOST}:{self.PG_PORT}/{self.PG_DB}'
+        return self.__PG_URL.format(PG_USER=self.PG_USER,
+                                    PG_PASSWORD=self.PG_PASSWORD,
+                                    PG_HOST=self.PG_HOST,
+                                    PG_PORT=self.PG_PORT,
+                                    PG_DB=self.PG_DB)
 
     @property
     def PG_URL_TEST(self) -> str:
-        return f'postgresql+asyncpg://{self.PG_USER_TEST}:{self.PG_PASSWORD_TEST}@{self.PG_HOST_TEST}:{self.PG_PORT_TEST}/{self.PG_DB_TEST}'
+        return self.__PG_URL.format(PG_USER=self.PG_USER_TEST,
+                                    PG_PASSWORD=self.PG_PASSWORD_TEST,
+                                    PG_HOST=self.PG_HOST_TEST,
+                                    PG_PORT=self.PG_PORT_TEST,
+                                    PG_DB=self.PG_DB_TEST)
 
     @property
     def REDIS_URL(self) -> str:
-        return f'redis://{self.REDIS_HOST}:{self.REDIS_PORT}'
+        return self.__REDIS_URL.format(REDIS_HOST=self.REDIS_HOST, REDIS_PORT=self.REDIS_PORT)
 
     model_config = SettingsConfigDict(env_file='./.env', case_sensitive=True)
 
