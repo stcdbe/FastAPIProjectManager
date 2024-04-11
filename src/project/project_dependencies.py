@@ -34,8 +34,8 @@ class ProjectDepFactory:
 
 def protect_project_dep(load_tasks: bool = False) -> Callable[[ProjectDB, Any], Awaitable[ProjectDB]]:
     async def validate_project_perms(
-        current_user: CurrentUserDep,
-        project: Annotated[ProjectDB, Depends(ProjectDepFactory(load_tasks=load_tasks))]
+            current_user: CurrentUserDep,
+            project: Annotated[ProjectDB, Depends(ProjectDepFactory(load_tasks=load_tasks))]
     ) -> ProjectDB:
         if current_user.id not in {project.creator_id, project.mentor_id}:
             raise HTTPException(status_code=403, detail='Forbidden request')
