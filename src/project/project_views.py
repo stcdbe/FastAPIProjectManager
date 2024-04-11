@@ -16,7 +16,8 @@ from src.project.project_schemas import (ProjectGet,
                                          ProjectWithTasksGet,
                                          TaskCreate,
                                          ProjectPatch,
-                                         TaskPatch, ProjectPagination)
+                                         TaskPatch,
+                                         ProjectPagination)
 from src.schemas import Message
 from src.utils import send_email
 

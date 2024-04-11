@@ -2,14 +2,13 @@ from datetime import datetime
 from typing import Annotated
 
 from annotated_types import Ge, Le
-from pydantic import BaseModel, ConfigDict, EmailStr, StringConstraints, UUID4, Field
+from pydantic import EmailStr, StringConstraints, UUID4, Field
 
-from src.schemas import AbstractPagination
+from src.schemas import BaseModel, AbstractPagination
 from src.user.user_enums import Sex
 
 
-class User(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+class UserBase(BaseModel):
     username: Annotated[str, StringConstraints(strip_whitespace=True,
                                                min_length=5,
                                                max_length=50,
@@ -24,7 +23,7 @@ class User(BaseModel):
     sex: Sex | None = None
 
 
-class UserCreate(User):
+class UserCreate(UserBase):
     password: Annotated[str, StringConstraints(strip_whitespace=True,
                                                min_length=10,
                                                max_length=72)]
@@ -43,7 +42,7 @@ class UserPatch(UserCreate):
                                                max_length=72)] | None = None
 
 
-class UserGet(User):
+class UserGet(UserBase):
     id: UUID4
     join_date: datetime
 

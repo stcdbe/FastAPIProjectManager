@@ -4,14 +4,14 @@ from uuid import UUID
 from fastapi import Depends, HTTPException
 
 from src.project.project_models import ProjectDB, TaskDB
-from src.project.project_repositories import ProjectRepository
+from src.project.project_repositories import SQLAlchemyProjectRepository
 from src.project.project_schemas import ProjectCreate, TaskCreate, ProjectPatch, TaskPatch, ProjectPagination
 
 
 class ProjectService:
-    project_repository: ProjectRepository
+    project_repository: SQLAlchemyProjectRepository
 
-    def __init__(self, project_repository: Annotated[ProjectRepository, Depends()]) -> None:
+    def __init__(self, project_repository: Annotated[SQLAlchemyProjectRepository, Depends()]) -> None:
         self.project_repository = project_repository
 
     async def get_list(self, params: ProjectPagination) -> list[ProjectDB]:
@@ -43,9 +43,9 @@ class ProjectService:
 
 
 class TaskService:
-    project_repository: ProjectRepository
+    project_repository: SQLAlchemyProjectRepository
 
-    def __init__(self, project_repository: Annotated[ProjectRepository, Depends()]) -> None:
+    def __init__(self, project_repository: Annotated[SQLAlchemyProjectRepository, Depends()]) -> None:
         self.project_repository = project_repository
 
     async def create_one(self, project: ProjectDB, task_data: TaskCreate) -> ProjectDB:

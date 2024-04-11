@@ -11,7 +11,7 @@ TokenDep = Annotated[str, Depends(OAuth2PasswordBearer(tokenUrl='api/auth/create
 
 
 async def get_current_user(auth_service: AuthServiceDep, token: TokenDep) -> UserDB:
-    return await auth_service.validate_token(token=token)
+    return await auth_service.validate_access_token(token=token)
 
 
 CurrentUserDep = Annotated[UserDB, Depends(get_current_user)]

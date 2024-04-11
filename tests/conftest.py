@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import AsyncGenerator, Any
+from typing import AsyncGenerator
 
 import pytest_asyncio
 from httpx import AsyncClient
@@ -32,7 +32,7 @@ app.dependency_overrides[get_session] = override_get_session
 
 
 @pytest_asyncio.fixture(autouse=True, scope='session')
-async def prepare_db() -> AsyncGenerator[Any, None]:
+async def prepare_db() -> AsyncGenerator[None, None]:
     await init_redis()
     async with test_async_engine.begin() as conn:
         await conn.run_sync(BaseModelDB.metadata.drop_all)

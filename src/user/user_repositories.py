@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from typing import Any
 
 from fastapi import HTTPException
@@ -8,12 +9,22 @@ from src.repositories import SQLAlchemyRepository
 from src.user.user_models import UserDB
 
 
-class UserRepository(SQLAlchemyRepository):
-    async def get_list(self,
-                       limit: int,
-                       offset: int,
-                       order_by: str,
-                       reverse: bool = False) -> list[UserDB]:
+class AbstractUserRepository(ABC):
+    @abstractmethod
+    async def get_list(self, *args: Any, **kwargs: Any): ...
+
+    @abstractmethod
+    async def get_one(self, *args: Any, **kwargs: Any): ...
+
+    @abstractmethod
+    async def create_one(self, *args: Any, **kwargs: Any): ...
+
+    @abstractmethod
+    async def patch_one(self, *args: Any, **kwargs: Any): ...
+
+
+class SQLAlchemyUserRepository(AbstractUserRepository, SQLAlchemyRepository):
+    async def get_list(self, limit: int, offset: int, order_by: str, reverse: bool = False) -> list[UserDB]:
         stmt = select(UserDB).offset(offset).limit(limit)
 
         if reverse:
@@ -42,7 +53,7 @@ class UserRepository(SQLAlchemyRepository):
             await self.session.refresh(user)
             return user
 
-    async def patch_one(self, user: UserDB) -> UserDB | None:
+    async def patch_one(self, user: UserDB) -> UserDB:
         try:
             await self.session.commit()
 

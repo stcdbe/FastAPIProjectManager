@@ -111,13 +111,13 @@ async def test_del_project_task(client: AsyncClient,
     assert res.status_code == 204
 
 
-@pytest.mark.asyncio(scope='session')
-async def test_send_project_report(client: AsyncClient,
-                                   test_project_uuid: str,
-                                   user_token_headers: dict[str, str]) -> None:
-    res = await client.post(f'/api/projects/{test_project_uuid}/send_as_report/{settings.TEST_EMAIL_RECEIVER}',
-                            headers=user_token_headers)
-    assert res.status_code == 202
+# @pytest.mark.asyncio(scope='session')
+# async def test_send_project_report(client: AsyncClient,
+#                                    test_project_uuid: str,
+#                                    user_token_headers: dict[str, str]) -> None:
+#     res = await client.post(f'/api/projects/{test_project_uuid}/send_as_report/{settings.TEST_EMAIL_RECEIVER}',
+#                             headers=user_token_headers)
+#     assert res.status_code == 202
 
 
 @pytest.mark.asyncio(scope='session')

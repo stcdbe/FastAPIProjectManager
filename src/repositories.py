@@ -1,30 +1,11 @@
-from abc import ABC, abstractmethod
-from typing import Any, NoReturn
+from abc import ABC
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.dependencies import SQLAlchemySessionDep
 
 
-class AbstractRepository(ABC):
-    @abstractmethod
-    async def get_list(self, *args: Any, **kwargs: Any) -> NoReturn:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def get_one(self, *args: Any, **kwargs: Any) -> NoReturn:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def create_one(self, *args: Any, **kwargs: Any) -> NoReturn:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def patch_one(self, *args: Any, **kwargs: Any) -> NoReturn:
-        raise NotImplementedError
-
-
-class SQLAlchemyRepository(AbstractRepository, ABC):
+class SQLAlchemyRepository(ABC):
     session: AsyncSession
 
     def __init__(self, session: SQLAlchemySessionDep) -> None:

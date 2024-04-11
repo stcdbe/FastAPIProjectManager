@@ -44,33 +44,34 @@ $ docker compose up -d
 ````
 ____
 #### Environment variables
-| variables              | description                                      |
-|:-----------------------|:-------------------------------------------------|
-| `DEBUG`                | debug mode, only allowed 1(True)/0(False)        |
-| `PORT`                 | app port                                         |
-| `DOCS_URL`             | docs url, undefined by default                   |
-| `REDOC_URL`            | redoc url, undefined by default                  |
-| `JWT_SECRET_KEY`       | a secret key for jwt encoding                    |
-| `JWT_ALGORITHM`        | jwt encoding algorithm                           |
-| `ACCESS_TOKEN_EXPIRES` | access token lifetime in minutes                 |
-| `PG_USER`              | PGSQL user                                       |
-| `PG_PASSWORD`          | PGSQL user password                              |
-| `PG_HOST`              | hostname or an IP address of PGSQL database      |
-| `PG_PORT`              | port from PG database                            |
-| `PG_DB`                | PGSQL database                                   |
-| `PG_USERT_EST`         | PGSQL test user                                  |
-| `PG_PASSWORD_TEST`     | PGSQL test user password                         |
-| `PG_HOST_TEST`         | hostname or an IP address of PGSQL test database |
-| `PG_PORT_TEST`         | port from PGSQL test database                    |
-| `PG_DB_TEST`           | PGSQL test database                              |
-| `REDIS_HOST`           | hostname or an IP address Redis database         |
-| `REDIS_PORT`           | port from Redis database                         |
-| `EMAIL_SMTP_SERVER`    | email SMTP server                                |
-| `EMAIL_PORT`           | email port                                       |
-| `EMAIL_USERNAME`       | email address                                    |
-| `EMAIL_PASSWORD`       | email password                                   |
-| `EMAIL_SENDER`         | email sender                                     |
-| `TEST_EMAIL_RECEIVER`  | test email receiver                              |
+| variables                | description                                      |
+|:-------------------------|:-------------------------------------------------|
+| `DEBUG`                  | debug mode, only allowed 1(True)/0(False)        |
+| `PORT`                   | app port                                         |
+| `DOCS_URL`               | docs url, undefined by default                   |
+| `REDOC_URL`              | redoc url, undefined by default                  |
+| `JWT_SECRET_KEY`         | a secret key for jwt encoding                    |
+| `JWT_ALGORITHM`          | jwt encoding algorithm                           |
+| `ACCESS_TOKEN_EXPIRES`   | access token lifetime in minutes                 |
+| `REFRESH_TOKEN_EXPIRES`  | refresh token lifetime in minutes                |
+| `PG_USER`                | PGSQL user                                       |
+| `PG_PASSWORD`            | PGSQL user password                              |
+| `PG_HOST`                | hostname or an IP address of PGSQL database      |
+| `PG_PORT`                | port from PG database                            |
+| `PG_DB`                  | PGSQL database                                   |
+| `PG_USERT_EST`           | PGSQL test user                                  |
+| `PG_PASSWORD_TEST`       | PGSQL test user password                         |
+| `PG_HOST_TEST`           | hostname or an IP address of PGSQL test database |
+| `PG_PORT_TEST`           | port from PGSQL test database                    |
+| `PG_DB_TEST`             | PGSQL test database                              |
+| `REDIS_HOST`             | hostname or an IP address Redis database         |
+| `REDIS_PORT`             | port from Redis database                         |
+| `EMAIL_SMTP_SERVER`      | email SMTP server                                |
+| `EMAIL_PORT`             | email port                                       |
+| `EMAIL_USERNAME`         | email address                                    |
+| `EMAIL_PASSWORD`         | email password                                   |
+| `EMAIL_SENDER`           | email sender                                     |
+| `TEST_EMAIL_RECEIVER`    | test email receiver                              |
 ____
 #### Tech Stack
 + `FastAPI`

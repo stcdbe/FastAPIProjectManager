@@ -1,13 +1,12 @@
 from datetime import datetime, timedelta
 from typing import Annotated
 
-from pydantic import BaseModel, StringConstraints, ConfigDict, conset, field_validator, UUID4, model_validator, Field
+from pydantic import StringConstraints, conset, field_validator, UUID4, model_validator, Field
 
-from src.schemas import AbstractPagination
+from src.schemas import BaseModel, AbstractPagination
 
 
-class TaskCreate(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+class TaskBase(BaseModel):
     task_title: Annotated[str, StringConstraints(strip_whitespace=True,
                                                  min_length=5,
                                                  max_length=100)]
@@ -16,6 +15,10 @@ class TaskCreate(BaseModel):
                                                        max_length=250)]
     is_completed: bool = False
     executor_id: UUID4
+
+
+class TaskCreate(TaskBase):
+    pass
 
 
 class TaskPatch(TaskCreate):
@@ -35,8 +38,7 @@ class TaskGet(TaskCreate):
     updated_at: datetime
 
 
-class Project(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+class ProjectBase(BaseModel):
     project_title: Annotated[str, StringConstraints(strip_whitespace=True,
                                                     min_length=5,
                                                     max_length=100)]
@@ -49,7 +51,7 @@ class Project(BaseModel):
     mentor_id: UUID4 | None
 
 
-class ProjectCreate(Project):
+class ProjectCreate(ProjectBase):
     @field_validator('start_date', 'constraint_date')
     @classmethod
     def validate_date_range(cls, v: datetime) -> datetime:
@@ -78,7 +80,7 @@ class ProjectPatch(ProjectCreate):
     mentor_id: UUID4 | None = None
 
 
-class ProjectGet(Project):
+class ProjectGet(ProjectBase):
     id: UUID4
     creator_id: UUID4
     created_at: datetime

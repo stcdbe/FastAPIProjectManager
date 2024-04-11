@@ -16,10 +16,7 @@ async def get_project_list_params(page: Annotated[int, Query(gt=0)] = 1,
                                   limit: Annotated[int, Query(gt=0, le=10)] = 5,
                                   order_by: Annotated[str, Query(enum=tuple(ProjectGet.model_fields))] = 'project_title',
                                   reverse: bool = False) -> ProjectPagination:
-    return ProjectPagination(page=page,
-                             limit=limit,
-                             order_by=order_by,
-                             reverse=reverse)
+    return ProjectPagination(page=page, limit=limit, order_by=order_by, reverse=reverse)
 
 
 class ProjectDepFactory:

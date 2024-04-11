@@ -5,4 +5,5 @@ from src.config import settings
 
 
 if __name__ == '__main__':
-    uvicorn.run('asgi:app', host='0.0.0.0', port=settings.PORT)
+    # uvicorn.run('asgi:app', host='0.0.0.0', port=settings.PORT)
+    uvicorn.run('asgi:app', reload=True)

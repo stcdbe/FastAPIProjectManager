@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from typing import Any
 
 from fastapi import HTTPException
@@ -9,12 +10,25 @@ from src.project.project_models import ProjectDB
 from src.repositories import SQLAlchemyRepository
 
 
-class ProjectRepository(SQLAlchemyRepository):
-    async def get_list(self,
-                       limit: int,
-                       offset: int,
-                       order_by: str,
-                       reverse: bool = False) -> list[ProjectDB]:
+class AbstractProjectRepository(ABC):
+    @abstractmethod
+    async def get_list(self, *args: Any, **kwargs: Any): ...
+
+    @abstractmethod
+    async def get_one(self, *args: Any, **kwargs: Any): ...
+
+    @abstractmethod
+    async def create_one(self, *args: Any, **kwargs: Any): ...
+
+    @abstractmethod
+    async def patch_one(self, *args: Any, **kwargs: Any): ...
+
+    @abstractmethod
+    async def del_one(self, *args: Any, **kwargs: Any): ...
+
+
+class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepository):
+    async def get_list(self, limit: int, offset: int, order_by: str, reverse: bool = False) -> list[ProjectDB]:
         stmt = select(ProjectDB).offset(offset).limit(limit)
 
         if reverse:

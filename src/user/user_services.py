@@ -4,14 +4,14 @@ from fastapi import Depends
 
 from src.auth.auth_utils import Hasher
 from src.user.user_models import UserDB
-from src.user.user_repositories import UserRepository
+from src.user.user_repositories import SQLAlchemyUserRepository
 from src.user.user_schemas import UserCreate, UserPatch, UserPagination
 
 
 class UserService:
-    user_repository: UserRepository
+    user_repository: SQLAlchemyUserRepository
 
-    def __init__(self, user_repository: Annotated[UserRepository, Depends()]) -> None:
+    def __init__(self, user_repository: Annotated[SQLAlchemyUserRepository, Depends()]) -> None:
         self.user_repository = user_repository
 
     async def get_one(self, **kwargs: Any) -> UserDB | None:

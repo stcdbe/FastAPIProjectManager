@@ -14,10 +14,7 @@ async def get_user_list_params(page: Annotated[int, Query(gt=0)] = 1,
                                limit: Annotated[int, Query(gt=0, le=10)] = 5,
                                order_by: Annotated[str, Query(enum=tuple(UserGet.model_fields))] = 'username',
                                reverse: bool = False) -> UserPagination:
-    return UserPagination(page=page,
-                          limit=limit,
-                          order_by=order_by,
-                          reverse=reverse)
+    return UserPagination(page=page, limit=limit, order_by=order_by, reverse=reverse)
 
 
 async def validate_user_id(user_service: UserServiceDep, user_id: UUID4) -> UserDB:
