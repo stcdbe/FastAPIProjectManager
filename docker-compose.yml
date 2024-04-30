@@ -3,7 +3,7 @@ version: '3.9'
 services:
 
   postgres:
-    container_name: fastapi-postgres
+    container_name: fastapiprojectmanager-postgres
     image: postgres:16.1
     restart: on-failure
     env_file:
@@ -19,21 +19,8 @@ services:
     networks:
       - custom
 
-  redis:
-    container_name: fastapi-redis
-    image: redis:7.2.3
-    restart: on-failure
-    env_file:
-      - .env
-    ports:
-      - ${REDIS_PORT}:${REDIS_PORT}
-    expose:
-      - ${REDIS_PORT}
-    networks:
-      - custom
-
   web:
-    container_name: fastapi-web
+    container_name: fastapiprojectmanager-web
     build: .
     command: "sh -c 'alembic upgrade head && gunicorn -c gunicorn.conf.py asgi:app'"
     restart: always

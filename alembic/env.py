@@ -6,11 +6,11 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
-from src.models import BaseModelDB
-from src.user.user_models import UserDB
-from src.project.project_models import ProjectDB, TaskDB
-from src.config import settings # upd
-
+from src.config import settings  # upd
+from src.core.models.base import SQLAlchemyBaseModel
+from src.modules.project.models.entities import Project
+from src.modules.task.models.entities import Task
+from src.modules.user.models.entities import User
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -25,13 +25,13 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = BaseModelDB.metadata # upd
+target_metadata = SQLAlchemyBaseModel.metadata  # upd
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-config.set_main_option('sqlalchemy.url', settings.PG_URL) # upd
+config.set_main_option("sqlalchemy.url", settings.PG_URL)  # upd
 
 
 def run_migrations_offline() -> None:

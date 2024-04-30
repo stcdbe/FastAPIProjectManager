@@ -26,7 +26,7 @@ $ poetry install --no-root
 + configure environment variables in `.env` file
 + create migration in db
 ````
-$ alembic upgrade head 
+$ alembic upgrade head
 ````
 + start app in virtual environment
 ````
@@ -64,8 +64,6 @@ ____
 | `PG_HOST_TEST`           | hostname or an IP address of PGSQL test database |
 | `PG_PORT_TEST`           | port from PGSQL test database                    |
 | `PG_DB_TEST`             | PGSQL test database                              |
-| `REDIS_HOST`             | hostname or an IP address Redis database         |
-| `REDIS_PORT`             | port from Redis database                         |
 | `EMAIL_SMTP_SERVER`      | email SMTP server                                |
 | `EMAIL_PORT`             | email port                                       |
 | `EMAIL_USERNAME`         | email address                                    |
@@ -76,7 +74,6 @@ ____
 #### Tech Stack
 + `FastAPI`
 + `SQLAlchemy` and `Alembic`
-+ `Redis`
 + `gunicorn`
 + `pytest-asyncio` and `httpx` for tests
 + `docker` and `docker-compose`
