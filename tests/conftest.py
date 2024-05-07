@@ -1,5 +1,5 @@
+from collections.abc import AsyncGenerator
 from datetime import datetime, timedelta
-from typing import AsyncGenerator
 
 import pytest_asyncio
 from httpx import AsyncClient

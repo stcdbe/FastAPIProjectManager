@@ -24,7 +24,7 @@ async def create_access_token(
     try:
         return await auth_service.create_token(form_data=form_data)
     except InvalidAuthDataError as exc:
-        raise HTTPException(status_code=409, detail=exc.message)
+        raise HTTPException(status_code=409, detail=exc.message) from exc
 
 
 @auth_router.post(
@@ -37,4 +37,4 @@ async def refresh_access_token(auth_service: Annotated[AuthService, Depends()], 
     try:
         return await auth_service.refresh_token(token=token)
     except InvalidAuthDataError as exc:
-        raise HTTPException(status_code=401, detail=exc.message)
+        raise HTTPException(status_code=401, detail=exc.message) from exc

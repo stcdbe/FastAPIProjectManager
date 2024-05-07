@@ -68,8 +68,8 @@ class AuthService:
             )
             guid = UUID(payload["sub"])
             token_typ = payload["typ"]
-        except (InvalidTokenError, DecodeError, KeyError, ValueError):
-            raise exc
+        except (InvalidTokenError, DecodeError, KeyError, ValueError) as e:
+            raise exc from e
 
         if token_typ != expected_token_typ:
             raise exc

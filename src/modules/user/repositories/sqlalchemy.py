@@ -40,7 +40,7 @@ class SQLAlchemyUserRepository(AbstractUserRepository, SQLAlchemyRepository):
 
         except IntegrityError as exc:
             await self._session.rollback()
-            raise InvalidUserDataError(message=f"{exc.orig}")
+            raise InvalidUserDataError(message=f"{exc.orig}") from exc
 
         else:
             await self._session.refresh(user)
@@ -53,7 +53,7 @@ class SQLAlchemyUserRepository(AbstractUserRepository, SQLAlchemyRepository):
 
         except IntegrityError as exc:
             await self._session.rollback()
-            raise InvalidUserDataError(message=f"{exc.orig}")
+            raise InvalidUserDataError(message=f"{exc.orig}") from exc
 
         else:
             await self._session.refresh(user)

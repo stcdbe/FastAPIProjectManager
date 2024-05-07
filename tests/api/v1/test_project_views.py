@@ -136,7 +136,9 @@ async def test_del_project_task(
 
 @pytest.mark.asyncio(scope="session")
 async def test_send_project_report(
-    client: AsyncClient, test_project_uuid: str, user_token_headers: dict[str, str]
+    client: AsyncClient,
+    test_project_uuid: str,
+    user_token_headers: dict[str, str],
 ) -> None:
     res = await client.post(
         f"/api/projects/{test_project_uuid}/send_as_report/{settings.TEST_EMAIL_RECEIVER}",

@@ -35,7 +35,7 @@ async def create_user(user_service: Annotated[UserService, Depends()], data: Use
     try:
         return await user_service.create_one(data=data)
     except InvalidUserDataError as exc:
-        raise HTTPException(status_code=409, detail=exc.message)
+        raise HTTPException(status_code=409, detail=exc.message) from exc
 
 
 @user_router.get(
@@ -62,7 +62,7 @@ async def patch_me(
     try:
         return await user_service.patch_one(user=current_user, data=data)
     except InvalidUserDataError as exc:
-        raise HTTPException(status_code=409, detail=exc.message)
+        raise HTTPException(status_code=409, detail=exc.message) from exc
 
 
 @user_router.get(

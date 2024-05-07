@@ -55,7 +55,7 @@ async def create_project(
     try:
         return await project_service.create_one(data=data, creator_guid=current_user.guid)
     except InvalidProjectDataError as exc:
-        raise HTTPException(status_code=409, detail=exc.message)
+        raise HTTPException(status_code=409, detail=exc.message) from exc
 
 
 @project_router.get(
@@ -82,7 +82,7 @@ async def create_project_task(
     try:
         return await task_service.create_one(project=project, data=data)
     except InvalidProjectDataError as exc:
-        raise HTTPException(status_code=409, detail=exc.message)
+        raise HTTPException(status_code=409, detail=exc.message) from exc
 
 
 @project_router.patch(
@@ -99,7 +99,7 @@ async def patch_project(
     try:
         return await project_service.patch_one(project=project, data=data)
     except InvalidProjectDataError as exc:
-        raise HTTPException(status_code=409, detail=exc.message)
+        raise HTTPException(status_code=409, detail=exc.message) from exc
 
 
 @project_router.delete(
@@ -121,7 +121,7 @@ async def del_project(
     name="Send the project report by email",
 )
 async def send_project_report(
-    current_user: CurrentUserDep,
+    _: CurrentUserDep,
     project: Annotated[Project, Depends(ProjectDepFactory(load_tasks=True))],
     email: EmailStr,
     bg_tasks: BackgroundTasks,
@@ -131,7 +131,7 @@ async def send_project_report(
         email_subject="(FastAPIProjectManager) Project report",
         email_receivers=[email],
         email_template="projectreportemail.html",
-        **{"project": project},
+        project=project,
     )
     return {"message": "Email sent successfully"}
 
@@ -151,7 +151,7 @@ async def patch_project_task(
     try:
         return await task_service.patch_one(project=project, task_guid=task_guid, data=data)
     except InvalidProjectDataError as exc:
-        raise HTTPException(status_code=409, detail=exc.message)
+        raise HTTPException(status_code=409, detail=exc.message) from exc
 
 
 @project_router.delete(

@@ -44,7 +44,7 @@ class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepositor
 
         except IntegrityError as exc:
             await self._session.rollback()
-            raise InvalidProjectDataError(message=f"{exc.orig}")
+            raise InvalidProjectDataError(message=f"{exc.orig}") from exc
 
         else:
             await self._session.refresh(project)
@@ -56,7 +56,7 @@ class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepositor
 
         except IntegrityError as exc:
             await self._session.rollback()
-            raise InvalidProjectDataError(message=f"{exc.orig}")
+            raise InvalidProjectDataError(message=f"{exc.orig}") from exc
 
         else:
             await self._session.refresh(project)

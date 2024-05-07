@@ -22,13 +22,15 @@ class ProjectCreate(_ProjectBase):
     def validate_date_range(cls, v: datetime) -> datetime:
         v = v.replace(tzinfo=None)
         if v < datetime.utcnow() - timedelta(days=1):
-            raise ValueError("Project start_date or constraint_date cannot be in the past")
+            msg = "Project start_date or constraint_date cannot be in the past"
+            raise ValueError(msg)
         return v
 
     @model_validator(mode="after")
     def validate_projects_dates(self) -> "ProjectCreate":
         if self.start_date > self.constraint_date:
-            raise ValueError("Project start_date cannot be older than project constraint_date")
+            msg = "Project start_date cannot be older than project constraint_date"
+            raise ValueError(msg)
         return self
 
 
