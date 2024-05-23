@@ -9,7 +9,7 @@ from src.modules.user.views.routes import user_router
 app = FastAPI(
     debug=settings.DEBUG,
     title="FastAPI Project Manager",
-    version="0.2.0",
+    version="0.2.1",
     docs_url=settings.DOCS_URL,
     redoc_url=settings.REDOC_URL,
 )

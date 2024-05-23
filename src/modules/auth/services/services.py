@@ -4,13 +4,15 @@ from uuid import UUID
 
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm
-from jwt import DecodeError, InvalidTokenError, decode, encode
 
 from src.config import settings
-from src.modules.auth.exceptions import InvalidAuthDataError
+from src.modules.auth.exceptions import InvalidAuthDataError, JWTDecodeError
 from src.modules.auth.models.entities import AuthToken
 from src.modules.auth.models.enums import AuthTokenTyp
-from src.modules.auth.utils.hasher import Hasher
+from src.modules.auth.utils.hasher.base import AbstractHasher
+from src.modules.auth.utils.hasher.bcrypt import BcryptHasher
+from src.modules.auth.utils.jwt.base import AbstractJWTManager
+from src.modules.auth.utils.jwt.pyjwt import PyJWTManager
 from src.modules.user.models.entities import User
 from src.modules.user.repositories.base import AbstractUserRepository
 from src.modules.user.repositories.sqlalchemy import SQLAlchemyUserRepository
@@ -18,9 +20,18 @@ from src.modules.user.repositories.sqlalchemy import SQLAlchemyUserRepository
 
 class AuthService:
     _repository: AbstractUserRepository
+    _hasher: AbstractHasher
+    _jwt_manager: AbstractJWTManager
 
-    def __init__(self, repository: Annotated[AbstractUserRepository, Depends(SQLAlchemyUserRepository)]) -> None:
+    def __init__(
+        self,
+        repository: Annotated[AbstractUserRepository, Depends(SQLAlchemyUserRepository)],
+        hasher: Annotated[AbstractHasher, Depends(BcryptHasher)],
+        jwt_manager: Annotated[AbstractJWTManager, Depends(PyJWTManager)],
+    ) -> None:
         self._repository = repository
+        self._hasher = hasher
+        self._jwt_manager = jwt_manager
 
     def _generate_token(
         self,
@@ -29,12 +40,8 @@ class AuthService:
         expires_delta: timedelta,
     ) -> str:
         expires = datetime.utcnow() + expires_delta
-        to_encode = {"exp": expires, "sub": sub, "typ": token_typ}
-        return encode(
-            payload=to_encode,
-            key=settings.JWT_SECRET_KEY,
-            algorithm=settings.JWT_ALGORITHM,
-        )
+        payload = {"exp": expires, "sub": sub, "typ": token_typ}
+        return self._jwt_manager.encode_token(payload=payload)
 
     async def create_token(self, form_data: OAuth2PasswordRequestForm) -> AuthToken:
         user = await self._repository.get_one(username=form_data.username)
@@ -42,7 +49,7 @@ class AuthService:
         if not user:
             raise InvalidAuthDataError(message="User not found")
 
-        if not Hasher.verify_psw(psw_to_check=form_data.password, hashed_psw=user.password):
+        if not self._hasher.verify_psw(psw_to_check=form_data.password, hashed_psw=user.password):
             raise InvalidAuthDataError(message="Incorrect username or password")
 
         access_token = self._generate_token(
@@ -61,14 +68,10 @@ class AuthService:
         exc = InvalidAuthDataError(message="Could not validate credentials")
 
         try:
-            payload = decode(
-                jwt=token,
-                key=settings.JWT_SECRET_KEY,
-                algorithms=[settings.JWT_ALGORITHM],
-            )
+            payload = self._jwt_manager.decode_token(token=token)
             guid = UUID(payload["sub"])
             token_typ = payload["typ"]
-        except (InvalidTokenError, DecodeError, KeyError, ValueError) as e:
+        except (JWTDecodeError, KeyError, ValueError) as e:
             raise exc from e
 
         if token_typ != expected_token_typ:
