@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Annotated
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
@@ -31,7 +32,7 @@ project_router = APIRouter(prefix="/projects", tags=["Projects"])
 @project_router.get(
     path="",
     response_model=list[ProjectGet],
-    status_code=200,
+    status_code=HTTPStatus.OK,
     name="Get some projects",
 )
 async def get_some_projects(
@@ -43,7 +44,7 @@ async def get_some_projects(
 
 @project_router.post(
     path="",
-    status_code=201,
+    status_code=HTTPStatus.CREATED,
     response_model=ProjectGet,
     name="Crete a new project",
 )
@@ -55,12 +56,12 @@ async def create_project(
     try:
         return await project_service.create_one(data=data, creator_guid=current_user.guid)
     except InvalidProjectDataError as exc:
-        raise HTTPException(status_code=409, detail=exc.message) from exc
+        raise HTTPException(status_code=HTTPStatus.CONFLICT, detail=exc.message) from exc
 
 
 @project_router.get(
     path="/{project_guid}",
-    status_code=200,
+    status_code=HTTPStatus.OK,
     response_model=ProjectWithTasksGet,
     name="Get the project",
 )
@@ -70,7 +71,7 @@ async def get_project(project: Annotated[Project, Depends(ProjectDepFactory(load
 
 @project_router.post(
     path="/{project_guid}",
-    status_code=201,
+    status_code=HTTPStatus.CREATED,
     response_model=ProjectWithTasksGet,
     name="Add a task to the project",
 )
@@ -82,12 +83,12 @@ async def create_project_task(
     try:
         return await task_service.create_one(project=project, data=data)
     except InvalidProjectDataError as exc:
-        raise HTTPException(status_code=409, detail=exc.message) from exc
+        raise HTTPException(status_code=HTTPStatus.CONFLICT, detail=exc.message) from exc
 
 
 @project_router.patch(
     path="/{project_guid}",
-    status_code=200,
+    status_code=HTTPStatus.OK,
     response_model=ProjectGet,
     name="Patch the project",
 )
@@ -99,12 +100,12 @@ async def patch_project(
     try:
         return await project_service.patch_one(project=project, data=data)
     except InvalidProjectDataError as exc:
-        raise HTTPException(status_code=409, detail=exc.message) from exc
+        raise HTTPException(status_code=HTTPStatus.CONFLICT, detail=exc.message) from exc
 
 
 @project_router.delete(
     path="/{project_guid}",
-    status_code=204,
+    status_code=HTTPStatus.NO_CONTENT,
     name="Delete the project",
 )
 async def del_project(
@@ -116,7 +117,7 @@ async def del_project(
 
 @project_router.post(
     path="/{project_guid}/send_as_report/{email}",
-    status_code=202,
+    status_code=HTTPStatus.ACCEPTED,
     response_model=Message,
     name="Send the project report by email",
 )
@@ -138,7 +139,7 @@ async def send_project_report(
 
 @project_router.patch(
     path="/{project_guid}/tasks/{task_guid}",
-    status_code=200,
+    status_code=HTTPStatus.OK,
     response_model=ProjectWithTasksGet,
     name="Patch the project task",
 )
@@ -149,14 +150,18 @@ async def patch_project_task(
 ) -> Project:
     project, task_guid = project_and_task_guid
     try:
-        return await task_service.patch_one(project=project, task_guid=task_guid, data=data)
+        return await task_service.patch_one(
+            project=project,
+            task_guid=task_guid,
+            data=data,
+        )
     except InvalidProjectDataError as exc:
-        raise HTTPException(status_code=409, detail=exc.message) from exc
+        raise HTTPException(status_code=HTTPStatus.CONFLICT, detail=exc.message) from exc
 
 
 @project_router.delete(
     path="/{project_guid}/tasks/{task_guid}",
-    status_code=204,
+    status_code=HTTPStatus.NO_CONTENT,
     name="Delete the project task",
 )
 async def del_project_task(

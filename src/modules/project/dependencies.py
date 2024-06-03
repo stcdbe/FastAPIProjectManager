@@ -1,4 +1,5 @@
 from collections.abc import Awaitable, Callable
+from http import HTTPStatus
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, Query
@@ -28,7 +29,7 @@ class ProjectDepFactory:
         project = await project_service.get_one(load_tasks=self.load_tasks, guid=project_guid)
 
         if not project:
-            raise HTTPException(status_code=404, detail="Not found")
+            raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Not found")
 
         return project
 
@@ -39,7 +40,7 @@ def validate_project_perms(load_tasks: bool = False) -> Callable[[User, Project]
         project: Annotated[Project, Depends(ProjectDepFactory(load_tasks=load_tasks))],
     ) -> Project:
         if current_user.guid not in {project.creator_guid, project.mentor_guid}:
-            raise HTTPException(status_code=403, detail="Forbidden request")
+            raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Forbidden request")
 
         return project
 
@@ -51,6 +52,6 @@ async def validate_perms_and_task_guid(
     task_guid: UUID4,
 ) -> tuple[Project, UUID4]:
     if task_guid not in {task.guid for task in project.tasks}:
-        raise HTTPException(status_code=409, detail="Incorrect task id")
+        raise HTTPException(status_code=HTTPStatus.CONFLICT, detail="Incorrect task id")
 
     return project, task_guid

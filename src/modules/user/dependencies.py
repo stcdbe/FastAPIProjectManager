@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, Query
@@ -21,6 +22,6 @@ async def validate_user_guid(user_service: Annotated[UserService, Depends()], us
     user = await user_service.get_one(guid=user_guid)
 
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="User not found")
 
     return user

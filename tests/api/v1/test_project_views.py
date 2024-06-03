@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from http import HTTPStatus
 
 import pytest
 from httpx import AsyncClient
@@ -9,7 +10,7 @@ from src.config import settings
 @pytest.mark.asyncio(scope="session")
 async def test_get_some_projects(client: AsyncClient) -> None:
     res = await client.get("/api/v1/projects")
-    assert res.status_code == 200
+    assert res.status_code == HTTPStatus.OK
 
 
 @pytest.mark.asyncio(scope="session")
@@ -24,7 +25,7 @@ async def test_create_project(client: AsyncClient, user_token_headers: dict[str,
     }
     res = await client.post("/api/v1/projects", json=data, headers=user_token_headers)
     project = res.json()
-    assert res.status_code == 201
+    assert res.status_code == HTTPStatus.CREATED
     assert project
     assert project["guid"]
     assert project["created_at"]
@@ -37,7 +38,7 @@ async def test_create_project(client: AsyncClient, user_token_headers: dict[str,
 async def test_get_project(client: AsyncClient, test_project_guid: str) -> None:
     res = await client.get(f"/api/v1/projects/{test_project_guid}")
     project = res.json()
-    assert res.status_code == 200
+    assert res.status_code == HTTPStatus.OK
     assert project
     assert project["guid"] == test_project_guid
 
@@ -63,7 +64,7 @@ async def test_patch_project(
         headers=user_token_headers,
     )
     upd_project = res.json()
-    assert res.status_code == 200
+    assert res.status_code == HTTPStatus.OK
     assert upd_project
     for key, val in data.items():
         assert upd_project[key] == val
@@ -88,7 +89,7 @@ async def test_create_project_task(
         headers=user_token_headers,
     )
     project = res.json()
-    assert res.status_code == 201
+    assert res.status_code == HTTPStatus.CREATED
     assert project
     assert test_task_data["title"] in {task["title"] for task in project["tasks"]}
     assert test_task_data["description"] in {task["description"] for task in project["tasks"]}
@@ -114,7 +115,7 @@ async def test_patch_project_task(
         headers=user_token_headers,
     )
     project = res.json()
-    assert res.status_code == 200
+    assert res.status_code == HTTPStatus.OK
     assert project
     assert test_patch_task_data["title"] in {task["title"] for task in project["tasks"]}
     assert test_patch_task_data["description"] in {task["description"] for task in project["tasks"]}
@@ -131,20 +132,20 @@ async def test_del_project_task(
         f"/api/v1/projects/{test_project_guid}/tasks/{test_task_guid}",
         headers=user_token_headers,
     )
-    assert res.status_code == 204
+    assert res.status_code == HTTPStatus.NO_CONTENT
 
 
 @pytest.mark.asyncio(scope="session")
 async def test_send_project_report(
     client: AsyncClient,
-    test_project_uuid: str,
+    test_project_guid: str,
     user_token_headers: dict[str, str],
 ) -> None:
     res = await client.post(
-        f"/api/projects/{test_project_uuid}/send_as_report/{settings.TEST_EMAIL_RECEIVER}",
+        f"/api/projects/{test_project_guid}/send_as_report/{settings.TEST_EMAIL_RECEIVER}",
         headers=user_token_headers,
     )
-    assert res.status_code == 202
+    assert res.status_code == HTTPStatus.ACCEPTED
 
 
 @pytest.mark.asyncio(scope="session")
@@ -154,4 +155,4 @@ async def test_del_project(
     user_token_headers: dict[str, str],
 ) -> None:
     res = await client.delete(f"/api/v1/projects/{test_project_guid}", headers=user_token_headers)
-    assert res.status_code == 204
+    assert res.status_code == HTTPStatus.NO_CONTENT

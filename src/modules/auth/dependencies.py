@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Annotated
 
 from fastapi import Depends, HTTPException
@@ -14,7 +15,7 @@ async def get_current_user(auth_service: Annotated[AuthService, Depends()], toke
     try:
         return await auth_service.validate_access_token(token=token)
     except InvalidAuthDataError as exc:
-        raise HTTPException(status_code=401, detail=exc.message) from exc
+        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail=exc.message) from exc
 
 
 CurrentUserDep = Annotated[User, Depends(get_current_user)]

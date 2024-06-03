@@ -12,7 +12,12 @@ async_engine = create_async_engine(
     pool_recycle=3600,
 )
 
-async_session_factory = async_sessionmaker(bind=async_engine, expire_on_commit=False)
+async_session_factory = async_sessionmaker(
+    bind=async_engine,
+    expire_on_commit=False,
+    autoflush=False,
+    autocommit=False,
+)
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:

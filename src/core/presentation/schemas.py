@@ -1,10 +1,20 @@
 from abc import ABC
+from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import UUID4, BaseModel, ConfigDict
 
 
-class AttrsBaseModel(BaseModel, ABC):
+class FromAttrsBaseModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+
+
+class GUIDMixin(FromAttrsBaseModel):
+    guid: UUID4
+
+
+class TimeMixin(FromAttrsBaseModel):
+    created_at: datetime
+    updated_at: datetime
 
 
 class Message(BaseModel):

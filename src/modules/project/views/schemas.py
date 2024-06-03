@@ -3,11 +3,11 @@ from typing import Annotated
 
 from pydantic import UUID4, Field, StringConstraints, conset, field_validator, model_validator
 
-from src.core.presentation.schemas import AbstractPagination, AttrsBaseModel
+from src.core.presentation.schemas import AbstractPagination, FromAttrsBaseModel, GUIDMixin, TimeMixin
 from src.modules.task.views.schemas import TaskGet
 
 
-class _ProjectBase(AttrsBaseModel):
+class _ProjectBase(FromAttrsBaseModel):
     title: Annotated[str, StringConstraints(strip_whitespace=True, min_length=5, max_length=100)]
     description: Annotated[str, StringConstraints(strip_whitespace=True, min_length=5, max_length=500)]
     tech_stack: conset(str, min_length=1, max_length=5)
@@ -43,11 +43,8 @@ class ProjectPatch(ProjectCreate):
     mentor_guid: UUID4 | None = None
 
 
-class ProjectGet(_ProjectBase):
-    guid: UUID4
+class ProjectGet(_ProjectBase, GUIDMixin, TimeMixin):
     creator_guid: UUID4
-    created_at: datetime
-    updated_at: datetime
 
 
 class ProjectWithTasksGet(ProjectGet):

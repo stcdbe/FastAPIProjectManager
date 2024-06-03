@@ -1,12 +1,11 @@
-from datetime import datetime
 from typing import Annotated
 
 from pydantic import UUID4, StringConstraints
 
-from src.core.presentation.schemas import AttrsBaseModel
+from src.core.presentation.schemas import FromAttrsBaseModel, GUIDMixin, TimeMixin
 
 
-class _TaskBase(AttrsBaseModel):
+class _TaskBase(FromAttrsBaseModel):
     title: Annotated[str, StringConstraints(strip_whitespace=True, min_length=5, max_length=100)]
     description: Annotated[str, StringConstraints(strip_whitespace=True, min_length=5, max_length=250)]
     is_completed: bool = False
@@ -24,7 +23,5 @@ class TaskPatch(TaskCreate):
     executor_guid: UUID4 | None = None
 
 
-class TaskGet(TaskCreate):
-    guid: UUID4
-    created_at: datetime
-    updated_at: datetime
+class TaskGet(_TaskBase, GUIDMixin, TimeMixin):
+    pass

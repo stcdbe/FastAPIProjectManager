@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 import pytest
 from httpx import AsyncClient
 
@@ -14,7 +16,7 @@ async def test_create_token(client: AsyncClient) -> None:
     auth_form_data = {"username": "auth_username", "password": "passwordpassword"}
     res = await client.post("/api/v1/auth/create_token", data=auth_form_data)
     token = res.json()
-    assert res.status_code == 201
+    assert res.status_code == HTTPStatus.CREATED
     assert token
     assert token["access_token"]
     assert token["refresh_token"]
@@ -28,6 +30,6 @@ async def test_refresh_token(client: AsyncClient) -> None:
 
     res = await client.post("/api/v1/auth/refresh_token", params={"token": token["refresh_token"]})
     new_token = res.json()
-    assert res.status_code == 201
+    assert res.status_code == HTTPStatus.CREATED
     assert new_token
     assert new_token["access_token"]
