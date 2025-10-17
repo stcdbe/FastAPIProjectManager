@@ -3,6 +3,9 @@ from logging.config import dictConfig
 import uvicorn
 
 from src.config import get_settings
+from src.main import create_app
+
+app = create_app()
 
 if __name__ == "__main__":
     dictConfig(get_settings().LOG_CONFIG)
