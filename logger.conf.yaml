@@ -1,0 +1,53 @@
+version: 1
+
+disable_existing_loggers: false
+
+formatters:
+  default:
+    format: "[%(asctime)s | %(levelname)s | %(processName)s | %(name)s] %(message)s"
+
+handlers:
+  console:
+    level: "INFO"
+    class: "logging.StreamHandler"
+    formatter: "default"
+    stream: "ext://sys.stdout"
+
+  # fileInfo:
+  #   level: "INFO"
+  #   class: "logging.handlers.RotatingFileHandler"
+  #   filename: "./logs/info.log"
+  #   formatter: "default"
+  #   maxBytes: 1073741824 # 1 GB in bytes
+  #   backupCount: 0
+
+  # fileWarning:
+  #   level: "WARNING"
+  #   class: "logging.handlers.RotatingFileHandler"
+  #   filename: "./logs/warn.log"
+  #   formatter: "default"
+  #   maxBytes: 1073741824 # 1 GB in bytes
+  #   backupCount: 0
+
+  queueHandler:
+    level: "INFO"
+    class: "logging.handlers.QueueHandler"
+    listener: "src.local_logging.listener.AutoStartQueueListener"
+    respect_handler_level: true
+    queue:
+      (): "queue.Queue"
+      maxsize: -1
+    handlers:
+      - "console"
+      # - "fileInfo"
+      # - "fileWarning"
+
+loggers:
+  root:
+    level: "INFO"
+    handlers:
+      # - "console"
+      # - "fileInfo"
+      # - "fileWarning"
+      - "queueHandler"
+

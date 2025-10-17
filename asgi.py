@@ -1,7 +1,14 @@
+from logging.config import dictConfig
+
 import uvicorn
 
-from src.main import app
 from src.config import settings
 
 if __name__ == "__main__":
-    uvicorn.run("asgi:app", host="0.0.0.0", port=settings.PORT, reload=settings.DEBUG)
+    dictConfig(settings.LOG_CONFIG)
+    uvicorn.run(
+        app="asgi:app",
+        host=settings.HOST,
+        port=settings.PORT,
+        reload=settings.DEBUG,
+    )
