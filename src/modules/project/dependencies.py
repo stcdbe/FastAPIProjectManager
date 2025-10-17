@@ -7,7 +7,7 @@ from pydantic import UUID4
 
 from src.modules.auth.dependencies import CurrentUserDep
 from src.modules.project.models.entities import Project
-from src.modules.project.services.services import ProjectService
+from src.modules.project.services.project_service import ProjectService
 from src.modules.project.views.schemas import ProjectGet, ProjectPagination
 from src.modules.user.models.entities import User
 
