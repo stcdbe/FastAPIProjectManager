@@ -5,7 +5,7 @@ from uuid import UUID
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
-from src.config import settings
+from src.config import get_settings
 from src.modules.auth.exceptions import InvalidAuthDataError, JWTDecodeError
 from src.modules.auth.models.entities import AuthToken
 from src.modules.auth.models.enums import AuthTokenTyp
@@ -55,12 +55,12 @@ class AuthService:
         access_token = self._generate_token(
             sub=str(user.guid),
             token_typ=AuthTokenTyp.access,
-            expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRES),
+            expires_delta=timedelta(minutes=get_settings().ACCESS_TOKEN_EXPIRES),
         )
         refresh_token = self._generate_token(
             sub=str(user.guid),
             token_typ=AuthTokenTyp.refresh,
-            expires_delta=timedelta(minutes=settings.REFRESH_TOKEN_EXPIRES),
+            expires_delta=timedelta(minutes=get_settings().REFRESH_TOKEN_EXPIRES),
         )
         return AuthToken(access_token=access_token, refresh_token=refresh_token)
 
@@ -92,6 +92,6 @@ class AuthService:
         access_token = self._generate_token(
             sub=str(user.guid),
             token_typ=AuthTokenTyp.access,
-            expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRES),
+            expires_delta=timedelta(minutes=get_settings().ACCESS_TOKEN_EXPIRES),
         )
         return AuthToken(access_token=access_token)

@@ -4,7 +4,7 @@ from http import HTTPStatus
 import pytest
 from httpx import AsyncClient
 
-from src.config import settings
+from src.config import get_settings
 
 
 @pytest.mark.asyncio(scope="session")
@@ -142,7 +142,7 @@ async def test_send_project_report(
     user_token_headers: dict[str, str],
 ) -> None:
     res = await client.post(
-        f"/api/projects/{test_project_guid}/send_as_report/{settings.TEST_EMAIL_RECEIVER}",
+        f"/api/projects/{test_project_guid}/send_as_report/{get_settings().TEST_EMAIL_RECEIVER}",
         headers=user_token_headers,
     )
     assert res.status_code == HTTPStatus.ACCEPTED

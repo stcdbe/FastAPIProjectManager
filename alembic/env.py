@@ -4,13 +4,10 @@ from logging.config import fileConfig
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
-from alembic import context
 
-from src.config import settings  # upd
+from alembic import context
+from src.config import get_settings  # upd
 from src.core.models.base import SQLAlchemyBaseModel
-from src.modules.project.models.entities import Project
-from src.modules.task.models.entities import Task
-from src.modules.user.models.entities import User
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -31,7 +28,7 @@ target_metadata = SQLAlchemyBaseModel.metadata  # upd
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-config.set_main_option("sqlalchemy.url", settings.PG_URL)  # upd
+config.set_main_option("sqlalchemy.url", get_settings().PG_URL.unicode_string())  # upd
 
 
 def run_migrations_offline() -> None:
@@ -70,7 +67,6 @@ async def run_async_migrations() -> None:
     and associate a connection with the context.
 
     """
-
     connectable = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
@@ -85,7 +81,6 @@ async def run_async_migrations() -> None:
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
-
     asyncio.run(run_async_migrations())
 
 
