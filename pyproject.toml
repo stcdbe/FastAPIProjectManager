@@ -2,4 +2,23 @@
 name = "fastapiprojectmanager"
 version = "0.3.0"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "aiosmtplib>=4.0.2",
+    "alembic>=1.17.0",
+    "bcrypt>=5.0.0",
+    "email-validator>=2.3.0",
+    "fastapi>=0.119.0",
+    "gunicorn>=23.0.0",
+    "orjson>=3.11.3",
+    "psycopg[binary]>=3.2.10",
+    "pydantic-settings>=2.11.0",
+    "pyjwt>=2.10.1",
+    "pyyaml>=6.0.3",
+    "sqlalchemy>=2.0.44",
+    "uvicorn>=0.37.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest-asyncio>=1.2.0",
+]
