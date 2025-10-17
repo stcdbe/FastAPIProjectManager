@@ -30,7 +30,6 @@ services:
       - ${PORT}
     depends_on:
       - postgres
-      - redis
     networks:
       - custom
 

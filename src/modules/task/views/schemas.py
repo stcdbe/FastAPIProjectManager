@@ -2,7 +2,7 @@ from typing import Annotated
 
 from pydantic import UUID4, StringConstraints
 
-from src.core.presentation.schemas import FromAttrsBaseModel, GUIDMixin, TimeMixin
+from src.common.presentation.schemas import FromAttrsBaseModel, GUIDMixin, TimeMixin
 
 
 class _TaskBase(FromAttrsBaseModel):

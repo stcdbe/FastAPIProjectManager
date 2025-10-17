@@ -3,7 +3,7 @@ from typing import Any
 from sqlalchemy import desc, select
 from sqlalchemy.exc import IntegrityError
 
-from src.core.repositories.sqlalchemy import SQLAlchemyRepository
+from src.common.repositories.sqlalchemy import SQLAlchemyRepository
 from src.modules.user.exceptions import InvalidUserDataError
 from src.modules.user.models.entities import User
 from src.modules.user.repositories.base import AbstractUserRepository

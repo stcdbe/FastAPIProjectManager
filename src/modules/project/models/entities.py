@@ -6,7 +6,7 @@ from sqlalchemy import ForeignKey, String
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.core.models.base import TimedSQLAlchemyBaseModel
+from src.common.models.base import TimedSQLAlchemyBaseModel
 
 if TYPE_CHECKING:
     from src.modules.task.models.entities import Task

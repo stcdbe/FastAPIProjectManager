@@ -4,8 +4,8 @@ from typing import Annotated
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import UUID4, EmailStr
 
-from src.core.presentation.schemas import Message
-from src.core.utils.email.smtp import send_email
+from src.common.presentation.schemas import Message
+from src.common.utils.email.smtp import send_email
 from src.modules.auth.dependencies import CurrentUserDep
 from src.modules.project.dependencies import (
     ProjectDepFactory,

@@ -4,7 +4,7 @@ from typing import Annotated
 from annotated_types import Ge, Le
 from pydantic import EmailStr, Field, StringConstraints
 
-from src.core.presentation.schemas import AbstractPagination, FromAttrsBaseModel, GUIDMixin
+from src.common.presentation.schemas import AbstractPagination, FromAttrsBaseModel, GUIDMixin
 from src.modules.user.models.enums import UserSex
 
 
