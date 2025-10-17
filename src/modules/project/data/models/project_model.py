@@ -6,14 +6,14 @@ from sqlalchemy import ForeignKey, String
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.common.data.models.sqlalchemy_timed_base import TimedSQLAlchemyBaseModel
+from src.common.data.models.sqlalchemy_timed_base import SQLAlchemyTimedBaseModel
 
 if TYPE_CHECKING:
     from src.modules.task.data.models.task_model import Task
     from src.modules.user.data.models.user_model import User
 
 
-class Project(TimedSQLAlchemyBaseModel):
+class Project(SQLAlchemyTimedBaseModel):
     __tablename__ = "project"
     title: Mapped[str]
     description: Mapped[str]

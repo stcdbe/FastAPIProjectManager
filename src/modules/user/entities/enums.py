@@ -1,6 +1,6 @@
-from enum import StrEnum, auto
+from enum import StrEnum
 
 
-class UserSex(StrEnum):
-    m = auto()
-    f = auto()
+class UserGender(StrEnum):
+    M = "M"
+    F = "F"

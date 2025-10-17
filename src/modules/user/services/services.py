@@ -4,10 +4,9 @@ from fastapi import Depends
 
 from src.modules.auth.utils.hasher.base import AbstractHasher
 from src.modules.auth.utils.hasher.bcrypt import BcryptHasher
-from src.modules.user.models.entities import User
-from src.modules.user.repositories.base import AbstractUserRepository
-from src.modules.user.repositories.sqlalchemy import SQLAlchemyUserRepository
-from src.modules.user.views.schemas import UserCreate, UserPagination, UserPatch
+from src.modules.user.data.repositories.base import AbstractUserRepository
+from src.modules.user.data.repositories.sqlalchemy import SQLAlchemyUserRepository
+from src.modules.user.entities.user import User
 
 
 class UserService:
@@ -25,13 +24,19 @@ class UserService:
     async def get_one(self, **kwargs: Any) -> User | None:
         return await self._repository.get_one(**kwargs)
 
-    async def get_list(self, params: UserPagination) -> list[User]:
-        offset = (params.page - 1) * params.limit
+    async def get_list(
+        self,
+        page: int = 1,
+        limit: int = 5,
+        order_by: str = "username",
+        reverse: bool = False,
+    ) -> list[User]:
+        offset = (page - 1) * limit
         return await self._repository.get_list(
-            limit=params.limit,
+            limit=limit,
             offset=offset,
-            order_by=params.order_by,
-            reverse=params.reverse,
+            order_by=order_by,
+            reverse=reverse,
         )
 
     async def create_one(self, data: UserCreate) -> User:

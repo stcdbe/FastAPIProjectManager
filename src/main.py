@@ -5,13 +5,13 @@ from fastapi.routing import APIRouter
 from src.config import get_settings
 from src.modules.auth.views.routes import auth_router
 from src.modules.project.views.routes import project_router
-from src.modules.user.views.routes import user_router
+from src.modules.user.views.routes import user_v1_router
 
 
 def get_api_v1_router() -> APIRouter:
     api_v1_router = APIRouter(prefix="/api/v1")
 
-    for router in (auth_router, user_router, project_router):
+    for router in (auth_router, user_v1_router, project_router):
         api_v1_router.include_router(router=router)
 
     return api_v1_router
