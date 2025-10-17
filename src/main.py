@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import ORJSONResponse
 from fastapi.routing import APIRouter
 
 from src.config import get_settings
@@ -27,6 +28,7 @@ def create_app() -> FastAPI:
         version="0.3.0",
         docs_url=get_settings().DOCS_URL,
         redoc_url=get_settings().REDOC_URL,
+        default_response_class=ORJSONResponse,
     )
 
     for router in (get_api_v1_router(),):
