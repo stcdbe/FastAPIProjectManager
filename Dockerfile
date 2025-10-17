@@ -1,14 +1,12 @@
-FROM python:3.11.8-alpine AS builder
+FROM python:3.12-alpine AS builder
 
-COPY pyproject.toml poetry.lock ./
+COPY pyproject.toml uv.lock ./
 
 RUN pip install --no-cache-dir -U pip setuptools && \
-    pip install --no-cache-dir poetry && \
-    poetry self add poetry-plugin-export && \
-    poetry export -o requirements.prod.txt --without-hashes && \
-    poetry export --with=dev -o requirements.dev.txt --without-hashes
+    pip install --no-cache-dir uv && \
+    uv export --no-hashes --no-dev --format requirements-txt > requirements.dev.txt
 
-FROM python:3.11.8-alpine AS dev
+FROM python:3.12-alpine AS dev
 
 WORKDIR /app
 
