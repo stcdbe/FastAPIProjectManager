@@ -4,7 +4,7 @@ from sqlalchemy import desc, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
 
-from src.core.repositories.sqlalchemy import SQLAlchemyRepository
+from src.common.repositories.sqlalchemy import SQLAlchemyRepository
 from src.modules.project.exceptions import InvalidProjectDataError
 from src.modules.project.models.entities import Project
 from src.modules.project.repositories.base import AbstractProjectRepository

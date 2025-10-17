@@ -3,7 +3,7 @@ from collections.abc import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from src.config import get_settings
-from src.core.models.base import SQLAlchemyBaseModel
+from src.common.models.base import SQLAlchemyBaseModel
 
 test_async_engine = create_async_engine(
     url=get_settings().PG_URL_TEST.unicode_string(),

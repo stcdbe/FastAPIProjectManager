@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.core.models.base import SQLAlchemyBaseModel
+from src.common.models.base import SQLAlchemyBaseModel
 from src.modules.user.models.enums import UserSex
 
 if TYPE_CHECKING:

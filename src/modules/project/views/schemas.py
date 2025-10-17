@@ -3,7 +3,7 @@ from typing import Annotated
 
 from pydantic import UUID4, Field, StringConstraints, conset, field_validator, model_validator
 
-from src.core.presentation.schemas import AbstractPagination, FromAttrsBaseModel, GUIDMixin, TimeMixin
+from src.common.presentation.schemas import AbstractPagination, FromAttrsBaseModel, GUIDMixin, TimeMixin
 from src.modules.task.views.schemas import TaskGet
 
 
