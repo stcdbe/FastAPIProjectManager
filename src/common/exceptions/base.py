@@ -1,7 +1,12 @@
+from dataclasses import dataclass
+
+
+@dataclass(eq=False, frozen=True, slots=True)
 class BaseAppError(Exception):
-    def __init__(self, message: str) -> None:
-        self.message = message
-        super().__init__(message)
+    msg: str
 
     def __str__(self) -> str:
-        return self.message
+        return self.msg
+
+    def __repr__(self) -> str:
+        return self.__str__()
