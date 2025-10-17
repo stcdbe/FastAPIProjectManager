@@ -5,9 +5,10 @@ import pytest_asyncio
 from httpx import AsyncClient
 
 from src.core.database.sqlalchemy import get_session
-from src.main import app
+from src.main import create_app
 from tests.sqlalchemy import create_tables, drop_tables, get_test_session
 
+app = create_app()
 app.dependency_overrides[get_session] = get_test_session
 
 
