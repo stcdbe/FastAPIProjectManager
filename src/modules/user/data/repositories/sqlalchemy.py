@@ -1,12 +1,14 @@
 from typing import Any
+from uuid import UUID
 
-from sqlalchemy import desc, select
+from sqlalchemy import desc, insert, select, update
 from sqlalchemy.exc import IntegrityError
 
-from src.common.repositories.sqlalchemy import SQLAlchemyRepository
+from src.common.data.repositories.sqlalchemy_base import SQLAlchemyRepository
+from src.modules.user.data.models.user_model import UserModel
+from src.modules.user.data.repositories.base import AbstractUserRepository
+from src.modules.user.entities import User
 from src.modules.user.exceptions import InvalidUserDataError
-from src.modules.user.models.entities import User
-from src.modules.user.repositories.base import AbstractUserRepository
 
 
 class SQLAlchemyUserRepository(AbstractUserRepository, SQLAlchemyRepository):
@@ -17,7 +19,7 @@ class SQLAlchemyUserRepository(AbstractUserRepository, SQLAlchemyRepository):
         order_by: str,
         reverse: bool = False,
     ) -> list[User]:
-        stmt = select(User).offset(offset).limit(limit)
+        stmt = select(UserModel).offset(offset).limit(limit)
 
         if reverse:
             stmt = stmt.order_by(desc(order_by))
@@ -27,34 +29,36 @@ class SQLAlchemyUserRepository(AbstractUserRepository, SQLAlchemyRepository):
         res = await self._session.execute(stmt)
         return list(res.scalars().all())
 
-    async def get_one(self, **kwargs: Any) -> User | None:
-        stmt = select(User).filter_by(**kwargs)
+    async def get_one(self, **kwargs: Any) -> User:
+        stmt = select(UserModel).filter_by(**kwargs)
 
         res = await self._session.execute(stmt)
-        return res.scalars().first()
+        return res.scalars().one()
 
-    async def create_one(self, user: User) -> User:
+    async def create_one(self, user: User) -> UUID:
+        stmt = insert(UserModel).values().returning(UserModel.guid)
+
         try:
-            self._session.add(user)
+            res = await self._session.execute(stmt)
             await self._session.commit()
 
         except IntegrityError as exc:
             await self._session.rollback()
-            raise InvalidUserDataError(message=f"{exc.orig}") from exc
+            msg = f"{exc.orig}"
+            raise InvalidUserDataError(msg) from exc
 
-        else:
-            await self._session.refresh(user)
-            return user
+        return res.scalars().one()
 
-    async def patch_one(self, user: User) -> User:
+    async def patch_one(self, user: User) -> UUID:
+        stmt = update(UserModel).where().values().returning(UserModel.guid)
+
         try:
-            await self._session.flush()
+            res = await self._session.execute(stmt)
             await self._session.commit()
 
         except IntegrityError as exc:
             await self._session.rollback()
-            raise InvalidUserDataError(message=f"{exc.orig}") from exc
+            msg = f"{exc.orig}"
+            raise InvalidUserDataError(msg) from exc
 
-        else:
-            await self._session.refresh(user)
-            return user
+        return res.scalars().one()

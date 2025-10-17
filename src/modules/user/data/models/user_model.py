@@ -1,26 +1,30 @@
-from datetime import datetime
+from datetime import date
 from typing import TYPE_CHECKING
 
+from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.common.data.models.sqlalchemy_base import SQLAlchemyBaseModel
+from src.common.data.models.sqlalchemy_timed_base import SQLAlchemyTimedBaseModel
 
 if TYPE_CHECKING:
     from src.modules.project.data.models.project_model import Project
     from src.modules.task.data.models.task_model import Task
 
 
-class User(SQLAlchemyBaseModel):
+class UserModel(SQLAlchemyTimedBaseModel):
     __tablename__ = "user"
-    username: Mapped[str] = mapped_column(unique=True, index=True)
-    email: Mapped[str] = mapped_column(unique=True)
-    password: Mapped[str]
-    company: Mapped[str | None]
-    job_title: Mapped[str | None]
-    fullname: Mapped[str | None]
-    age: Mapped[int | None]
-    sex: Mapped[str | None]
-    join_date: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+
+    username: Mapped[str] = mapped_column(index=True, unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(index=True, unique=True, nullable=False)
+    password: Mapped[str] = mapped_column(String(128), nullable=False)
+    first_name: Mapped[str | None] = mapped_column(String(64))
+    second_name: Mapped[str | None] = mapped_column(String(64))
+    gender: Mapped[str | None] = mapped_column(String(1))
+    company: Mapped[str | None] = mapped_column(String(128))
+    join_date: Mapped[date | None]
+    job_title: Mapped[str | None] = mapped_column(String(128))
+    date_of_birth: Mapped[date | None]
+
     created_projects: Mapped[list["Project"]] = relationship(
         back_populates="creator",
         cascade="all, delete-orphan",

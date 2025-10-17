@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 
 from src.modules.auth.exceptions import InvalidAuthDataError
 from src.modules.auth.services.services import AuthService
-from src.modules.user.models.entities import User
+from src.modules.user.entities.user import User
 
 TokenDep = Annotated[str, Depends(OAuth2PasswordBearer(tokenUrl="api/v1/auth/create_token"))]
 
@@ -15,7 +15,7 @@ async def get_current_user(auth_service: Annotated[AuthService, Depends()], toke
     try:
         return await auth_service.validate_access_token(token=token)
     except InvalidAuthDataError as exc:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail=exc.message) from exc
+        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail=exc.msg) from exc
 
 
 CurrentUserDep = Annotated[User, Depends(get_current_user)]
