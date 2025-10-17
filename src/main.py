@@ -1,17 +1,17 @@
 from fastapi import FastAPI
 from fastapi.routing import APIRouter
 
-from src.config import settings
+from src.config import get_settings
 from src.modules.auth.views.routes import auth_router
 from src.modules.project.views.routes import project_router
 from src.modules.user.views.routes import user_router
 
 app = FastAPI(
-    debug=settings.DEBUG,
+    debug=get_settings().DEBUG,
     title="FastAPI Project Manager",
     version="0.2.2",
-    docs_url=settings.DOCS_URL,
-    redoc_url=settings.REDOC_URL,
+    docs_url=get_settings().DOCS_URL,
+    redoc_url=get_settings().REDOC_URL,
 )
 
 api_v1_router = APIRouter(prefix="/api/v1")

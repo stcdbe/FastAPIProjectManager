@@ -2,13 +2,13 @@ from logging.config import dictConfig
 
 import uvicorn
 
-from src.config import settings
+from src.config import get_settings
 
 if __name__ == "__main__":
-    dictConfig(settings.LOG_CONFIG)
+    dictConfig(get_settings().LOG_CONFIG)
     uvicorn.run(
         app="asgi:app",
-        host=settings.HOST,
-        port=settings.PORT,
-        reload=settings.DEBUG,
+        host=get_settings().HOST,
+        port=get_settings().PORT,
+        reload=get_settings().DEBUG,
     )

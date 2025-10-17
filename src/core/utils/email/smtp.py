@@ -3,16 +3,16 @@ from typing import Any
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 from pydantic import EmailStr
 
-from src.config import settings
+from src.config import get_settings
 
-template_folder_path = settings.BASE_DIR / "templates" / "email"
+template_folder_path = get_settings().BASE_DIR / "templates" / "email"
 
 mail_config = ConnectionConfig(
-    MAIL_USERNAME=settings.EMAIL_USERNAME,
-    MAIL_PASSWORD=settings.EMAIL_PASSWORD,
-    MAIL_FROM=settings.EMAIL_SENDER,
-    MAIL_PORT=settings.EMAIL_PORT,
-    MAIL_SERVER=settings.EMAIL_SMTP_SERVER,
+    MAIL_USERNAME=get_settings().EMAIL_USERNAME,
+    MAIL_PASSWORD=get_settings().EMAIL_PASSWORD,
+    MAIL_FROM=get_settings().EMAIL_SENDER,
+    MAIL_PORT=get_settings().EMAIL_PORT,
+    MAIL_SERVER=get_settings().EMAIL_SMTP_SERVER,
     MAIL_STARTTLS=False,
     MAIL_SSL_TLS=True,
     USE_CREDENTIALS=True,

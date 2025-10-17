@@ -2,11 +2,11 @@ from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from src.config import settings
+from src.config import get_settings
 from src.core.models.base import SQLAlchemyBaseModel
 
 test_async_engine = create_async_engine(
-    url=settings.PG_URL_TEST,
+    url=get_settings().PG_URL_TEST.unicode_string(),
     echo=False,
     pool_pre_ping=True,
     pool_size=10,
