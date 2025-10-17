@@ -1,23 +1,40 @@
 from pathlib import Path
+from typing import Annotated, Any, Final
 
-from pydantic import DirectoryPath, EmailStr, PostgresDsn
+import yaml
+from pydantic import DirectoryPath, EmailStr, Field, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_ENCODING: Final[str] = "utf-8"
+_BASE_DIR: Final[Path] = Path(__file__).resolve().parent.parent
+_ENV_FILE: Final[Path] = _BASE_DIR / ".env"
+_LOGGER_CONF_YAML_FILE: Final[Path] = _BASE_DIR / "logger.conf.yaml"
+
+
+def _parse_log_config() -> dict[str, Any]:
+    with _LOGGER_CONF_YAML_FILE.open(encoding=_ENCODING) as file:
+        return yaml.safe_load(file)  # type: ignore
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file="./.env",
+        frozen=True,
         case_sensitive=True,
+        env_file=_ENV_FILE,
+        env_file_encoding=_ENCODING,
     )
 
-    DEBUG: bool
-    PORT: int
-    DOCS_URL: str | None = None
-    REDOC_URL: str | None = None
-    BASE_DIR: DirectoryPath = Path(__file__).parent.parent
+    LOG_CONFIG: Annotated[dict[str, Any], Field(default_factory=_parse_log_config)]
+
+    DEBUG: Annotated[bool, Field(default=False)]
+    HOST: Annotated[str, Field(default="localhost")]
+    PORT: Annotated[int, Field(default=8000)]
+    DOCS_URL: Annotated[str | None, Field(default=None)]
+    REDOC_URL: Annotated[str | None, Field(default=None)]
+    BASE_DIR: Annotated[DirectoryPath, Field(default=_BASE_DIR)]
 
     JWT_SECRET_KEY: str
-    JWT_ALGORITHM: str
+    JWT_ALGORITHM: Annotated[str, Field(default="HS256")]
     ACCESS_TOKEN_EXPIRES: int
     REFRESH_TOKEN_EXPIRES: int
 
