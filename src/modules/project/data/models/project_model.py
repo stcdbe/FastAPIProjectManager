@@ -6,11 +6,11 @@ from sqlalchemy import ForeignKey, String
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.common.models.base import TimedSQLAlchemyBaseModel
+from src.common.data.models.sqlalchemy_timed_base import TimedSQLAlchemyBaseModel
 
 if TYPE_CHECKING:
-    from src.modules.task.models.entities import Task
-    from src.modules.user.models.entities import User
+    from src.modules.task.data.models.task_model import Task
+    from src.modules.user.data.models.user_model import User
 
 
 class Project(TimedSQLAlchemyBaseModel):

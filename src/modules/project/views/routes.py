@@ -15,7 +15,7 @@ from src.modules.project.dependencies import (
 )
 from src.modules.project.exceptions import InvalidProjectDataError
 from src.modules.project.models.entities import Project
-from src.modules.project.services.services import ProjectService
+from src.modules.project.services.project_service import ProjectService
 from src.modules.project.views.schemas import (
     ProjectCreate,
     ProjectGet,

@@ -4,11 +4,11 @@ from uuid import UUID
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.common.models.base import TimedSQLAlchemyBaseModel
+from src.common.data.models.sqlalchemy_timed_base import TimedSQLAlchemyBaseModel
 
 if TYPE_CHECKING:
-    from src.modules.project.models.entities import Project
-    from src.modules.user.models.entities import User
+    from src.modules.project.data.models.project_model import Project
+    from src.modules.user.data.models.user_model import User
 
 
 class Task(TimedSQLAlchemyBaseModel):

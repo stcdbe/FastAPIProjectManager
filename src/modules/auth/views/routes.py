@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
 from src.modules.auth.exceptions import InvalidAuthDataError
-from src.modules.auth.models.entities import AuthToken
+from src.modules.auth.entities.auth_token import AuthToken
 from src.modules.auth.services.services import AuthService
 from src.modules.auth.views.schemas import AuthTokenGet
 
