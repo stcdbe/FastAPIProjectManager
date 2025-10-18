@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(slots=True)
 class AuthToken:
     access_token: str
-    refresh_token: str | None = None
-    token_type: str = "Bearer"
+    refresh_token: str | None
+    token_type: str

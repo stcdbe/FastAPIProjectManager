@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import String
@@ -14,8 +14,8 @@ if TYPE_CHECKING:
 class UserModel(SQLAlchemyTimedBaseModel):
     __tablename__ = "user"
 
-    username: Mapped[str] = mapped_column(index=True, unique=True, nullable=False)
-    email: Mapped[str] = mapped_column(index=True, unique=True, nullable=False)
+    username: Mapped[str] = mapped_column(String(128), index=True, unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(String(128), index=True, unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(128), nullable=False)
     first_name: Mapped[str | None] = mapped_column(String(64))
     second_name: Mapped[str | None] = mapped_column(String(64))
@@ -24,6 +24,8 @@ class UserModel(SQLAlchemyTimedBaseModel):
     join_date: Mapped[date | None]
     job_title: Mapped[str | None] = mapped_column(String(128))
     date_of_birth: Mapped[date | None]
+    is_deleted: Mapped[bool]
+    deleted_at: Mapped[datetime | None]
 
     created_projects: Mapped[list["Project"]] = relationship(
         back_populates="creator",
