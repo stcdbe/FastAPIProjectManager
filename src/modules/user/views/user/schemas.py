@@ -1,58 +1,38 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Annotated
 
-from annotated_types import Ge, Le
-from pydantic import EmailStr, Field, StringConstraints
+from pydantic import UUID4, BaseModel, EmailStr, Field
 
-from src.common.presentation.schemas import AbstractPagination, FromAttrsBaseModel, GUIDMixin
-from src.modules.user.models.enums import UserSex
+from src.modules.user.entities.enums import UserGender
 
 
-class _UserBase(FromAttrsBaseModel):
-    username: Annotated[
-        str,
-        StringConstraints(
-            strip_whitespace=True,
-            min_length=5,
-            max_length=50,
-            pattern=r"^[a-z0-9_-]*$",
-        ),
-    ]
-    email: Annotated[EmailStr, StringConstraints(strip_whitespace=True, min_length=5, max_length=50)]
-    company: Annotated[str, StringConstraints(strip_whitespace=True, max_length=100)] | None = None
-    job_title: Annotated[str, StringConstraints(strip_whitespace=True, max_length=100)] | None = None
-    fullname: Annotated[str, StringConstraints(strip_whitespace=True, max_length=100)] | None = None
-    age: Annotated[int, Ge(18), Le(99)] | None = None
-    sex: UserSex | None = None
+class _UserBaseScheme(BaseModel):
+    username: Annotated[str, Field(min_length=5, max_length=128, pattern=r"^[a-z0-9_-]*$")]
+    email: EmailStr
+    first_name: Annotated[str | None, Field(max_length=64)]
+    second_name: Annotated[str | None, Field(max_length=64)]
+    gender: UserGender | None
+    company: Annotated[str | None, Field(max_length=128)]
+    join_date: date | None
+    job_title: Annotated[str | None, Field(max_length=128)]
+    date_of_birth: date | None
 
 
-class UserCreate(_UserBase):
-    password: Annotated[str, StringConstraints(strip_whitespace=True, min_length=10, max_length=72)]
+class UserCreateScheme(_UserBaseScheme):
+    password: Annotated[str, Field(min_length=8, max_length=72)]
 
 
-class UserPatch(UserCreate):
-    username: (
-        Annotated[
-            str,
-            StringConstraints(
-                strip_whitespace=True,
-                min_length=5,
-                max_length=50,
-                pattern=r"^[a-z0-9_-]*$",
-            ),
-        ]
-        | None
-    ) = None
-    email: Annotated[EmailStr, StringConstraints(strip_whitespace=True, min_length=5, max_length=50)] | None = None
-    password: Annotated[str, StringConstraints(strip_whitespace=True, min_length=10, max_length=72)] | None = None
+class UserPatchScheme(_UserBaseScheme):
+    username: Annotated[str | None, Field(min_length=5, max_length=128, pattern=r"^[a-z0-9_-]*$")]
+    email: EmailStr | None
+    password: Annotated[str | None, Field(min_length=8, max_length=72)]
 
 
-class UserGet(_UserBase, GUIDMixin):
-    join_date: datetime
+class UserGetScheme(_UserBaseScheme):
+    guid: UUID4
+    created_at: datetime
+    updated_at: datetime
 
 
-class UserPagination(AbstractPagination):
-    page: int = Field(default=1, gt=0)
-    limit: int = Field(default=5, gt=0, le=10)
-    order_by: str = Field(default="username")
-    reverse: bool = Field(default=False)
+class UserListGetScheme(BaseModel):
+    users: list[UserGetScheme]

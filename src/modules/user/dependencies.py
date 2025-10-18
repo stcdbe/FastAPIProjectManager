@@ -18,15 +18,3 @@ async def get_current_user(auth_service: Annotated[AuthService, Depends()], toke
         return await auth_service.validate_access_token(token=token)
     except InvalidAuthDataError as exc:
         raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail=exc.msg) from exc
-
-
-CurrentUserDep = Annotated[User, Depends(get_current_user)]
-
-
-async def validate_user_guid(user_service: Annotated[UserService, Depends()], user_guid: UUID4) -> User:
-    user = await user_service.get_one(guid=user_guid)
-
-    if not user:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="User not found")
-
-    return user

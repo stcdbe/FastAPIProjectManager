@@ -1,4 +1,4 @@
-from enum import StrEnum, auto
+from enum import StrEnum
 
 
 class UserGender(StrEnum):
@@ -7,5 +7,5 @@ class UserGender(StrEnum):
 
 
 class AuthTokenTyp(StrEnum):
-    access = auto()
-    refresh = auto()
+    ACCESS = "A"
+    REFRESH = "R"

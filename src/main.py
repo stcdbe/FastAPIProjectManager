@@ -1,5 +1,6 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from logging import getLogger
 
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
@@ -10,10 +11,14 @@ from src.config import get_settings
 # from src.modules.project.views.routes import project_v1_router
 from src.modules.user.views.user.routes import user_v1_router
 
+logger = getLogger()
+
 
 @asynccontextmanager
-async def lifespan(_: FastAPI) -> AsyncGenerator[None, None]:
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    logger.info("Web app %s %s starting up...", app.title, app.version)
     yield
+    logger.info("Web app %s %s shutting down...", app.title, app.version)
 
 
 def get_api_v1_router() -> APIRouter:

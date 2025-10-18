@@ -1,97 +1,51 @@
-from datetime import datetime, timedelta
-from typing import Annotated
+from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
-from fastapi import Depends
-from fastapi.security import OAuth2PasswordRequestForm
+import jwt
 
 from src.config import get_settings
-from src.modules.auth.exceptions import InvalidAuthDataError, JWTDecodeError
-from src.modules.user.entities.auth_token import AuthToken
-from src.modules.auth.entities.enums import AuthTokenTyp
-from src.modules.auth.utils.hasher.base import AbstractHasher
-from src.modules.user.services.hasher_service import BcryptHasher
-from src.modules.auth.utils.jwt.base import AbstractJWTManager
-from src.modules.user.services.jwt_service import PyJWTManager
-from src.modules.user.models.entities import User
-from src.modules.user.repositories.base import AbstractUserRepository
-from src.modules.user.repositories.sqlalchemy import SQLAlchemyUserRepository
+from src.modules.user.entities.enums import AuthTokenTyp
 
 
 class AuthService:
-    _repository: AbstractUserRepository
-    _hasher: AbstractHasher
-    _jwt_manager: AbstractJWTManager
-
-    def __init__(
+    def validate_token_and_extract_user_guid(
         self,
-        repository: Annotated[AbstractUserRepository, Depends(SQLAlchemyUserRepository)],
-        hasher: Annotated[AbstractHasher, Depends(BcryptHasher)],
-        jwt_manager: Annotated[AbstractJWTManager, Depends(PyJWTManager)],
-    ) -> None:
-        self._repository = repository
-        self._hasher = hasher
-        self._jwt_manager = jwt_manager
-
-    def _generate_token(
-        self,
-        sub: str,
-        token_typ: AuthTokenTyp,
-        expires_delta: timedelta,
-    ) -> str:
-        expires = datetime.utcnow() + expires_delta
-        payload = {"exp": expires, "sub": sub, "typ": token_typ}
-        return self._jwt_manager.encode_token(payload=payload)
-
-    async def create_token(self, form_data: OAuth2PasswordRequestForm) -> AuthToken:
-        user = await self._repository.get_one(username=form_data.username)
-
-        if not user:
-            raise InvalidAuthDataError(message="User not found")
-
-        if not self._hasher.verify_psw(psw_to_check=form_data.password, hashed_psw=user.password):
-            raise InvalidAuthDataError(message="Incorrect username or password")
-
-        access_token = self._generate_token(
-            sub=str(user.guid),
-            token_typ=AuthTokenTyp.access,
-            expires_delta=timedelta(minutes=get_settings().ACCESS_TOKEN_EXPIRES),
-        )
-        refresh_token = self._generate_token(
-            sub=str(user.guid),
-            token_typ=AuthTokenTyp.refresh,
-            expires_delta=timedelta(minutes=get_settings().REFRESH_TOKEN_EXPIRES),
-        )
-        return AuthToken(access_token=access_token, refresh_token=refresh_token)
-
-    async def _validate_token(self, token: str, expected_token_typ: AuthTokenTyp) -> User:
-        exc = InvalidAuthDataError(message="Could not validate credentials")
-
+        token: str,
+        expected_token_typ: AuthTokenTyp = AuthTokenTyp.ACCESS,
+    ) -> UUID:
         try:
-            payload = self._jwt_manager.decode_token(token=token)
-            guid = UUID(payload["sub"])
-            token_typ = payload["typ"]
-        except (JWTDecodeError, KeyError, ValueError) as e:
-            raise exc from e
+            token_payload = jwt.decode(
+                jwt=token,
+                key=get_settings().JWT_SECRET_KEY,
+                algorithms=(get_settings().JWT_ALGORITHM,),
+            )
+            user_guid = UUID(token_payload["sub"])
+            token_typ = AuthTokenTyp(token_payload["typ"])
+        except (jwt.PyJWTError, KeyError, ValueError) as e:
+            msg = ""
+            raise TypeError(msg) from e
 
         if token_typ != expected_token_typ:
-            raise exc
+            msg = ""
+            raise TypeError(msg)
 
-        user = await self._repository.get_one(guid=guid)
+        return user_guid
 
-        if not user:
-            raise exc
+    def generate_token(
+        self,
+        user_guid: UUID,
+        token_typ: AuthTokenTyp = AuthTokenTyp.ACCESS,
+    ) -> str:
+        if token_typ == AuthTokenTyp.ACCESS:
+            delta = timedelta(minutes=get_settings().ACCESS_TOKEN_EXPIRES)
+        else:
+            delta = timedelta(minutes=get_settings().REFRESH_TOKEN_EXPIRES)
 
-        return user
+        exp = datetime.now(UTC) + delta
+        token_payload = {"sub": str(user_guid), "token_typ": token_typ, "exp": exp}
 
-    async def validate_access_token(self, token: str) -> User:
-        return await self._validate_token(token=token, expected_token_typ=AuthTokenTyp.access)
-
-    async def refresh_token(self, token: str) -> AuthToken:
-        user = await self._validate_token(token=token, expected_token_typ=AuthTokenTyp.refresh)
-        access_token = self._generate_token(
-            sub=str(user.guid),
-            token_typ=AuthTokenTyp.access,
-            expires_delta=timedelta(minutes=get_settings().ACCESS_TOKEN_EXPIRES),
+        return jwt.encode(
+            payload=token_payload,
+            key=get_settings().JWT_SECRET_KEY,
+            algorithm=get_settings().JWT_ALGORITHM,
         )
-        return AuthToken(access_token=access_token)

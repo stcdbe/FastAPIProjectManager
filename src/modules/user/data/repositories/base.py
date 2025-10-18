@@ -8,8 +8,8 @@ class AbstractUserRepository(ABC):
     @abstractmethod
     async def get_list(
         self,
-        limit: int,
         offset: int,
+        limit: int,
         order_by: str,
         reverse: bool = False,
     ) -> list[User]: ...
