@@ -25,6 +25,7 @@ class Settings(BaseSettings):
         case_sensitive=True,
         env_file=_ENV_FILE,
         env_file_encoding=_ENCODING,
+        extra="ignore",
     )
 
     LOG_CONFIG: Annotated[dict[str, Any], Field(default_factory=_parse_log_config)]

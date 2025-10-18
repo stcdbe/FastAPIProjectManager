@@ -3,7 +3,7 @@ from typing import Annotated, Any
 from fastapi import Depends
 
 from src.modules.auth.utils.hasher.base import AbstractHasher
-from src.modules.auth.utils.hasher.bcrypt import BcryptHasher
+from src.modules.user.services.hasher_service import BcryptHasher
 from src.modules.user.data.repositories.base import AbstractUserRepository
 from src.modules.user.data.repositories.sqlalchemy import SQLAlchemyUserRepository
 from src.modules.user.entities.user import User
