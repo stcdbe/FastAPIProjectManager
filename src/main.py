@@ -1,3 +1,6 @@
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi.routing import APIRouter
@@ -6,6 +9,11 @@ from src.config import get_settings
 
 # from src.modules.project.views.routes import project_v1_router
 from src.modules.user.views.user.routes import user_v1_router
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI) -> AsyncGenerator[None, None]:
+    yield
 
 
 def get_api_v1_router() -> APIRouter:
@@ -32,6 +40,7 @@ def create_app() -> FastAPI:
         docs_url=get_settings().DOCS_URL,
         redoc_url=get_settings().REDOC_URL,
         default_response_class=ORJSONResponse,
+        lifespan=lifespan,
     )
 
     for router in (get_api_v1_router(),):
