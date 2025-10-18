@@ -1,4 +1,3 @@
-from typing import Any
 from uuid import UUID
 
 from sqlalchemy import desc, insert, select, update
@@ -7,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from src.common.data.repositories.sqlalchemy_base import SQLAlchemyRepository
 from src.modules.user.data.models.user_model import UserModel
 from src.modules.user.data.repositories.base import AbstractUserRepository
-from src.modules.user.entities import User
+from src.modules.user.entities.user import User
 from src.modules.user.exceptions import InvalidUserDataError
 
 
@@ -29,8 +28,8 @@ class SQLAlchemyUserRepository(AbstractUserRepository, SQLAlchemyRepository):
         res = await self._session.execute(stmt)
         return list(res.scalars().all())
 
-    async def get_one(self, **kwargs: Any) -> User:
-        stmt = select(UserModel).filter_by(**kwargs)
+    async def get_one_by_guid(self, guid: UUID) -> User:
+        stmt = select(UserModel).where(UserModel.guid == guid)
 
         res = await self._session.execute(stmt)
         return res.scalars().one()

@@ -1,12 +1,12 @@
-from typing import Annotated, Any
+from typing import Annotated
+from uuid import UUID
 
 from fastapi import Depends
 
-from src.modules.auth.utils.hasher.base import AbstractHasher
-from src.modules.user.services.hasher_service import BcryptHasher
 from src.modules.user.data.repositories.base import AbstractUserRepository
 from src.modules.user.data.repositories.sqlalchemy import SQLAlchemyUserRepository
 from src.modules.user.entities.user import User
+from src.modules.user.services.hasher_service import BcryptHasher
 
 
 class UserService:
@@ -21,8 +21,8 @@ class UserService:
         self._repository = repository
         self._hasher = hasher
 
-    async def get_one(self, **kwargs: Any) -> User | None:
-        return await self._repository.get_one(**kwargs)
+    async def get_one_by_guid(self, guid: UUID) -> User | None:
+        return await self._repository.get_one_by_guid(guid=guid)
 
     async def get_list(
         self,
