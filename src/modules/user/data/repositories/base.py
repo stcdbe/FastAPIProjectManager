@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Any
 from uuid import UUID
 
 from src.modules.user.entities.user import User
@@ -16,7 +15,7 @@ class AbstractUserRepository(ABC):
     ) -> list[User]: ...
 
     @abstractmethod
-    async def get_one(self, **kwargs: Any) -> User: ...
+    async def get_one_by_guid(self, guid: UUID) -> User: ...
 
     @abstractmethod
     async def create_one(self, user: User) -> UUID: ...

@@ -26,10 +26,10 @@ from src.modules.project.views.schemas import (
 from src.modules.task.services.services import TaskService
 from src.modules.task.views.schemas import TaskCreate, TaskPatch
 
-project_router = APIRouter(prefix="/projects", tags=["Projects"])
+project_v1_router = APIRouter(prefix="/projects", tags=["Projects"])
 
 
-@project_router.get(
+@project_v1_router.get(
     path="",
     response_model=list[ProjectGet],
     status_code=HTTPStatus.OK,
@@ -42,7 +42,7 @@ async def get_some_projects(
     return await project_service.get_list(params=params)
 
 
-@project_router.post(
+@project_v1_router.post(
     path="",
     status_code=HTTPStatus.CREATED,
     response_model=ProjectGet,
@@ -59,7 +59,7 @@ async def create_project(
         raise HTTPException(status_code=HTTPStatus.CONFLICT, detail=exc.message) from exc
 
 
-@project_router.get(
+@project_v1_router.get(
     path="/{project_guid}",
     status_code=HTTPStatus.OK,
     response_model=ProjectWithTasksGet,
@@ -69,7 +69,7 @@ async def get_project(project: Annotated[Project, Depends(ProjectDepFactory(load
     return project
 
 
-@project_router.post(
+@project_v1_router.post(
     path="/{project_guid}",
     status_code=HTTPStatus.CREATED,
     response_model=ProjectWithTasksGet,
@@ -86,7 +86,7 @@ async def create_project_task(
         raise HTTPException(status_code=HTTPStatus.CONFLICT, detail=exc.message) from exc
 
 
-@project_router.patch(
+@project_v1_router.patch(
     path="/{project_guid}",
     status_code=HTTPStatus.OK,
     response_model=ProjectGet,
@@ -103,7 +103,7 @@ async def patch_project(
         raise HTTPException(status_code=HTTPStatus.CONFLICT, detail=exc.message) from exc
 
 
-@project_router.delete(
+@project_v1_router.delete(
     path="/{project_guid}",
     status_code=HTTPStatus.NO_CONTENT,
     name="Delete the project",
@@ -115,7 +115,7 @@ async def del_project(
     await project_service.del_one(project=project)
 
 
-@project_router.post(
+@project_v1_router.post(
     path="/{project_guid}/send_as_report/{email}",
     status_code=HTTPStatus.ACCEPTED,
     response_model=Message,
@@ -137,7 +137,7 @@ async def send_project_report(
     return {"message": "Email sent successfully"}
 
 
-@project_router.patch(
+@project_v1_router.patch(
     path="/{project_guid}/tasks/{task_guid}",
     status_code=HTTPStatus.OK,
     response_model=ProjectWithTasksGet,
@@ -159,7 +159,7 @@ async def patch_project_task(
         raise HTTPException(status_code=HTTPStatus.CONFLICT, detail=exc.message) from exc
 
 
-@project_router.delete(
+@project_v1_router.delete(
     path="/{project_guid}/tasks/{task_guid}",
     status_code=HTTPStatus.NO_CONTENT,
     name="Delete the project task",

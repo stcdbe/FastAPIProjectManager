@@ -4,10 +4,9 @@ from jwt import DecodeError, InvalidTokenError, decode, encode
 
 from src.config import get_settings
 from src.modules.auth.exceptions import JWTDecodeError
-from src.modules.auth.utils.jwt.base import AbstractJWTManager
 
 
-class PyJWTManager(AbstractJWTManager):
+class PyJWTManager:
     def encode_token(self, payload: dict[str, Any]) -> str:
         return encode(
             payload=payload,
