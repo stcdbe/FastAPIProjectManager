@@ -4,10 +4,10 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
-auth_router = APIRouter(prefix="/auth", tags=["Auth"])
+auth_v1_router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
-@auth_router.post(
+@auth_v1_router.post(
     path="/create_token",
     status_code=HTTPStatus.CREATED,
     response_model=AuthTokenGet,
@@ -23,7 +23,7 @@ async def create_access_token(
         raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail=exc.message) from exc
 
 
-@auth_router.post(
+@auth_v1_router.post(
     path="/refresh_token",
     status_code=HTTPStatus.CREATED,
     response_model=AuthToken,
