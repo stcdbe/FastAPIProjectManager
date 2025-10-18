@@ -7,7 +7,7 @@ from src.modules.auth.dependencies import CurrentUserDep
 from src.modules.user.dependencies import validate_user_guid
 from src.modules.user.entities.user import User
 from src.modules.user.exceptions import InvalidUserDataError
-from src.modules.user.services.services import UserService
+from src.modules.user.services.user_service import UserService
 from src.modules.user.views.schemas import UserCreate, UserGet, UserPatch
 
 user_v1_router = APIRouter(prefix="/users", tags=["Users"])

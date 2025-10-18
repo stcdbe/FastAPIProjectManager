@@ -7,12 +7,12 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from src.config import get_settings
 from src.modules.auth.exceptions import InvalidAuthDataError, JWTDecodeError
-from src.modules.auth.entities.auth_token import AuthToken
+from src.modules.user.entities.auth_token import AuthToken
 from src.modules.auth.entities.enums import AuthTokenTyp
 from src.modules.auth.utils.hasher.base import AbstractHasher
-from src.modules.auth.utils.hasher.bcrypt import BcryptHasher
+from src.modules.user.services.hasher_service import BcryptHasher
 from src.modules.auth.utils.jwt.base import AbstractJWTManager
-from src.modules.auth.utils.jwt.pyjwt import PyJWTManager
+from src.modules.user.services.jwt_service import PyJWTManager
 from src.modules.user.models.entities import User
 from src.modules.user.repositories.base import AbstractUserRepository
 from src.modules.user.repositories.sqlalchemy import SQLAlchemyUserRepository
