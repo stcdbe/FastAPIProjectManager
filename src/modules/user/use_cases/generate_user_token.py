@@ -31,8 +31,6 @@ class GenerateUserTokenUseCase:
         acess_token = self._auth_service.generate_token(user.guid)
         refresh_token = self._auth_service.generate_token(user.guid, token_typ=AuthTokenTyp.REFRESH)
 
-        logger.info("Generated access and refresh tokens for user %s", user.guid)
-
         return AuthToken(
             access_token=acess_token,
             refresh_token=refresh_token,

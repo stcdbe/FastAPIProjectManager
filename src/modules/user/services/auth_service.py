@@ -25,6 +25,7 @@ class AuthService:
             )
             user_guid = UUID(token_payload["sub"])
             token_typ = AuthTokenTyp(token_payload["typ"])
+            exp = token_payload["exp"]
         except (jwt.PyJWTError, KeyError, ValueError) as e:
             logger.warning("Error while decoding token %s error: %s", token, e)
             msg = f"Error while decoding token {token}"
@@ -33,6 +34,11 @@ class AuthService:
         if token_typ != expected_token_typ:
             logger.warning("Error while decoding token %s invalid token_typ %s", token, expected_token_typ)
             msg = f"Error while decoding token {token}"
+            raise UserInvalidTokenError(msg)
+
+        if exp > datetime.now(UTC).timestamp():
+            logger.info("Decoded expired token")
+            msg = "Expired token"
             raise UserInvalidTokenError(msg)
 
         return user_guid

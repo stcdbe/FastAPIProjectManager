@@ -4,10 +4,7 @@ from sqlalchemy import desc, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
 
-from src.common.repositories.sqlalchemy import SQLAlchemyRepository
 from src.modules.project.exceptions import InvalidProjectDataError
-from src.modules.project.models.entities import Project
-from src.modules.project.repositories.base import AbstractProjectRepository
 
 
 class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepository):
@@ -16,7 +13,7 @@ class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepositor
         limit: int,
         offset: int,
         order_by: str,
-        reverse: bool = False,
+        reverse: bool,
     ) -> list[Project]:
         stmt = select(Project).offset(offset).limit(limit)
 

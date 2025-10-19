@@ -18,7 +18,7 @@ class SQLAlchemyUserRepository(AbstractUserRepository, SQLAlchemyRepository):
         offset: int,
         limit: int,
         order_by: str,
-        reverse: bool = False,
+        reverse: bool,
     ) -> list[User]:
         stmt = select(UserModel).where(UserModel.is_deleted == False).offset(offset).limit(limit)  # noqa: E712
 
@@ -81,5 +81,5 @@ class SQLAlchemyUserRepository(AbstractUserRepository, SQLAlchemyRepository):
                 return res.scalars().one()
 
         except IntegrityError as e:
-            msg = f"Error while patching user {user.username}: {e!r}"
+            msg = f"Error while patching user {user.guid}: {e!r}"
             raise UserCreateError(msg) from e
