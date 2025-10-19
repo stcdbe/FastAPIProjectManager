@@ -1,10 +1,14 @@
 from datetime import UTC, datetime, timedelta
+from logging import getLogger
 from uuid import UUID
 
 import jwt
 
 from src.config import get_settings
 from src.modules.user.entities.enums import AuthTokenTyp
+from src.modules.user.exc import UserInvalidTokenError
+
+logger = getLogger()
 
 
 class AuthService:
@@ -22,12 +26,14 @@ class AuthService:
             user_guid = UUID(token_payload["sub"])
             token_typ = AuthTokenTyp(token_payload["typ"])
         except (jwt.PyJWTError, KeyError, ValueError) as e:
-            msg = ""
-            raise TypeError(msg) from e
+            logger.warning("Error while decoding token %s error: %s", token, e)
+            msg = f"Error while decoding token {token}"
+            raise UserInvalidTokenError(msg) from e
 
         if token_typ != expected_token_typ:
-            msg = ""
-            raise TypeError(msg)
+            logger.warning("Error while decoding token %s invalid token_typ %s", token, expected_token_typ)
+            msg = f"Error while decoding token {token}"
+            raise UserInvalidTokenError(msg)
 
         return user_guid
 
@@ -42,7 +48,7 @@ class AuthService:
             delta = timedelta(minutes=get_settings().REFRESH_TOKEN_EXPIRES)
 
         exp = datetime.now(UTC) + delta
-        token_payload = {"sub": str(user_guid), "token_typ": token_typ, "exp": exp}
+        token_payload = {"sub": str(user_guid), "typ": token_typ, "exp": exp}
 
         return jwt.encode(
             payload=token_payload,

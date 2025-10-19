@@ -1,9 +1,13 @@
 from datetime import UTC, datetime
+from logging import getLogger
 from uuid import UUID, uuid4
 
 from src.modules.user.data.repositories.sqlalchemy import SQLAlchemyUserRepository
 from src.modules.user.entities.user import User, UserCreateData, UserPatchData
-from src.modules.user.services.hasher_service import BcryptHasher
+from src.modules.user.exc import UserIsSoftDeletedError
+from src.modules.user.services.hasher_service import Hasher
+
+logger = getLogger()
 
 
 class UserService:
@@ -11,7 +15,7 @@ class UserService:
         self,
     ) -> None:
         self._user_repository = SQLAlchemyUserRepository()
-        self._hasher = BcryptHasher()
+        self._hasher = Hasher()
 
     async def get_list(
         self,
@@ -31,7 +35,8 @@ class UserService:
         user = await self._user_repository.get_one_by_guid(guid)
 
         if user.is_deleted:
-            raise
+            msg = f"User {guid} is soft deleted"
+            raise UserIsSoftDeletedError(msg)
 
         return user
 
@@ -39,7 +44,8 @@ class UserService:
         user = await self._user_repository.get_one_by_username(username)
 
         if user.is_deleted:
-            raise
+            msg = f"User {username} is soft deleted"
+            raise UserIsSoftDeletedError(msg)
 
         return user
 
@@ -61,7 +67,6 @@ class UserService:
             is_deleted=False,
             deleted_at=None,
         )
-        user.password = self._hasher.get_psw_hash(user.password)
         return await self._user_repository.create_one(user=user)
 
     async def patch_one(self, user: User, user_patch_data: UserPatchData) -> UUID:

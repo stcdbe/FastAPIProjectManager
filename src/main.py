@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi.routing import APIRouter
 
+from src.common.data.repositories.sqlalchemy_base import create_tables, drop_tables
 from src.config import get_settings
 from src.modules.user.views.auth.views import auth_v1_router
 from src.modules.user.views.user.routes import user_v1_router
@@ -18,16 +19,19 @@ logger = getLogger()
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Web app %s %s starting up...", app.title, app.version)
+    await drop_tables()
+    await create_tables()
     yield
     logger.info("Web app %s %s shutting down...", app.title, app.version)
+    await drop_tables()
 
 
 def get_api_v1_router() -> APIRouter:
     api_v1_router = APIRouter(prefix="/api/v1")
 
     for router in (
-        user_v1_router,
         auth_v1_router,
+        user_v1_router,
         # project_v1_router,
     ):
         api_v1_router.include_router(router=router)

@@ -1,7 +1,7 @@
 import bcrypt
 
 
-class BcryptHasher:
+class Hasher:
     def get_psw_hash(self, psw: str) -> str:
         return (bcrypt.hashpw(password=psw.encode(), salt=bcrypt.gensalt())).decode()
 

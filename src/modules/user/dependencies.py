@@ -11,7 +11,12 @@ from src.modules.user.use_cases.authenticate_user_by_token import AuthenticateUs
 async def get_current_user(
     token: Annotated[
         str,
-        Depends(OAuth2PasswordBearer(tokenUrl="api/v1/auth/create_token", refreshUrl="api/v1/auth/refresh_token")),
+        Depends(
+            OAuth2PasswordBearer(
+                tokenUrl="api/v1/auth/create_token",
+                refreshUrl="api/v1/auth/refresh_token",
+            ),
+        ),
     ],
 ) -> User:
     use_case = AuthenticateUserByTokenUseCase()

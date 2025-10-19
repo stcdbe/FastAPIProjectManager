@@ -39,6 +39,6 @@ async def drop_tables() -> None:
 
 class SQLAlchemyRepository:
     @asynccontextmanager
-    async def get_session(self) -> AsyncGenerator[AsyncSession, None]:
+    async def _get_session(self) -> AsyncGenerator[AsyncSession, None]:
         async with async_session_factory() as session:
             yield session
