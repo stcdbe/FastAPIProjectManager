@@ -11,14 +11,13 @@ class AbstractUserRepository(ABC):
         offset: int,
         limit: int,
         order_by: str,
-        reverse: bool = False,
+        reverse: bool,
     ) -> list[User]: ...
-
     @abstractmethod
     async def get_one_by_guid(self, guid: UUID) -> User: ...
-
+    @abstractmethod
+    async def get_one_by_username(self, username: str) -> User: ...
     @abstractmethod
     async def create_one(self, user: User) -> UUID: ...
-
     @abstractmethod
     async def patch_one(self, user: User) -> UUID: ...

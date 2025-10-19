@@ -35,6 +35,7 @@ class UserService:
         user = await self._user_repository.get_one_by_guid(guid)
 
         if user.is_deleted:
+            logger.warning("Attempt to fetch soft deleted user by guid %s", guid)
             msg = f"User {guid} is soft deleted"
             raise UserIsSoftDeletedError(msg)
 
@@ -44,6 +45,7 @@ class UserService:
         user = await self._user_repository.get_one_by_username(username)
 
         if user.is_deleted:
+            logger.warning("Attempt to fetch soft deleted user by username %s", username)
             msg = f"User {username} is soft deleted"
             raise UserIsSoftDeletedError(msg)
 
