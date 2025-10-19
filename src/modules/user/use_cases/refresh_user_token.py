@@ -10,9 +10,8 @@ class RefreshUserTokenUseCase:
         self._user_service = UserService()
 
     async def execute(self, token: str) -> AuthToken:
-        user_guid = self._auth_service.validate_token_and_extract_user_guid(token)
+        user_guid = self._auth_service.validate_token_and_extract_user_guid(token, AuthTokenTyp.REFRESH)
         user = await self._user_service.get_one_by_guid(user_guid)
-
         access_token = self._auth_service.generate_token(user.guid)
         refresh_token = self._auth_service.generate_token(user.guid, AuthTokenTyp.REFRESH)
         return AuthToken(

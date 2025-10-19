@@ -1,14 +1,15 @@
 from datetime import date, datetime
-from typing import TYPE_CHECKING
 
+# from typing import TYPE_CHECKING
 from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
+# , relationship
 from src.common.data.models.sqlalchemy_timed_base import SQLAlchemyTimedBaseModel
 
-if TYPE_CHECKING:
-    from src.modules.project.data.models.project_model import Project
-    from src.modules.task.data.models.task_model import Task
+# if TYPE_CHECKING:
+# from src.modules.project.data.models.project_model import ProjectModel
+# from src.modules.task.data.models.task_model import TaskModel
 
 
 class UserModel(SQLAlchemyTimedBaseModel):
@@ -27,17 +28,17 @@ class UserModel(SQLAlchemyTimedBaseModel):
     is_deleted: Mapped[bool]
     deleted_at: Mapped[datetime | None]
 
-    created_projects: Mapped[list["Project"]] = relationship(
-        back_populates="creator",
-        cascade="all, delete-orphan",
-        foreign_keys="Project.creator_guid",
-    )
-    mentioned_projects: Mapped[list["Project"]] = relationship(
-        back_populates="mentor",
-        cascade="all, delete-orphan",
-        foreign_keys="Project.mentor_guid",
-    )
-    tasks: Mapped[list["Task"]] = relationship(
-        back_populates="executor",
-        cascade="all, delete-orphan",
-    )
+    # created_projects: Mapped[list["ProjectModel"]] = relationship(
+    #     back_populates="creator",
+    #     cascade="all, delete-orphan",
+    #     foreign_keys="Project.creator_guid",
+    # )
+    # mentioned_projects: Mapped[list["ProjectModel"]] = relationship(
+    #     back_populates="mentor",
+    #     cascade="all, delete-orphan",
+    #     foreign_keys="Project.mentor_guid",
+    # )
+    # tasks: Mapped[list["TaskModel"]] = relationship(
+    #     back_populates="executor",
+    #     cascade="all, delete-orphan",
+    # )
