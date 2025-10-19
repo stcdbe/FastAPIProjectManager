@@ -7,9 +7,10 @@ from fastapi.responses import ORJSONResponse
 from fastapi.routing import APIRouter
 
 from src.config import get_settings
+from src.modules.user.views.auth.views import auth_v1_router
+from src.modules.user.views.user.routes import user_v1_router
 
 # from src.modules.project.views.routes import project_v1_router
-from src.modules.user.views.user.routes import user_v1_router
 
 logger = getLogger()
 
@@ -26,6 +27,7 @@ def get_api_v1_router() -> APIRouter:
 
     for router in (
         user_v1_router,
+        auth_v1_router,
         # project_v1_router,
     ):
         api_v1_router.include_router(router=router)

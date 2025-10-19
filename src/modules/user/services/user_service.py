@@ -28,10 +28,20 @@ class UserService:
         )
 
     async def get_one_by_guid(self, guid: UUID) -> User:
-        return await self._user_repository.get_one_by_guid(guid)
+        user = await self._user_repository.get_one_by_guid(guid)
+
+        if user.is_deleted:
+            raise
+
+        return user
 
     async def get_one_by_username(self, username: str) -> User:
-        return await self._user_repository.get_one_by_username(username)
+        user = await self._user_repository.get_one_by_username(username)
+
+        if user.is_deleted:
+            raise
+
+        return user
 
     async def create_one(self, user_create_data: UserCreateData) -> UUID:
         user = User(
@@ -48,6 +58,8 @@ class UserService:
             date_of_birth=user_create_data.date_of_birth,
             created_at=datetime.now(UTC),
             updated_at=datetime.now(UTC),
+            is_deleted=False,
+            deleted_at=None,
         )
         user.password = self._hasher.get_psw_hash(user.password)
         return await self._user_repository.create_one(user=user)
@@ -73,5 +85,7 @@ class UserService:
         user.updated_at = datetime.now(UTC)
         return await self._user_repository.patch_one(user=user)
 
-    async def delete_one_by_guid(self, user: User) -> UUID:
-        return await self._user_repository.delete_one(user)
+    async def soft_delete_one_by_guid(self, user: User) -> UUID:
+        user.is_deleted = True
+        user.deleted_at = datetime.now(UTC)
+        return await self._user_repository.patch_one(user)

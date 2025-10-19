@@ -1,7 +1,6 @@
 from collections.abc import AsyncGenerator
-from typing import Annotated
+from contextlib import asynccontextmanager
 
-from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from src.common.data.models.sqlalchemy_base import SQLAlchemyBaseModel
@@ -39,7 +38,7 @@ async def drop_tables() -> None:
 
 
 class SQLAlchemyRepository:
-    _session: AsyncSession
-
-    def __init__(self, session: Annotated[AsyncSession, Depends(get_session)]) -> None:
-        self._session = session
+    @asynccontextmanager
+    async def get_session(self) -> AsyncGenerator[AsyncSession, None]:
+        async with async_session_factory() as session:
+            yield session

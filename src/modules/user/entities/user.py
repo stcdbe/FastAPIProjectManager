@@ -20,6 +20,8 @@ class User:
     date_of_birth: date | None
     created_at: datetime
     updated_at: datetime
+    is_deleted: bool
+    deleted_at: datetime | None
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}(guid={self.guid})"
