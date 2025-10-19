@@ -1,9 +1,8 @@
 services:
-
   postgres:
-    container_name: fastapiprojectmanager-postgres
-    image: postgres:16.1
-    restart: on-failure
+    container_name: fpm-postgres
+    image: postgres:17-alpine
+    restart: always
     env_file:
       - .env
     environment:
@@ -11,29 +10,44 @@ services:
       - POSTGRES_USER=${PG_USER}
       - POSTGRES_DB=${PG_DB}
     ports:
-        - ${PG_PORT}:${PG_PORT}
-    expose:
-        - ${PG_PORT}
+        - 5432:${PG_PORT}
+    # volumes:
+    #   - local_pgdata:/var/lib/postgresql/data
     networks:
       - custom
 
-  web:
-    container_name: fastapiprojectmanager-web
-    build: .
-    command: "sh -c 'alembic upgrade head && gunicorn -c gunicorn.conf.py asgi:app'"
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: fpm-postgres-admin
     restart: always
     env_file:
       - .env
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     ports:
-      - ${PORT}:${PORT}
-    expose:
-      - ${PORT}
+      - "8888:80"
     depends_on:
       - postgres
+    # volumes:
+      # - pgadmin-data:/var/lib/pgadmin
     networks:
       - custom
 
-networks:
+  # web:
+  #   container_name: fpm-web
+  #   build: .
+  #   command: "sh -c 'python3 asgi.py'"
+  #   restart: always
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - 8000:${PORT}
+  #   depends_on:
+  #     - postgres
+  #   networks:
+  #     - custom
 
+networks:
   custom:
     driver: bridge

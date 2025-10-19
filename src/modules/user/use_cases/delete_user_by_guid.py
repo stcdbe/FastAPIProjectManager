@@ -8,4 +8,5 @@ class DeleteUserByGUIDUseCase:
         self._user_service = UserService()
 
     async def execute(self, guid: UUID) -> UUID:
-        return await self._user_service.delete_one_by_guid(guid)
+        user = await self._user_service.get_one_by_guid(guid)
+        return await self._user_service.soft_delete_one_by_guid(user)

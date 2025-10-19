@@ -1,3 +1,4 @@
+from logging import getLogger
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query, status
@@ -23,14 +24,14 @@ user_v1_router = APIRouter(prefix="/users", tags=["Users"])
     description="Get user list",
 )
 async def get_user_list(
-    offset: Annotated[int, Query(default=0, gt=0)],
-    limit: Annotated[int, Query(default=5, gt=0, le=10)],
-    order_by: Annotated[str, Query(default="username", enum=tuple(UserGetScheme.model_fields))],
-    reverse: Annotated[bool, Query(default=False)],
+    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(gt=0, le=10)] = 5,
+    order_by: Annotated[str, Query(enum=tuple(UserGetScheme.model_fields))] = "username",
+    reverse: Annotated[bool, Query()] = False,
 ) -> dict[str, list[User]]:
     use_case = GetUserListUseCase()
     try:
-        users = await use_case.execute()
+        users = await use_case.execute(offset, limit, order_by, reverse)
 
     except BaseAppError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.msg) from e
