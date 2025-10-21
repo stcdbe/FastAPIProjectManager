@@ -72,5 +72,5 @@ class ProjectService:
 
         return await self._repository.patch_one(project=project)
 
-    async def delete_one(self, project: Project) -> None:
-        await self._repository.delete_one(project=project)
+    async def delete_one(self, project: Project) -> UUID:
+        return await self._repository.delete_one(project=project)

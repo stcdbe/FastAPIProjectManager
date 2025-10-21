@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from src.modules.project.entities.project import ProjectCreateData, ProjectPatchData, ProjectReportSendData
 from src.modules.project.views.schemas import ProjectCreateScheme, ProjectPatchScheme, ProjectReportSendDataScheme
 
@@ -33,7 +35,11 @@ def convert_project_patch_scheme_to_entity(scheme: ProjectPatchScheme) -> Projec
     )
 
 
-def convert_project_report_send_data_scheme_to_entity(scheme: ProjectReportSendDataScheme) -> ProjectReportSendData:
+def convert_project_report_send_data_scheme_to_entity(
+    project_guid: UUID,
+    scheme: ProjectReportSendDataScheme,
+) -> ProjectReportSendData:
     return ProjectReportSendData(
+        project_guid=project_guid,
         email=scheme.email,
     )

@@ -71,7 +71,7 @@ class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepositor
             await session.commit()
             return res.scalars().one()
 
-    async def delete_one(self, project: Project) -> None:
+    async def delete_one(self, project: Project) -> UUID:
         stmt = delete(ProjectModel).where(ProjectModel.guid == project.guid).returning(ProjectModel.guid)
 
         async with self._get_session() as session:
