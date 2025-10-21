@@ -8,9 +8,12 @@ dependencies = [
     "bcrypt>=5.0.0",
     "email-validator>=2.3.0",
     "fastapi>=0.119.0",
+    "faststream[rabbit]>=0.6.2",
     "gunicorn>=23.0.0",
+    "httpx>=0.28.1",
     "orjson>=3.11.3",
     "psycopg[binary]>=3.2.10",
+    "punq>=0.7.0",
     "pydantic-settings>=2.11.0",
     "pyjwt>=2.10.1",
     "python-multipart>=0.0.20",
@@ -23,3 +26,6 @@ dependencies = [
 dev = [
     "pytest-asyncio>=1.2.0",
 ]
+
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "session"
