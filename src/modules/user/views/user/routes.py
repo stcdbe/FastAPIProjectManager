@@ -1,11 +1,10 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import UUID4
 
 from src.common.exceptions.base import BaseAppError
-from src.common.presentation.schemas import GUIDResponse
-from src.modules.user.dependencies import get_current_user
+from src.common.presentation.schemas import ErrorResponse, GUIDResponse
 from src.modules.user.entities.user import User
 from src.modules.user.exc import UserNotFoundError
 from src.modules.user.use_cases.create_user import CreateUserUseCase
@@ -26,13 +25,18 @@ user_v1_router = APIRouter(prefix="/users", tags=["Users"])
     path="",
     status_code=status.HTTP_200_OK,
     response_model=UserListGetScheme,
+    responses={
+        status.HTTP_200_OK: {"model": UserListGetScheme},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
+        status.HTTP_403_FORBIDDEN: {"model": ErrorResponse},
+    },
     description="Get user list",
 )
 async def get_user_list(
     # _: Annotated[User, Depends(get_current_user)],
     offset: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(gt=0, le=10)] = 5,
-    order_by: Annotated[str, Query(enum=tuple(UserGetScheme.model_fields))] = "username",
+    order_by: Annotated[str, Query(enum=tuple(UserGetScheme.model_fields))] = "created_at",
     reverse: Annotated[bool, Query()] = False,
 ) -> dict[str, list[User]]:
     use_case = GetUserListUseCase()
@@ -49,6 +53,11 @@ async def get_user_list(
     path="",
     status_code=status.HTTP_200_OK,
     response_model=GUIDResponse,
+    responses={
+        status.HTTP_200_OK: {"model": GUIDResponse},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
+        status.HTTP_403_FORBIDDEN: {"model": ErrorResponse},
+    },
     description="Create a new user",
 )
 async def create_user(
@@ -70,6 +79,12 @@ async def create_user(
     path="/{user_guid}",
     status_code=status.HTTP_200_OK,
     response_model=UserGetScheme,
+    responses={
+        status.HTTP_200_OK: {"model": UserGetScheme},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse},
+        status.HTTP_403_FORBIDDEN: {"model": ErrorResponse},
+    },
     description="Get user by guid",
 )
 async def get_user(
@@ -91,6 +106,12 @@ async def get_user(
     path="/{user_guid}",
     status_code=status.HTTP_200_OK,
     response_model=GUIDResponse,
+    responses={
+        status.HTTP_200_OK: {"model": GUIDResponse},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse},
+        status.HTTP_403_FORBIDDEN: {"model": ErrorResponse},
+    },
     description="Patch user by guid",
 )
 async def patch_user(
@@ -115,6 +136,13 @@ async def patch_user(
 @user_v1_router.delete(
     path="/{user_guid}",
     status_code=status.HTTP_204_NO_CONTENT,
+    response_model=None,
+    responses={
+        status.HTTP_204_NO_CONTENT: {"model": None},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse},
+        status.HTTP_403_FORBIDDEN: {"model": ErrorResponse},
+    },
     description="Delete user by guid",
 )
 async def delete_user(

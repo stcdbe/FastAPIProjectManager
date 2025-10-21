@@ -22,7 +22,7 @@ class UserCreateScheme(_UserBaseScheme):
     password: Annotated[str, Field(min_length=8, max_length=72)]
 
 
-class UserPatchScheme(_UserBaseScheme):
+class UserPatchScheme(UserCreateScheme):
     username: Annotated[str | None, Field(min_length=5, max_length=128, pattern=r"^[a-z0-9_-]*$")]
     email: EmailStr | None
     password: Annotated[str | None, Field(min_length=8, max_length=72)]

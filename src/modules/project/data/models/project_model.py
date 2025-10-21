@@ -1,10 +1,11 @@
 from datetime import date
 
 # from typing import TYPE_CHECKING
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import ForeignKey, String, Text
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 # , relationship
@@ -21,6 +22,7 @@ class ProjectModel(SQLAlchemyTimedBaseModel):
     title: Mapped[str] = mapped_column(String(256))
     description: Mapped[str] = mapped_column(Text)
     tech_stack: Mapped[tuple[str, ...]] = mapped_column(ARRAY(item_type=String, as_tuple=True))
+    additional_metadata: Mapped[dict[str, Any]] = mapped_column(JSONB)
     start_date: Mapped[date]
     constraint_date: Mapped[date]
     creator_guid: Mapped[UUID] = mapped_column(ForeignKey("user.guid"))
