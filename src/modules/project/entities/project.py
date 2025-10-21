@@ -44,4 +44,5 @@ class ProjectPatchData:
 
 @dataclass(slots=True)
 class ProjectReportSendData:
+    project_guid: UUID
     email: str
