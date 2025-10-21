@@ -1,10 +1,13 @@
-from typing import Any
+from dataclasses import asdict
+from uuid import UUID
 
-from sqlalchemy import desc, select
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import selectinload
+from sqlalchemy import delete, desc, insert, select, update
 
-from src.modules.project.exceptions import InvalidProjectDataError
+# from sqlalchemy.orm import selectinload
+from src.common.data.repositories.sqlalchemy_base import SQLAlchemyRepository
+from src.modules.project.data.models.project_model import ProjectModel
+from src.modules.project.data.repositories.base import AbstractProjectRepository
+from src.modules.project.entities.project import Project
 
 
 class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepository):
@@ -15,50 +18,63 @@ class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepositor
         order_by: str,
         reverse: bool,
     ) -> list[Project]:
-        stmt = select(Project).offset(offset).limit(limit)
+        stmt = select(ProjectModel).offset(offset).limit(limit)
 
         if reverse:
             stmt = stmt.order_by(desc(order_by))
         else:
             stmt = stmt.order_by(order_by)
 
-        res = await self._session.execute(stmt)
-        return list(res.scalars().all())
+        async with self._get_session() as session:
+            res = await session.execute(stmt)
+            return list(res.scalars().all())
 
-    async def get_one(self, load_tasks: bool = False, **kwargs: Any) -> Project | None:
-        stmt = select(Project).filter_by(**kwargs)
+    async def get_one_by_guid(self, guid: UUID, with_tasks: bool = False) -> Project:
+        stmt = select(ProjectModel).where(ProjectModel.guid == guid)
 
-        if load_tasks:
-            stmt = stmt.options(selectinload(Project.tasks))
+        # if with_tasks:
+        #     stmt = stmt.options(selectinload(ProjectModel.tasks))
 
-        res = await self._session.execute(stmt)
-        return res.scalars().first()
+        async with self._get_session() as session:
+            res = await session.execute(stmt)
+            return res.scalars().one()
 
-    async def create_one(self, project: Project) -> Project:
-        try:
-            self._session.add(project)
-            await self._session.commit()
+    async def get_one_by_title(self, title: str) -> Project:
+        stmt = select(ProjectModel).where(ProjectModel.title.icontains(title))
 
-        except IntegrityError as exc:
-            await self._session.rollback()
-            raise InvalidProjectDataError(message=f"{exc.orig}") from exc
+        async with self._get_session() as session:
+            res = await session.execute(stmt)
+            return res.scalars().one()
 
-        else:
-            await self._session.refresh(project)
-            return project
+    async def create_one(self, project: Project) -> UUID:
+        stmt = insert(ProjectModel).values(**asdict(project)).returning(ProjectModel.guid)
 
-    async def patch_one(self, project: Project) -> Project:
-        try:
-            await self._session.commit()
+        async with self._get_session() as session:
+            res = await session.execute(stmt)
+            await session.commit()
+            return res.scalars().one()
 
-        except IntegrityError as exc:
-            await self._session.rollback()
-            raise InvalidProjectDataError(message=f"{exc.orig}") from exc
+        # except IntegrityError as exc:
+        #     msg = f"{exc.orig}"
+        #     raise InvalidProjectDataError(msg) from exc
 
-        else:
-            await self._session.refresh(project)
-            return project
+    async def patch_one(self, project: Project) -> UUID:
+        stmt = (
+            update(ProjectModel)
+            .where(ProjectModel.guid == project.guid)
+            .values(**asdict(project))
+            .returning(ProjectModel.guid)
+        )
 
-    async def del_one(self, project: Project) -> None:
-        await self._session.delete(project)
-        await self._session.commit()
+        async with self._get_session() as session:
+            res = await session.execute(stmt)
+            await session.commit()
+            return res.scalars().one()
+
+    async def delete_one(self, project: Project) -> None:
+        stmt = delete(ProjectModel).where(ProjectModel.guid == project.guid).returning(ProjectModel.guid)
+
+        async with self._get_session() as session:
+            res = await session.execute(stmt)
+            await session.commit()
+            return res.scalars().one()
