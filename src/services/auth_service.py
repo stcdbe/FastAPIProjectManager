@@ -12,6 +12,8 @@ logger = getLogger()
 
 
 class AuthService:
+    __slots__ = ()
+
     def validate_token_and_extract_user_guid(
         self,
         token: str,
@@ -26,6 +28,7 @@ class AuthService:
             user_guid = UUID(token_payload["sub"])
             token_typ = AuthTokenTyp(token_payload["typ"])
             exp = token_payload["exp"]
+
         except (jwt.PyJWTError, KeyError, ValueError) as e:
             logger.warning("Error while decoding token %s error: %s", token, e)
             msg = f"Error while decoding token {token}"
@@ -36,7 +39,7 @@ class AuthService:
             msg = f"Error while decoding token {token}"
             raise UserInvalidTokenError(msg)
 
-        if exp > datetime.now(UTC).timestamp():
+        if (expected_token_typ == AuthTokenTyp.ACCESS) and (exp > datetime.now(UTC).timestamp()):
             logger.info("Decoded expired token")
             msg = "Expired token"
             raise UserInvalidTokenError(msg)

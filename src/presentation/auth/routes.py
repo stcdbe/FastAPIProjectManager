@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 
 from src.common.exc import BaseAppError
@@ -36,11 +36,12 @@ async def create_access_token(
     description="Refresh the access token",
 )
 async def refresh_access_token(
-    token: str,
+    request: Request,
 ) -> AuthToken:
     use_case = RefreshUserTokenUseCase()
+    _, acess_token = request.headers.get("Authorization", "Bearer invalid_token").split(" ")
     try:
-        return await use_case.execute(token=token)
+        return await use_case.execute(token=acess_token)
 
     except BaseAppError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.msg) from e

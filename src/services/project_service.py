@@ -29,7 +29,7 @@ class ProjectService:
     async def get_one_by_title(self, title: str) -> Project:
         return await self._repository.get_one_by_title(title=title)
 
-    async def create_one(self, project_create_data: ProjectCreateData) -> UUID:
+    async def create_one(self, creator_guid: UUID, project_create_data: ProjectCreateData) -> UUID:
         project = Project(
             guid=uuid4(),
             title=project_create_data.title,
@@ -38,7 +38,7 @@ class ProjectService:
             additional_metadata=project_create_data.additional_metadata,
             start_date=project_create_data.start_date,
             constraint_date=project_create_data.constraint_date,
-            creator_guid=project_create_data.creator_guid,
+            creator_guid=creator_guid,
             mentor_guid=project_create_data.mentor_guid,
             created_at=datetime.now(UTC),
             updated_at=datetime.now(UTC),

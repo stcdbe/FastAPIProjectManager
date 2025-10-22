@@ -1,7 +1,7 @@
 from uuid import UUID
 
-from src.modules.project.entities.project import ProjectCreateData, ProjectPatchData, ProjectReportSendData
-from src.modules.project.views.schemas import ProjectCreateScheme, ProjectPatchScheme, ProjectReportSendDataScheme
+from src.domain.project.entities.project import ProjectCreateData, ProjectPatchData, ProjectReportSendData
+from src.presentation.project.schemas import ProjectCreateScheme, ProjectPatchScheme, ProjectReportSendDataScheme
 
 
 def convert_project_create_scheme_to_entity(
@@ -15,11 +15,12 @@ def convert_project_create_scheme_to_entity(
         start_date=scheme.start_date,
         constraint_date=scheme.constraint_date,
         mentor_guid=scheme.mentor_guid,
-        creator_guid=
     )
 
 
-def convert_project_patch_scheme_to_entity(scheme: ProjectPatchScheme) -> ProjectPatchData:
+def convert_project_patch_scheme_to_entity(
+    scheme: ProjectPatchScheme,
+) -> ProjectPatchData:
     if scheme.tech_stack is None:
         tech_stack = None
     else:

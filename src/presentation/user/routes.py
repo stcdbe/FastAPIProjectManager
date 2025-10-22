@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import UUID4
 
 from src.common.exc import BaseAppError
@@ -12,6 +12,7 @@ from src.domain.user.use_cases.get_one_user_by_guid import GetOneUserByGUIDUseCa
 from src.domain.user.use_cases.get_user_list import GetUserListUseCase
 from src.domain.user.use_cases.patch_user_by_guid import PatchUserByGUIDUseCase
 from src.presentation.common.schemas import ErrorResponse, GUIDResponse
+from src.presentation.dependencies import get_current_user
 from src.presentation.user.converters import (
     convert_user_create_data_scheme_to_entity,
     convert_user_patch_data_scheme_to_entity,
@@ -33,7 +34,7 @@ user_v1_router = APIRouter(prefix="/users", tags=["Users"])
     description="Get user list",
 )
 async def get_user_list(
-    # _: Annotated[User, Depends(get_current_user)],
+    _: Annotated[User, Depends(get_current_user)],
     offset: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(gt=0, le=10)] = 5,
     order_by: Annotated[str, Query(enum=tuple(UserGetScheme.model_fields))] = "created_at",
@@ -61,7 +62,7 @@ async def get_user_list(
     description="Create a new user",
 )
 async def create_user(
-    # _: Annotated[User, Depends(get_current_user)],
+    _: Annotated[User, Depends(get_current_user)],
     scheme_data: UserCreateScheme,
 ) -> dict[str, UUID4]:
     use_case = CreateUserUseCase()
@@ -88,7 +89,7 @@ async def create_user(
     description="Get user by guid",
 )
 async def get_user(
-    # _: Annotated[User, Depends(get_current_user)],
+    _: Annotated[User, Depends(get_current_user)],
     user_guid: UUID4,
 ) -> User:
     use_case = GetOneUserByGUIDUseCase()
@@ -115,7 +116,7 @@ async def get_user(
     description="Patch user by guid",
 )
 async def patch_user(
-    # _: Annotated[User, Depends(get_current_user)],
+    _: Annotated[User, Depends(get_current_user)],
     user_guid: UUID4,
     scheme_data: UserPatchScheme,
 ) -> dict[str, UUID4]:
@@ -146,7 +147,7 @@ async def patch_user(
     description="Delete user by guid",
 )
 async def delete_user(
-    # _: Annotated[User, Depends(get_current_user)],
+    _: Annotated[User, Depends(get_current_user)],
     user_guid: UUID4,
 ) -> None:
     use_case = DeleteUserByGUIDUseCase()
