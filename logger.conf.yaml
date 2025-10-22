@@ -32,7 +32,7 @@ handlers:
   queueHandler:
     level: "INFO"
     class: "logging.handlers.QueueHandler"
-    listener: "src.local_logging.listener.AutoStartQueueListener"
+    listener: "src.common.local_logging.listener.AutoStartQueueListener"
     respect_handler_level: true
     queue:
       (): "queue.Queue"
