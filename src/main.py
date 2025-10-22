@@ -6,12 +6,10 @@ from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi.routing import APIRouter
 
-from src.common.data.repositories.sqlalchemy_base import create_tables, drop_tables
 from src.config import get_settings
-from src.modules.user.views.auth.views import auth_v1_router
-from src.modules.user.views.user.routes import user_v1_router
-
-# from src.modules.project.views.routes import project_v1_router
+from src.data.repositories.sqlalchemy_base import create_tables, drop_tables
+from src.presentation.auth.routes import auth_v1_router
+from src.presentation.user.routes import user_v1_router
 
 logger = getLogger()
 

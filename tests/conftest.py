@@ -1,29 +1,29 @@
 from collections.abc import AsyncGenerator
 from datetime import UTC, datetime, timedelta
-from typing import TypedDict
-from uuid import uuid4
+from typing import Final
+from uuid import UUID, uuid4
 
 import orjson
 import pytest_asyncio
 from fastapi import FastAPI
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 
 from src.main import create_app
 from tests.sqlalchemy import create_tables, drop_tables
 
-mock_user_guid = uuid4()
-mock_project_guid = uuid4()
-mock_task_guid = uuid4()
+MOCK_USER_GUID: Final[UUID] = uuid4()
+MOCK_PROJECT_GUID: Final[UUID] = uuid4()
+MOCK_TASK_GUID: Final[UUID] = uuid4()
 
 mock_data_for_tests = {
     "user": {
-        "guid": mock_user_guid,
+        "guid": MOCK_USER_GUID,
         "username": "auth_username",
         "email": "auth_email@example.com",
         "password": "passwordpassword",
     },
     "project": {
-        "guid": mock_project_guid,
+        "guid": MOCK_PROJECT_GUID,
         "title": "project_title",
         "description": "project_description",
         "tech_stack": ["string1"],
@@ -32,17 +32,13 @@ mock_data_for_tests = {
         "mentor_guid": None,
     },
     "task": {
-        "guid": mock_task_guid,
+        "guid": MOCK_TASK_GUID,
         "title": "task_title",
         "description": "task_description",
         "is_completed": False,
-        "executor_guid": mock_user_guid,
+        "executor_guid": MOCK_USER_GUID,
     },
 }
-
-
-class AuthTokenHeaders(TypedDict):
-    Authorization: str
 
 
 @pytest_asyncio.fixture(scope="session")
@@ -61,13 +57,13 @@ async def prepare_test_db() -> AsyncGenerator[None, None]:
 
 
 @pytest_asyncio.fixture(scope="session")
-async def client() -> AsyncGenerator[AsyncClient, None]:
-    async with AsyncClient(app=app, base_url="http://test") as cli:
+async def client(app: FastAPI) -> AsyncGenerator[AsyncClient, None]:
+    async with AsyncClient(transport=ASGITransport(app), base_url="http://test") as cli:
         yield cli
 
 
 @pytest_asyncio.fixture(scope="session")
-async def auth_token_headers(client: AsyncClient) -> AsyncGenerator[AuthTokenHeaders, None]:
+async def auth_token_headers(client: AsyncClient) -> AsyncGenerator[dict[str, str], None]:
     auth_data = {
         "username": "auth_username",
         "password": "passwordpassword",
@@ -75,7 +71,16 @@ async def auth_token_headers(client: AsyncClient) -> AsyncGenerator[AuthTokenHea
     res = await client.post("/api/v1/auth/create_token", data=auth_data)
 
     access_token = orjson.loads(res.content)["access_token"]
-    yield AuthTokenHeaders(Authorization=f"Bearer {access_token}")
+    yield {"Authorization": f"Bearer {access_token}"}
+
+
+@pytest_asyncio.fixture(scope="session")
+async def authenticated_client(
+    app: FastAPI,
+    auth_token_headers: dict[str, str],
+) -> AsyncGenerator[AsyncClient, None]:
+    async with AsyncClient(transport=ASGITransport(app), base_url="http://test", headers=auth_token_headers) as cli:
+        yield cli
 
 
 # @pytest_asyncio.fixture(scope="session")
