@@ -29,7 +29,6 @@ class ProjectCreateData:
     start_date: date
     constraint_date: date
     mentor_guid: UUID | None
-    creator_guid: UUID
 
 
 @dataclass(slots=True)

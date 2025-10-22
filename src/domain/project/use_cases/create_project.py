@@ -10,4 +10,4 @@ class CreateProjectUseCase:
         self._project_service = ProjectService()
 
     async def execute(self, creator: User, project_create_data: ProjectCreateData) -> UUID:
-        return await self._project_service.create_one(project_create_data)
+        return await self._project_service.create_one(creator.guid, project_create_data)

@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.params import Query
 from pydantic import UUID4
 
@@ -12,8 +12,14 @@ from src.domain.project.use_cases.get_project_by_guid_by_guid import GetProjectB
 from src.domain.project.use_cases.get_project_list import GetProjectListUseCase
 from src.domain.project.use_cases.patch_project_by_guid import PatchProjectByGUIDUseCase
 from src.domain.project.use_cases.send_project_as_report import SendProjectAsReportUseCase
+from src.domain.user.entities.user import User
 from src.presentation.common.schemas import GUIDResponse
-from src.presentation.project.converters import convert_project_report_send_data_scheme_to_entity
+from src.presentation.dependencies import get_current_user
+from src.presentation.project.converters import (
+    convert_project_create_scheme_to_entity,
+    convert_project_patch_scheme_to_entity,
+    convert_project_report_send_data_scheme_to_entity,
+)
 from src.presentation.project.schemas import (
     ProjectCreateScheme,
     ProjectGetScheme,
@@ -32,7 +38,7 @@ project_v1_router = APIRouter(prefix="/projects", tags=["Projects"])
     name="Get some projects",
 )
 async def get_some_projects(
-    # _: Annotated[User, Depends(get_current_user)],
+    _: Annotated[User, Depends(get_current_user)],
     offset: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(gt=0, le=10)] = 5,
     order_by: Annotated[str, Query(enum=tuple(ProjectGetScheme.model_fields))] = "created_at",
@@ -55,12 +61,13 @@ async def get_some_projects(
     name="Crete a new project",
 )
 async def create_project(
-    # _: Annotated[User, Depends(get_current_user)],
-    data: ProjectCreateScheme,
+    current_user: Annotated[User, Depends(get_current_user)],
+    scheme_data: ProjectCreateScheme,
 ) -> dict[str, UUID4]:
     use_case = CreateProjectUseCase()
+    project_create_data = convert_project_create_scheme_to_entity(scheme_data)
     try:
-        guid = await use_case.execute()
+        guid = await use_case.execute(current_user, project_create_data)
 
     except BaseAppError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.msg) from e
@@ -75,7 +82,7 @@ async def create_project(
     name="Get the project",
 )
 async def get_project_by_guid(
-    # _: Annotated[User, Depends(get_current_user)],
+    _: Annotated[User, Depends(get_current_user)],
     project_guid: UUID4,
 ) -> Project:
     use_case = GetProjectByGUIDUseCase()
@@ -93,13 +100,14 @@ async def get_project_by_guid(
     name="Patch the project",
 )
 async def patch_project(
-    # _: Annotated[User, Depends(get_current_user)],
+    _: Annotated[User, Depends(get_current_user)],
     project_guid: UUID4,
-    data: ProjectPatchScheme,
+    scheme_data: ProjectPatchScheme,
 ) -> dict[str, UUID4]:
     use_case = PatchProjectByGUIDUseCase()
+    project_patch_data = convert_project_patch_scheme_to_entity(scheme_data)
     try:
-        guid = await use_case.execute(project_guid)
+        guid = await use_case.execute(project_guid, project_patch_data)
 
     except BaseAppError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.msg) from e
@@ -113,7 +121,7 @@ async def patch_project(
     name="Delete the project",
 )
 async def del_project(
-    # _: Annotated[User, Depends(get_current_user)],
+    _: Annotated[User, Depends(get_current_user)],
     project_guid: UUID4,
 ) -> None:
     use_case = DeleteProjectByGUIDUseCase()
@@ -127,17 +135,18 @@ async def del_project(
 @project_v1_router.post(
     path="/{project_guid}/send_as_report",
     status_code=status.HTTP_202_ACCEPTED,
-    # response_model=Message,
+    response_model=None,
     name="Send the project report by email",
 )
 async def send_project_as_report(
-    # _: Annotated[User, Depends(get_current_user)],
+    _: Annotated[User, Depends(get_current_user)],
+    project_guid: UUID4,
     scheme_data: ProjectReportSendDataScheme,
 ) -> None:
     use_case = SendProjectAsReportUseCase()
-    send_data = convert_project_report_send_data_scheme_to_entity(scheme_data)
+    send_data = convert_project_report_send_data_scheme_to_entity(project_guid, scheme_data)
     try:
-        return await use_case.execute(send_data)
+        await use_case.execute(send_data)
 
     except BaseAppError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.msg) from e

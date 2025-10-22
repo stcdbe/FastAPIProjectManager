@@ -35,3 +35,37 @@
 #     )
 #     fm = FastMail(config=mail_config)
 #     await fm.send_message(message=email, template_name=email_template)
+
+
+# from email.message import EmailMessage
+
+# import aiosmtplib
+# from jinja2 import Environment, PackageLoader, select_autoescape
+
+# from src.config import get_settings
+
+# env = Environment(
+#     loader=PackageLoader("yourapp"),
+#     autoescape=select_autoescape(),
+#     enable_async=True,
+# )
+
+
+# async def _generate_email_body() -> str:
+#     template = env.get_template("projectreportemail.html")
+#     return await template.render_async()
+
+
+# def _generate_email_message(recipient: str, subject: str, body: str) -> EmailMessage:
+#     message = EmailMessage()
+#     message["From"] = get_settings().EMAIL_SENDER
+#     message["To"] = recipient
+#     message["Subject"] = subject
+#     message.set_content(body, subtype="html")
+#     return message
+
+
+# async def send_email(email: str, ) -> None:
+#     body = await _generate_email_body()
+#     message = _generate_email_message(body)
+#     await aiosmtplib.send(message, hostname="127.0.0.1", port=1025)

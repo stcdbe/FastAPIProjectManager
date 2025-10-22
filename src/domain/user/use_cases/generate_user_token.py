@@ -20,11 +20,7 @@ class GenerateUserTokenUseCase:
         user = await self._user_service.get_one_by_username(username)
 
         if not self._hasher.verify_psw(password, user.password):
-            logger.warning(
-                "Failed attempt to generate access token with username: %s password: %s",
-                username,
-                password,
-            )
+            logger.warning("Failed attempt to generate access token for username: %s", username)
             msg = "Invalid username or password"
             raise UserInvalidCredentialsError(msg)
 

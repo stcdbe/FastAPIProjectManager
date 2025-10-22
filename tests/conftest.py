@@ -1,7 +1,4 @@
 from collections.abc import AsyncGenerator
-from datetime import UTC, datetime, timedelta
-from typing import Final
-from uuid import UUID, uuid4
 
 import orjson
 import pytest_asyncio
@@ -9,36 +6,7 @@ from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 
 from src.main import create_app
-from tests.sqlalchemy import create_tables, drop_tables
-
-MOCK_USER_GUID: Final[UUID] = uuid4()
-MOCK_PROJECT_GUID: Final[UUID] = uuid4()
-MOCK_TASK_GUID: Final[UUID] = uuid4()
-
-mock_data_for_tests = {
-    "user": {
-        "guid": MOCK_USER_GUID,
-        "username": "auth_username",
-        "email": "auth_email@example.com",
-        "password": "passwordpassword",
-    },
-    "project": {
-        "guid": MOCK_PROJECT_GUID,
-        "title": "project_title",
-        "description": "project_description",
-        "tech_stack": ["string1"],
-        "start_date": (datetime.now(UTC) + timedelta(days=1)).isoformat(),
-        "constraint_date": (datetime.now(UTC) + timedelta(days=365)).isoformat(),
-        "mentor_guid": None,
-    },
-    "task": {
-        "guid": MOCK_TASK_GUID,
-        "title": "task_title",
-        "description": "task_description",
-        "is_completed": False,
-        "executor_guid": MOCK_USER_GUID,
-    },
-}
+from tests.sqlalchemy import create_tables, drop_tables, insert_mock_data
 
 
 @pytest_asyncio.fixture(scope="session")
@@ -52,6 +20,7 @@ async def app() -> AsyncGenerator[FastAPI, None]:
 async def prepare_test_db() -> AsyncGenerator[None, None]:
     await drop_tables()
     await create_tables()
+    await insert_mock_data()
     yield
     await drop_tables()
 
