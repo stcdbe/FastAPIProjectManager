@@ -45,8 +45,8 @@ MOCK_USER_AUTH_GUID: Final[UUID] = uuid4()
 MOCK_USER_GET_GUID: Final[UUID] = uuid4()
 MOCK_USER_PATCH_GUID: Final[UUID] = uuid4()
 MOCK_USER_DELETE_GUID: Final[UUID] = uuid4()
-MOCK_PROJECT_GUID: Final[UUID] = uuid4()
-MOCK_TASK_GUID: Final[UUID] = uuid4()
+# MOCK_PROJECT_GUID: Final[UUID] = uuid4()
+# MOCK_TASK_GUID: Final[UUID] = uuid4()
 
 
 async def insert_mock_data() -> None:
@@ -66,7 +66,58 @@ async def insert_mock_data() -> None:
             job_title=None,
             date_of_birth=None,
             is_deleted=False,
-            deleted_at=datetime.now(UTC),
+            deleted_at=None,
+        ),
+        UserModel(
+            guid=MOCK_USER_GET_GUID,
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
+            username="get_username",
+            email="get@email.com",
+            password=Hasher().get_psw_hash("passwordpassword"),
+            first_name=None,
+            second_name=None,
+            gender=None,
+            company=None,
+            join_date=None,
+            job_title=None,
+            date_of_birth=None,
+            is_deleted=False,
+            deleted_at=None,
+        ),
+        UserModel(
+            guid=MOCK_USER_PATCH_GUID,
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
+            username="patch_username",
+            email="patch@email.com",
+            password=Hasher().get_psw_hash("passwordpassword"),
+            first_name=None,
+            second_name=None,
+            gender=None,
+            company=None,
+            join_date=None,
+            job_title=None,
+            date_of_birth=None,
+            is_deleted=False,
+            deleted_at=None,
+        ),
+        UserModel(
+            guid=MOCK_USER_DELETE_GUID,
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
+            username="delete_username",
+            email="delete@email.com",
+            password=Hasher().get_psw_hash("passwordpassword"),
+            first_name=None,
+            second_name=None,
+            gender=None,
+            company=None,
+            join_date=None,
+            job_title=None,
+            date_of_birth=None,
+            is_deleted=False,
+            deleted_at=None,
         ),
     )
     async with test_async_session_factory() as test_session:

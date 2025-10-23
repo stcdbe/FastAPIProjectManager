@@ -40,32 +40,40 @@
 # from email.message import EmailMessage
 
 # import aiosmtplib
-# from jinja2 import Environment, PackageLoader, select_autoescape
+# from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 # from src.config import get_settings
 
-# env = Environment(
-#     loader=PackageLoader("yourapp"),
-#     autoescape=select_autoescape(),
+# templates_env = Environment(
+#     loader=FileSystemLoader(get_settings().EMAIL_TEMPLATES_DIR),
+#     autoescape=select_autoescape(default=True),
 #     enable_async=True,
 # )
 
 
 # async def _generate_email_body() -> str:
-#     template = env.get_template("projectreportemail.html")
+#     template = templates_env.get_template("projectreportemail.html")
 #     return await template.render_async()
 
 
-# def _generate_email_message(recipient: str, subject: str, body: str) -> EmailMessage:
+# def _generate_email_message(recipient: str, subject: str, html_body: str) -> EmailMessage:
 #     message = EmailMessage()
 #     message["From"] = get_settings().EMAIL_SENDER
 #     message["To"] = recipient
 #     message["Subject"] = subject
-#     message.set_content(body, subtype="html")
+#     message.set_content(html_body, subtype="html")
 #     return message
 
 
-# async def send_email(email: str, ) -> None:
+# async def send_email(
+#     email: str,
+# ) -> None:
 #     body = await _generate_email_body()
-#     message = _generate_email_message(body)
-#     await aiosmtplib.send(message, hostname="127.0.0.1", port=1025)
+#     message = _generate_email_message(email, body)
+#     await aiosmtplib.send(
+#         message,
+#         hostname="127.0.0.1",
+#         port=get_settings().EMAIL_PORT,
+#         username=get_settings().EMAIL_USERNAME,
+#         password=get_settings().EMAIL_PASSWORD,
+#     )

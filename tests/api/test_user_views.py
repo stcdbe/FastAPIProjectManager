@@ -1,104 +1,115 @@
-# from http import HTTPStatus
+from datetime import UTC, datetime
+from uuid import UUID
 
-# import orjson
-# import pytest
-# from fastapi import status
-# from httpx import AsyncClient
-
-
-# @pytest.mark.asyncio(scope="session")
-# async def test_get_some_users(client: AsyncClient) -> None:
-#     res = await client.get("/api/v1/users")
-#     assert res.status_code == status.HTTP_200_OK
-
-#     res_json = orjson.loads(res.content)
-#     assert isinstance(res_json["users"], list)
-
-
-# @pytest.mark.asyncio(scope="session")
-# async def test_create_user(client: AsyncClient) -> None:
-#     data = {
-#         "username": "test_username",
-#         "email": "test_email@example.com",
-#         "password": "passwordpassword",
-#     }
-#     res = await client.post("/api/v1/users", json=data)
-#     assert res.status_code == status.HTTP_201_CREATED
-
-#     user = res.json()
-#     assert user
-#     assert user.get("password") is None
-#     assert user["username"] == data["username"]
-#     assert user["email"] == data["email"]
-#     assert user["join_date"]
-#     assert user["guid"]
-
-
-# @pytest.mark.asyncio(scope="session")
-# async def test_patch_me(client: AsyncClient, user_token_headers: dict[str, str]) -> None:
-#     data = {
-#         "username": "test_patch_username",
-#         "email": "test_patch_user@example.com",
-#         "password": "passwordpassword",
-#         "company": "company",
-#         "job_title": "job_title",
-#         "fullname": "fullname",
-#         "age": 20,
-#         "sex": "m",
-#     }
-#     res = await client.patch("/api/v1/users/me", json=data, headers=user_token_headers)
-#     user = res.json()
-#     assert res.status_code == HTTPStatus.OK
-#     assert user
-#     assert user.get("password") is None
-#     data.pop("password")
-#     for key, val in data.items():
-#         assert user[key] == val
-
-
-# @pytest.mark.asyncio(scope="session")
-# async def test_get_user(client: AsyncClient, test_user_guid: str) -> None:
-#     res = await client.get(f"/api/v1/users/{test_user_guid}")
-#     user = res.json()
-#     assert res.status_code == HTTPStatus.OK
-#     assert user
-#     assert user["guid"] == test_user_guid
-
+import orjson
 import pytest
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 from httpx import AsyncClient
 
+from src.domain.user.entities.enums import UserGender
+from src.presentation.user.schemas import UserCreateScheme, UserPatchScheme
+from tests.sqlalchemy import MOCK_USER_DELETE_GUID, MOCK_USER_GET_GUID, MOCK_USER_PATCH_GUID
 
-@pytest.mark.asyncio(scope="session")
+
+@pytest.mark.asyncio
 async def test_get_user_list(
     app: FastAPI,
     client: AsyncClient,
-) -> None: ...
+    auth_token_headers: dict[str, str],
+) -> None:
+    url = app.url_path_for("get_user_list")
+
+    res = await client.get(url, headers=auth_token_headers)
+    assert res.status_code == status.HTTP_200_OK
+
+    res_json = orjson.loads(res.content)
+    users = res_json["users"]
+    assert isinstance(users, list)
+
+    for user in users:
+        assert user["username"]
+        assert user["email"]
+        assert user.get("password") is None
 
 
-@pytest.mark.asyncio(scope="session")
+@pytest.mark.asyncio
 async def test_create_user(
     app: FastAPI,
     client: AsyncClient,
-) -> None: ...
+    auth_token_headers: dict[str, str],
+) -> None:
+    url = app.url_path_for("create_user")
+    data = UserCreateScheme(
+        username="create_username",
+        email="create@email.com",
+        password="passwordpassword",  # noqa: S106
+        first_name=None,
+        second_name=None,
+        gender=None,
+        company=None,
+        join_date=None,
+        job_title=None,
+        date_of_birth=None,
+    )
+
+    res = await client.post(url, json=data.model_dump(), headers=auth_token_headers)
+    assert res.status_code == status.HTTP_201_CREATED
+
+    res_json = orjson.loads(res.content)
+    assert UUID(res_json["guid"])
 
 
-@pytest.mark.asyncio(scope="session")
+@pytest.mark.asyncio
 async def test_get_user(
     app: FastAPI,
     client: AsyncClient,
-) -> None: ...
+    auth_token_headers: dict[str, str],
+) -> None:
+    url = app.url_path_for("get_user", user_guid=str(MOCK_USER_GET_GUID))
+
+    res = await client.get(url, headers=auth_token_headers)
+    assert res.status_code == status.HTTP_200_OK
+
+    res_json = orjson.loads(res.content)
+    assert res_json["username"]
+    assert res_json["email"]
+    assert res_json.get("password") is None
 
 
-@pytest.mark.asyncio(scope="session")
+@pytest.mark.asyncio
 async def test_patch_user(
     app: FastAPI,
     client: AsyncClient,
-) -> None: ...
+    auth_token_headers: dict[str, str],
+) -> None:
+    url = app.url_path_for("patch_user", user_guid=str(MOCK_USER_PATCH_GUID))
+    data = UserPatchScheme(
+        username=None,
+        email=None,
+        password=None,
+        first_name="first_name",
+        second_name="second_name",
+        gender=UserGender.M,
+        company="company",
+        join_date=datetime.now(UTC).date(),
+        job_title="job_title",
+        date_of_birth=datetime.now(UTC).date(),
+    )
+
+    res = await client.patch(url, json=data.model_dump(), headers=auth_token_headers)
+    assert res.status_code == status.HTTP_200_OK
+
+    res_json = orjson.loads(res.content)
+    assert UUID(res_json["guid"])
 
 
-@pytest.mark.asyncio(scope="session")
+@pytest.mark.asyncio
 async def test_delete_user(
     app: FastAPI,
     client: AsyncClient,
-) -> None: ...
+    auth_token_headers: dict[str, str],
+) -> None:
+    url = app.url_path_for("delete_user", user_guid=str(MOCK_USER_DELETE_GUID))
+
+    res = await client.delete(url, headers=auth_token_headers)
+    assert res.status_code == status.HTTP_204_NO_CONTENT

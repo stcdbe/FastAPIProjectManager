@@ -17,11 +17,11 @@ logger = getLogger()
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Web app %s %s starting up...", app.title, app.version)
-    await drop_tables()
+    # await drop_tables()
     await create_tables()
     yield
     logger.info("Web app %s %s shutting down...", app.title, app.version)
-    await drop_tables()
+    # await drop_tables()
 
 
 def get_api_v1_router() -> APIRouter:
