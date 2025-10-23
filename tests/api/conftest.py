@@ -40,7 +40,7 @@ async def auth_token_headers(
         "username": "auth_username",
         "password": "passwordpassword",
     }
-    url = app.url_path_for("create_access_token")
+    url = app.url_path_for("create_token")
     res = await client.post(url, data=auth_data)
 
     access_token = orjson.loads(res.content)["access_token"]

@@ -6,4 +6,8 @@ from pydantic import BaseModel, Field
 class AuthTokenScheme(BaseModel):
     access_token: str
     refresh_token: Annotated[str | None, Field(default=None)]
-    token_type: Annotated[str, Field(default="Bearer")]
+    token_type: Annotated[str, Field(default="bearer")]
+
+
+class RefreshTokenInputScheme(BaseModel):
+    refresh_token: str

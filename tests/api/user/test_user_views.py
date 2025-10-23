@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from secrets import choice, token_urlsafe
 from uuid import UUID
 
 import orjson
@@ -42,13 +43,13 @@ async def test_create_user(
     data = UserCreateScheme(
         username="create_username",
         email="create@email.com",
-        password="passwordpassword",  # noqa: S106
-        first_name=None,
-        second_name=None,
-        gender=None,
-        company=None,
+        password=token_urlsafe(16),
+        first_name=token_urlsafe(16),
+        second_name=token_urlsafe(16),
+        gender=choice(tuple(UserGender)),
+        company=token_urlsafe(16),
         join_date=None,
-        job_title=None,
+        job_title=token_urlsafe(16),
         date_of_birth=None,
     )
 
@@ -96,7 +97,17 @@ async def test_patch_user(
         date_of_birth=datetime.now(UTC).date(),
     )
 
-    res = await client.patch(url, json=data.model_dump(), headers=auth_token_headers)
+    content = orjson.dumps(data.model_dump())
+    content_headers = {
+        "Content-Length": str(len(content)),
+        "Content-Type": "application/json",
+    }
+
+    res = await client.patch(
+        url,
+        content=content,
+        headers=auth_token_headers | content_headers,
+    )
     assert res.status_code == status.HTTP_200_OK
 
     res_json = orjson.loads(res.content)
