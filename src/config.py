@@ -10,7 +10,7 @@ _ENCODING: Final[str] = "utf-8"
 _BASE_DIR: Final[Path] = Path(__file__).resolve().parent.parent
 _ENV_FILE: Final[Path] = _BASE_DIR / ".env"
 _LOGGER_CONF_YAML_FILE: Final[Path] = _BASE_DIR / "logger.conf.yaml"
-_TEMPLATES_DIR: Final[Path] = _BASE_DIR / "templates"
+_TEMPLATES_DIR: Final[Path] = _BASE_DIR / "src" / "templates"
 _EMAIL_TEMPLATES_DIR: Final[Path] = _TEMPLATES_DIR / "email"
 
 

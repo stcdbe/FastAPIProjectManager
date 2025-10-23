@@ -52,10 +52,10 @@ async def get_user_list(
 
 @user_v1_router.post(
     path="",
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_201_CREATED,
     response_model=GUIDResponse,
     responses={
-        status.HTTP_200_OK: {"model": GUIDResponse},
+        status.HTTP_201_CREATED: {"model": GUIDResponse},
         status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
         status.HTTP_403_FORBIDDEN: {"model": ErrorResponse},
     },

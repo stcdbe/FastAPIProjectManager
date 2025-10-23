@@ -1,13 +1,16 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 
 from src.common.exc import BaseAppError
 from src.domain.user.entities.auth_token import AuthToken
+from src.domain.user.exc import UserInvalidCredentialsError, UserInvalidTokenError
 from src.domain.user.use_cases.generate_user_token import GenerateUserTokenUseCase
 from src.domain.user.use_cases.refresh_user_token import RefreshUserTokenUseCase
 from src.presentation.auth.schemas import AuthTokenScheme
+from src.presentation.common.schemas import ErrorResponse
+from src.presentation.dependencies import oauth2_scheme
 
 auth_v1_router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -17,6 +20,11 @@ auth_v1_router = APIRouter(prefix="/auth", tags=["Auth"])
     status_code=status.HTTP_201_CREATED,
     response_model=AuthTokenScheme,
     description="Create an access token",
+    responses={
+        status.HTTP_201_CREATED: {"model": AuthTokenScheme},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
+        status.HTTP_401_UNAUTHORIZED: {"model": ErrorResponse},
+    },
 )
 async def create_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
@@ -24,6 +32,9 @@ async def create_access_token(
     use_case = GenerateUserTokenUseCase()
     try:
         return await use_case.execute(username=form_data.username, password=form_data.password)
+
+    except UserInvalidCredentialsError as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=e.msg) from e
 
     except BaseAppError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.msg) from e
@@ -34,14 +45,19 @@ async def create_access_token(
     status_code=status.HTTP_201_CREATED,
     response_model=AuthTokenScheme,
     description="Refresh the access token",
+    responses={
+        status.HTTP_201_CREATED: {"model": AuthTokenScheme},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
+        status.HTTP_401_UNAUTHORIZED: {"model": ErrorResponse},
+    },
 )
-async def refresh_access_token(
-    request: Request,
-) -> AuthToken:
+async def refresh_access_token(token: str) -> AuthToken:
     use_case = RefreshUserTokenUseCase()
-    _, acess_token = request.headers.get("Authorization", "Bearer invalid_token").split(" ")
     try:
-        return await use_case.execute(token=acess_token)
+        return await use_case.execute(token)
+
+    except UserInvalidTokenError as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=e.msg) from e
 
     except BaseAppError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.msg) from e
