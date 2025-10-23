@@ -39,7 +39,7 @@ class AuthService:
             msg = f"Error while decoding token {token}"
             raise UserInvalidTokenError(msg)
 
-        if (expected_token_typ == AuthTokenTyp.ACCESS) and (exp > datetime.now(UTC).timestamp()):
+        if datetime.fromtimestamp(exp, UTC) < datetime.now(UTC):
             logger.info("Decoded expired token")
             msg = "Expired token"
             raise UserInvalidTokenError(msg)

@@ -30,5 +30,5 @@ class GenerateUserTokenUseCase:
         return AuthToken(
             access_token=acess_token,
             refresh_token=refresh_token,
-            token_type="Bearer",  # noqa: S106
+            token_type="bearer",  # noqa: S106
         )

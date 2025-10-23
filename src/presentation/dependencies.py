@@ -8,8 +8,8 @@ from src.domain.user.entities.user import User
 from src.domain.user.use_cases.authenticate_user_by_token import AuthenticateUserByTokenUseCase
 
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="api/v1/auth/create_token",
-    refreshUrl="api/v1/auth/refresh_token",
+    tokenUrl="/api/v1/auth/create_token",
+    refreshUrl="/api/v1/auth/refresh_token",
 )
 
 

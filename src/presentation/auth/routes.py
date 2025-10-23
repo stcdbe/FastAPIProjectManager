@@ -5,12 +5,13 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from src.common.exc import BaseAppError
 from src.domain.user.entities.auth_token import AuthToken
+from src.domain.user.entities.user import User
 from src.domain.user.exc import UserInvalidCredentialsError, UserInvalidTokenError
 from src.domain.user.use_cases.generate_user_token import GenerateUserTokenUseCase
 from src.domain.user.use_cases.refresh_user_token import RefreshUserTokenUseCase
-from src.presentation.auth.schemas import AuthTokenScheme
+from src.presentation.auth.schemas import AuthTokenScheme, RefreshTokenInputScheme
 from src.presentation.common.schemas import ErrorResponse
-from src.presentation.dependencies import oauth2_scheme
+from src.presentation.dependencies import get_current_user
 
 auth_v1_router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -26,7 +27,7 @@ auth_v1_router = APIRouter(prefix="/auth", tags=["Auth"])
         status.HTTP_401_UNAUTHORIZED: {"model": ErrorResponse},
     },
 )
-async def create_access_token(
+async def create_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> AuthToken:
     use_case = GenerateUserTokenUseCase()
@@ -34,7 +35,11 @@ async def create_access_token(
         return await use_case.execute(username=form_data.username, password=form_data.password)
 
     except UserInvalidCredentialsError as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=e.msg) from e
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=e.msg,
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from e
 
     except BaseAppError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.msg) from e
@@ -51,13 +56,20 @@ async def create_access_token(
         status.HTTP_401_UNAUTHORIZED: {"model": ErrorResponse},
     },
 )
-async def refresh_access_token(token: str) -> AuthToken:
+async def refresh_token(
+    _: Annotated[User, Depends(get_current_user)],
+    sheme_data: RefreshTokenInputScheme,
+) -> AuthToken:
     use_case = RefreshUserTokenUseCase()
     try:
-        return await use_case.execute(token)
+        return use_case.execute(sheme_data.refresh_token)
 
     except UserInvalidTokenError as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=e.msg) from e
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=e.msg,
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from e
 
     except BaseAppError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.msg) from e

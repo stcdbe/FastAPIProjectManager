@@ -2,6 +2,8 @@ import bcrypt
 
 
 class Hasher:
+    __slots__ = ()
+
     def get_psw_hash(self, psw: str) -> str:
         return (bcrypt.hashpw(password=psw.encode(), salt=bcrypt.gensalt())).decode()
 

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src.common.exceptions.base import BaseAppError
+from src.common.exc import BaseAppError
 
 
 @dataclass(eq=False, frozen=True, slots=True)
