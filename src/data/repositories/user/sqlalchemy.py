@@ -9,7 +9,7 @@ from src.data.models.user.user_model import UserModel
 from src.data.repositories.sqlalchemy_base import SQLAlchemyRepository
 from src.data.repositories.user.base import AbstractUserRepository
 from src.domain.user.entities.user import User
-from src.domain.user.exc import UserCreateError, UserNotFoundError
+from src.domain.user.exc import UserCreateError, UserNotFoundError, UserPatchError
 
 
 class SQLAlchemyUserRepository(AbstractUserRepository, SQLAlchemyRepository):
@@ -82,4 +82,4 @@ class SQLAlchemyUserRepository(AbstractUserRepository, SQLAlchemyRepository):
 
         except IntegrityError as e:
             msg = f"Error while patching user {user.guid}: {e!r}"
-            raise UserCreateError(msg) from e
+            raise UserPatchError(msg) from e

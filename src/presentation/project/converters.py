@@ -38,10 +38,9 @@ def convert_project_patch_scheme_to_entity(
 
 
 def convert_project_report_send_data_scheme_to_entity(
-    project_guid: UUID,
     scheme: ProjectReportSendDataScheme,
 ) -> ProjectReportSendData:
     return ProjectReportSendData(
-        project_guid=project_guid,
+        project_guid=scheme.project_guid,
         email=scheme.email,
     )

@@ -2,10 +2,14 @@ from dataclasses import asdict
 from uuid import UUID
 
 from sqlalchemy import delete, desc, insert, select, update
+from sqlalchemy.exc import IntegrityError, NoResultFound
+
+from src.data.models.project.converters import convert_project_model_to_entity
 from src.data.models.project.project_model import ProjectModel
 from src.data.repositories.project.base import AbstractProjectRepository
 from src.data.repositories.sqlalchemy_base import SQLAlchemyRepository
 from src.domain.project.entities.project import Project
+from src.domain.project.exceptions import ProjectCreateError, ProjectNotFoundError
 
 # from sqlalchemy.orm import selectinload
 
@@ -27,7 +31,8 @@ class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepositor
 
         async with self._get_session() as session:
             res = await session.execute(stmt)
-            return list(res.scalars().all())
+            project_models_seq = res.scalars().all()
+            return [convert_project_model_to_entity(model) for model in project_models_seq]
 
     async def get_one_by_guid(self, guid: UUID, with_tasks: bool = False) -> Project:
         stmt = select(ProjectModel).where(ProjectModel.guid == guid)
@@ -35,28 +40,28 @@ class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepositor
         # if with_tasks:
         #     stmt = stmt.options(selectinload(ProjectModel.tasks))
 
-        async with self._get_session() as session:
-            res = await session.execute(stmt)
-            return res.scalars().one()
+        try:
+            async with self._get_session() as session:
+                res = await session.execute(stmt)
+                project_model = res.scalars().one()
+                return convert_project_model_to_entity(project_model)
 
-    async def get_one_by_title(self, title: str) -> Project:
-        stmt = select(ProjectModel).where(ProjectModel.title.icontains(title))
-
-        async with self._get_session() as session:
-            res = await session.execute(stmt)
-            return res.scalars().one()
+        except NoResultFound as e:
+            msg = f"Project {guid} not found"
+            raise ProjectNotFoundError(msg) from e
 
     async def create_one(self, project: Project) -> UUID:
         stmt = insert(ProjectModel).values(**asdict(project)).returning(ProjectModel.guid)
 
-        async with self._get_session() as session:
-            res = await session.execute(stmt)
-            await session.commit()
-            return res.scalars().one()
+        try:
+            async with self._get_session() as session:
+                res = await session.execute(stmt)
+                await session.commit()
+                return res.scalars().one()
 
-        # except IntegrityError as exc:
-        #     msg = f"{exc.orig}"
-        #     raise InvalidProjectDataError(msg) from exc
+        except IntegrityError as e:
+            msg = f"Error while adding project: {e!r}"
+            raise ProjectCreateError(msg) from e
 
     async def patch_one(self, project: Project) -> UUID:
         stmt = (
@@ -66,15 +71,25 @@ class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepositor
             .returning(ProjectModel.guid)
         )
 
-        async with self._get_session() as session:
-            res = await session.execute(stmt)
-            await session.commit()
-            return res.scalars().one()
+        try:
+            async with self._get_session() as session:
+                res = await session.execute(stmt)
+                await session.commit()
+                return res.scalars().one()
+
+        except IntegrityError as e:
+            msg = f"Error while pathcing project: {e!r}"
+            raise ProjectCreateError(msg) from e
 
     async def delete_one(self, project: Project) -> UUID:
         stmt = delete(ProjectModel).where(ProjectModel.guid == project.guid).returning(ProjectModel.guid)
 
-        async with self._get_session() as session:
-            res = await session.execute(stmt)
-            await session.commit()
-            return res.scalars().one()
+        try:
+            async with self._get_session() as session:
+                res = await session.execute(stmt)
+                await session.commit()
+                return res.scalars().one()
+
+        except IntegrityError as e:
+            msg = f"Error while deleting project: {e!r}"
+            raise ProjectCreateError(msg) from e

@@ -13,7 +13,7 @@ from src.domain.project.use_cases.get_project_list import GetProjectListUseCase
 from src.domain.project.use_cases.patch_project_by_guid import PatchProjectByGUIDUseCase
 from src.domain.project.use_cases.send_project_as_report import SendProjectAsReportUseCase
 from src.domain.user.entities.user import User
-from src.presentation.common.schemas import GUIDResponse
+from src.presentation.common.schemas import ErrorResponse, GUIDResponse
 from src.presentation.dependencies import get_current_user
 from src.presentation.project.converters import (
     convert_project_create_scheme_to_entity,
@@ -35,9 +35,14 @@ project_v1_router = APIRouter(prefix="/projects", tags=["Projects"])
     path="",
     response_model=ProjectListGetScheme,
     status_code=status.HTTP_200_OK,
-    name="Get some projects",
+    responses={
+        status.HTTP_200_OK: {"model": ProjectListGetScheme},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
+        status.HTTP_403_FORBIDDEN: {"model": ErrorResponse},
+    },
+    description="Get project list",
 )
-async def get_some_projects(
+async def get_project_list(
     _: Annotated[User, Depends(get_current_user)],
     offset: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(gt=0, le=10)] = 5,
@@ -58,7 +63,12 @@ async def get_some_projects(
     path="",
     status_code=status.HTTP_201_CREATED,
     response_model=GUIDResponse,
-    name="Crete a new project",
+    responses={
+        status.HTTP_201_CREATED: {"model": GUIDResponse},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
+        status.HTTP_403_FORBIDDEN: {"model": ErrorResponse},
+    },
+    description="Crete a new project",
 )
 async def create_project(
     current_user: Annotated[User, Depends(get_current_user)],
@@ -79,9 +89,15 @@ async def create_project(
     path="/{project_guid}",
     status_code=status.HTTP_200_OK,
     response_model=ProjectGetScheme,
-    name="Get the project",
+    responses={
+        status.HTTP_200_OK: {"model": ProjectGetScheme},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
+        status.HTTP_403_FORBIDDEN: {"model": ErrorResponse},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse},
+    },
+    description="Get the project",
 )
-async def get_project_by_guid(
+async def get_project(
     _: Annotated[User, Depends(get_current_user)],
     project_guid: UUID4,
 ) -> Project:
@@ -97,7 +113,13 @@ async def get_project_by_guid(
     path="/{project_guid}",
     status_code=status.HTTP_200_OK,
     response_model=GUIDResponse,
-    name="Patch the project",
+    responses={
+        status.HTTP_200_OK: {"model": GUIDResponse},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
+        status.HTTP_403_FORBIDDEN: {"model": ErrorResponse},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse},
+    },
+    description="Patch the project",
 )
 async def patch_project(
     _: Annotated[User, Depends(get_current_user)],
@@ -118,9 +140,16 @@ async def patch_project(
 @project_v1_router.delete(
     path="/{project_guid}",
     status_code=status.HTTP_204_NO_CONTENT,
-    name="Delete the project",
+    response_model=None,
+    responses={
+        status.HTTP_204_NO_CONTENT: {"model": None},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
+        status.HTTP_403_FORBIDDEN: {"model": ErrorResponse},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse},
+    },
+    description="Delete the project",
 )
-async def del_project(
+async def delete_project(
     _: Annotated[User, Depends(get_current_user)],
     project_guid: UUID4,
 ) -> None:
@@ -133,18 +162,22 @@ async def del_project(
 
 
 @project_v1_router.post(
-    path="/{project_guid}/send_as_report",
+    path="/send_as_report",
     status_code=status.HTTP_202_ACCEPTED,
     response_model=None,
-    name="Send the project report by email",
+    responses={
+        status.HTTP_202_ACCEPTED: {"model": None},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
+        status.HTTP_403_FORBIDDEN: {"model": ErrorResponse},
+    },
+    description="Send the project report by email",
 )
-async def send_project_as_report(
+async def send_project_report(
     _: Annotated[User, Depends(get_current_user)],
-    project_guid: UUID4,
     scheme_data: ProjectReportSendDataScheme,
 ) -> None:
     use_case = SendProjectAsReportUseCase()
-    send_data = convert_project_report_send_data_scheme_to_entity(project_guid, scheme_data)
+    send_data = convert_project_report_send_data_scheme_to_entity(scheme_data)
     try:
         await use_case.execute(send_data)
 

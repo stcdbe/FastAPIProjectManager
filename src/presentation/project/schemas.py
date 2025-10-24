@@ -3,8 +3,6 @@ from typing import Annotated, Any, Self
 
 from pydantic import UUID4, BaseModel, EmailStr, Field, field_validator, model_validator
 
-from src.modules.task.views.schemas import TaskGet
-
 
 class _ProjectBaseScheme(BaseModel):
     title: Annotated[str, Field(max_length=256)]
@@ -49,13 +47,14 @@ class ProjectGetScheme(_ProjectBaseScheme):
     updated_at: datetime
 
 
-class ProjectWithTasksGetScheme(ProjectGetScheme):
-    tasks: list[TaskGet]
+# class ProjectWithTasksGetScheme(ProjectGetScheme):
+#     tasks: list[TaskGet]
 
 
 class ProjectListGetScheme(BaseModel):
     projects: list[ProjectGetScheme]
 
 
-class ProjectReportSendDataScheme:
+class ProjectReportSendDataScheme(BaseModel):
+    project_guid: UUID4
     email: EmailStr

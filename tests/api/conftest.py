@@ -22,7 +22,7 @@ async def prepare_test_db() -> AsyncGenerator[None, None]:
     await create_tables()
     await insert_mock_data()
     yield
-    # await drop_tables()
+    await drop_tables()
 
 
 @pytest_asyncio.fixture(scope="session")
