@@ -36,7 +36,7 @@ class UserService:
 
         if user.is_deleted:
             logger.warning("Attempt to fetch soft deleted user by guid %s", guid)
-            msg = f"User {guid} is soft deleted"
+            msg = f"User {guid} is not found"
             raise UserIsSoftDeletedError(msg)
 
         return user
@@ -46,7 +46,7 @@ class UserService:
 
         if user.is_deleted:
             logger.warning("Attempt to fetch soft deleted user by username %s", username)
-            msg = f"User {username} is soft deleted"
+            msg = f"User {username} is not found"
             raise UserIsSoftDeletedError(msg)
 
         return user

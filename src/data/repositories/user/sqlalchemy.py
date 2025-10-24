@@ -59,7 +59,7 @@ class SQLAlchemyUserRepository(AbstractUserRepository, SQLAlchemyRepository):
             raise UserNotFoundError(msg) from e
 
     async def create_one(self, user: User) -> UUID:
-        stmt = insert(UserModel).values(**asdict(user)).returning(UserModel.guid)
+        stmt = insert(UserModel).values(asdict(user)).returning(UserModel.guid)
 
         try:
             async with self._get_session() as session:
@@ -72,7 +72,7 @@ class SQLAlchemyUserRepository(AbstractUserRepository, SQLAlchemyRepository):
             raise UserCreateError(msg) from e
 
     async def patch_one(self, user: User) -> UUID:
-        stmt = update(UserModel).where(UserModel.guid == user.guid).values(**asdict(user)).returning(UserModel.guid)
+        stmt = update(UserModel).where(UserModel.guid == user.guid).values(asdict(user)).returning(UserModel.guid)
 
         try:
             async with self._get_session() as session:

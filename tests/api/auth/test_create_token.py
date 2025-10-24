@@ -1,3 +1,5 @@
+from secrets import token_urlsafe
+
 import orjson
 import pytest
 from fastapi import FastAPI, status
@@ -22,3 +24,18 @@ async def test_create_token(
     assert token["access_token"]
     assert token["refresh_token"]
     assert token["token_type"] == "bearer"  # noqa: S105
+
+
+@pytest.mark.asyncio
+async def test_create_token_failed(
+    app: FastAPI,
+    client: AsyncClient,
+) -> None:
+    url = app.url_path_for("create_token")
+    auth_form_data = {
+        "username": token_urlsafe(16),
+        "password": token_urlsafe(16),
+    }
+
+    res = await client.post(url, data=auth_form_data)
+    assert res.status_code == status.HTTP_401_UNAUTHORIZED
