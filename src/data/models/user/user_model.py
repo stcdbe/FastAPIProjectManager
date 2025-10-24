@@ -15,7 +15,7 @@ from src.data.models.sqlalchemy_timed_base import SQLAlchemyTimedBaseModel
 
 class UserModel(SQLAlchemyTimedBaseModel):
     __tablename__ = "user"
-
+    # main data
     username: Mapped[str] = mapped_column(String(128), index=True, unique=True, nullable=False)
     email: Mapped[str] = mapped_column(String(128), index=True, unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(128), nullable=False)
@@ -28,7 +28,7 @@ class UserModel(SQLAlchemyTimedBaseModel):
     date_of_birth: Mapped[date | None]
     is_deleted: Mapped[bool]
     deleted_at: Mapped[datetime | None]
-
+    # relations
     # created_projects: Mapped[list["ProjectModel"]] = relationship(
     #     back_populates="creator",
     #     cascade="all, delete-orphan",

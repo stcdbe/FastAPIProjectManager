@@ -26,9 +26,6 @@ class ProjectService:
     async def get_one_by_guid(self, guid: UUID, with_tasks: bool = False) -> Project:
         return await self._repository.get_one_by_guid(guid=guid, with_tasks=with_tasks)
 
-    async def get_one_by_title(self, title: str) -> Project:
-        return await self._repository.get_one_by_title(title=title)
-
     async def create_one(self, creator_guid: UUID, project_create_data: ProjectCreateData) -> UUID:
         project = Project(
             guid=uuid4(),

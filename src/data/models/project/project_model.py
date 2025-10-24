@@ -19,18 +19,25 @@ from src.data.models.sqlalchemy_timed_base import SQLAlchemyTimedBaseModel
 
 class ProjectModel(SQLAlchemyTimedBaseModel):
     __tablename__ = "project"
-
+    # main data
     title: Mapped[str] = mapped_column(String(256))
     description: Mapped[str] = mapped_column(Text)
     tech_stack: Mapped[tuple[str, ...]] = mapped_column(ARRAY(item_type=String, as_tuple=True))
     additional_metadata: Mapped[dict[str, Any]] = mapped_column(JSONB)
     start_date: Mapped[date]
     constraint_date: Mapped[date]
+    # foreign keys
     creator_guid: Mapped[UUID] = mapped_column(ForeignKey("user.guid"))
     mentor_guid: Mapped[UUID | None] = mapped_column(ForeignKey("user.guid"))
-
-    # creator: Mapped["UserModel"] = relationship(back_populates="created_projects", foreign_keys=(creator_guid,))
-    # mentor: Mapped["UserModel"] = relationship(back_populates="mentioned_projects", foreign_keys=(mentor_guid,))
+    # relations
+    # creator: Mapped["UserModel"] = relationship(
+    #     back_populates="created_projects",
+    #     foreign_keys=(creator_guid,),
+    # )
+    # mentor: Mapped["UserModel"] = relationship(
+    #     back_populates="mentioned_projects",
+    #     foreign_keys=(mentor_guid,),
+    # )
     # tasks: Mapped[list["TaskModel"]] = relationship(
     #     back_populates="project",
     #     cascade="all, delete-orphan",

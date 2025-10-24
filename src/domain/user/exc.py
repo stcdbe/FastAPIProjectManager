@@ -19,6 +19,11 @@ class UserCreateError(BaseAppError):
 
 
 @dataclass(eq=False, frozen=True, slots=True)
+class UserPatchError(BaseAppError):
+    pass
+
+
+@dataclass(eq=False, frozen=True, slots=True)
 class UserInvalidTokenError(BaseAppError):
     pass
 

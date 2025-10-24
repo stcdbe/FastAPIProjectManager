@@ -1,11 +1,13 @@
 from collections.abc import AsyncGenerator
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
+from secrets import token_urlsafe
 from typing import Final
 from uuid import UUID, uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from src.config import get_settings
+from src.data.models.project.project_model import ProjectModel
 from src.data.models.sqlalchemy_base import SQLAlchemyBaseModel
 from src.data.models.user.user_model import UserModel
 from src.services.hasher_service import Hasher
@@ -45,18 +47,33 @@ MOCK_USER_AUTH_GUID: Final[UUID] = uuid4()
 MOCK_USER_GET_GUID: Final[UUID] = uuid4()
 MOCK_USER_PATCH_GUID: Final[UUID] = uuid4()
 MOCK_USER_DELETE_GUID: Final[UUID] = uuid4()
-# MOCK_PROJECT_GUID: Final[UUID] = uuid4()
+
+MOCK_PROJECT_GET_GUID: Final[UUID] = uuid4()
+MOCK_PROJECT_PATCH_GUID: Final[UUID] = uuid4()
+MOCK_PROJECT_DELETE_GUID: Final[UUID] = uuid4()
 # MOCK_TASK_GUID: Final[UUID] = uuid4()
+
+mock_user_data = (
+    (MOCK_USER_AUTH_GUID, "auth_username", "auth@email.com"),
+    (MOCK_USER_GET_GUID, "get_username", "get@email.com"),
+    (MOCK_USER_PATCH_GUID, "patch_username", "patch@email.com"),
+    (MOCK_USER_DELETE_GUID, "delete_username", "delete@email.com"),
+)
+mock_projet_data = (
+    (MOCK_PROJECT_GET_GUID, "get_title"),
+    (MOCK_PROJECT_PATCH_GUID, "patch_title"),
+    (MOCK_PROJECT_DELETE_GUID, "delete_title"),
+)
 
 
 async def insert_mock_data() -> None:
-    mock_models = (
+    mock_user_models = (
         UserModel(
-            guid=MOCK_USER_AUTH_GUID,
+            guid=guid,
             created_at=datetime.now(UTC),
             updated_at=datetime.now(UTC),
-            username="auth_username",
-            email="auth@email.com",
+            username=username,
+            email=email,
             password=Hasher().get_psw_hash("passwordpassword"),
             first_name=None,
             second_name=None,
@@ -67,59 +84,27 @@ async def insert_mock_data() -> None:
             date_of_birth=None,
             is_deleted=False,
             deleted_at=None,
-        ),
-        UserModel(
-            guid=MOCK_USER_GET_GUID,
+        )
+        for guid, username, email in mock_user_data
+    )
+    mock_project_models = (
+        ProjectModel(
+            guid=guid,
             created_at=datetime.now(UTC),
             updated_at=datetime.now(UTC),
-            username="get_username",
-            email="get@email.com",
-            password=Hasher().get_psw_hash("passwordpassword"),
-            first_name=None,
-            second_name=None,
-            gender=None,
-            company=None,
-            join_date=None,
-            job_title=None,
-            date_of_birth=None,
-            is_deleted=False,
-            deleted_at=None,
-        ),
-        UserModel(
-            guid=MOCK_USER_PATCH_GUID,
-            created_at=datetime.now(UTC),
-            updated_at=datetime.now(UTC),
-            username="patch_username",
-            email="patch@email.com",
-            password=Hasher().get_psw_hash("passwordpassword"),
-            first_name=None,
-            second_name=None,
-            gender=None,
-            company=None,
-            join_date=None,
-            job_title=None,
-            date_of_birth=None,
-            is_deleted=False,
-            deleted_at=None,
-        ),
-        UserModel(
-            guid=MOCK_USER_DELETE_GUID,
-            created_at=datetime.now(UTC),
-            updated_at=datetime.now(UTC),
-            username="delete_username",
-            email="delete@email.com",
-            password=Hasher().get_psw_hash("passwordpassword"),
-            first_name=None,
-            second_name=None,
-            gender=None,
-            company=None,
-            join_date=None,
-            job_title=None,
-            date_of_birth=None,
-            is_deleted=False,
-            deleted_at=None,
-        ),
+            title=title,
+            description=token_urlsafe(16),
+            tech_stack=(token_urlsafe(16), token_urlsafe(16)),
+            additional_metadata={},
+            start_date=datetime.now(UTC).date() + timedelta(days=1),
+            constraint_date=datetime.now(UTC).date() + timedelta(days=10),
+            creator_guid=MOCK_USER_AUTH_GUID,
+            mentor_guid=None,
+        )
+        for guid, title in mock_projet_data
     )
     async with test_async_session_factory() as test_session:
-        test_session.add_all(mock_models)
+        test_session.add_all(mock_user_models)
+        await test_session.commit()
+        test_session.add_all(mock_project_models)
         await test_session.commit()
