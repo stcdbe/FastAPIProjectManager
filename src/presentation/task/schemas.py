@@ -1,27 +1,29 @@
+from datetime import datetime
 from typing import Annotated
 
-from pydantic import UUID4, StringConstraints
-
-from src.common.presentation.schemas import FromAttrsBaseModel, GUIDMixin, TimeMixin
+from pydantic import UUID4, BaseModel, Field
 
 
-class _TaskBase(FromAttrsBaseModel):
-    title: Annotated[str, StringConstraints(strip_whitespace=True, min_length=5, max_length=100)]
-    description: Annotated[str, StringConstraints(strip_whitespace=True, min_length=5, max_length=250)]
-    is_completed: bool = False
+class _TaskBaseScheme(BaseModel):
+    title: Annotated[str, Field(min_length=5, max_length=256)]
+    description: str
+    is_completed: bool
     executor_guid: UUID4
 
 
-class TaskCreate(_TaskBase):
+class TaskCreateScheme(_TaskBaseScheme):
     pass
 
 
-class TaskPatch(TaskCreate):
-    title: Annotated[str, StringConstraints(strip_whitespace=True, min_length=5, max_length=100)] | None = None
-    description: Annotated[str, StringConstraints(strip_whitespace=True, min_length=5, max_length=250)] | None = None
-    is_completed: bool | None = None
-    executor_guid: UUID4 | None = None
+class TaskPatchScheme(TaskCreateScheme):
+    title: Annotated[str | None, Field(min_length=5, max_length=256)]  # type: ignore
+    description: str | None  # type: ignore
+    is_completed: bool | None  # type: ignore
+    executor_guid: UUID4 | None  # type: ignore
 
 
-class TaskGet(_TaskBase, GUIDMixin, TimeMixin):
-    pass
+class TaskGetScheme(_TaskBaseScheme):
+    guid: UUID4
+    created_at: datetime
+    updated_at: datetime
+    project_guid: UUID4

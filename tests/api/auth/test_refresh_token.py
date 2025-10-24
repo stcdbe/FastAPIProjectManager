@@ -1,3 +1,5 @@
+from secrets import token_urlsafe
+
 import orjson
 import pytest
 from fastapi import FastAPI, status
@@ -29,3 +31,15 @@ async def test_refresh_token(
     assert res_json["access_token"]
     assert res_json["refresh_token"]
     assert res_json["token_type"] == "bearer"  # noqa: S105
+
+
+@pytest.mark.asyncio
+async def test_refresh_token_failed(
+    app: FastAPI,
+    client: AsyncClient,
+    auth_token_headers: dict[str, str],
+) -> None:
+    data = RefreshTokenInputScheme(refresh_token=token_urlsafe(16))
+    refresh_token_url = app.url_path_for("refresh_token")
+    refresh_token_res = await client.post(refresh_token_url, json=data.model_dump(), headers=auth_token_headers)
+    assert refresh_token_res.status_code == status.HTTP_400_BAD_REQUEST

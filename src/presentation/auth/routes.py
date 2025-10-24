@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from src.common.exc import BaseAppError
 from src.domain.user.entities.auth_token import AuthToken
 from src.domain.user.entities.user import User
-from src.domain.user.exc import UserInvalidCredentialsError, UserInvalidTokenError
+from src.domain.user.exc import UserInvalidCredentialsError, UserNotFoundError
 from src.domain.user.use_cases.generate_user_token import GenerateUserTokenUseCase
 from src.domain.user.use_cases.refresh_user_token import RefreshUserTokenUseCase
 from src.presentation.auth.schemas import AuthTokenScheme, RefreshTokenInputScheme
@@ -34,7 +34,7 @@ async def create_token(
     try:
         return await use_case.execute(username=form_data.username, password=form_data.password)
 
-    except UserInvalidCredentialsError as e:
+    except (UserNotFoundError, UserInvalidCredentialsError) as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=e.msg,
@@ -63,13 +63,6 @@ async def refresh_token(
     use_case = RefreshUserTokenUseCase()
     try:
         return use_case.execute(sheme_data.refresh_token)
-
-    except UserInvalidTokenError as e:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=e.msg,
-            headers={"WWW-Authenticate": "Bearer"},
-        ) from e
 
     except BaseAppError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.msg) from e

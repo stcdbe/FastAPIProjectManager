@@ -51,7 +51,7 @@ class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepositor
             raise ProjectNotFoundError(msg) from e
 
     async def create_one(self, project: Project) -> UUID:
-        stmt = insert(ProjectModel).values(**asdict(project)).returning(ProjectModel.guid)
+        stmt = insert(ProjectModel).values(asdict(project)).returning(ProjectModel.guid)
 
         try:
             async with self._get_session() as session:
@@ -67,7 +67,7 @@ class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepositor
         stmt = (
             update(ProjectModel)
             .where(ProjectModel.guid == project.guid)
-            .values(**asdict(project))
+            .values(asdict(project))
             .returning(ProjectModel.guid)
         )
 
