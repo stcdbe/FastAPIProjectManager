@@ -27,3 +27,7 @@ class TaskGetScheme(_TaskBaseScheme):
     created_at: datetime
     updated_at: datetime
     project_guid: UUID4
+
+
+class TaskListGetScheme(BaseModel):
+    tasks: list[TaskGetScheme]

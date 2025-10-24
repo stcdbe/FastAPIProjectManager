@@ -14,12 +14,7 @@ class UserIsSoftDeletedError(UserNotFoundError):
 
 
 @dataclass(eq=False, frozen=True, slots=True)
-class UserCreateError(BaseAppError):
-    pass
-
-
-@dataclass(eq=False, frozen=True, slots=True)
-class UserPatchError(BaseAppError):
+class UserInvalidDataError(BaseAppError):
     pass
 
 

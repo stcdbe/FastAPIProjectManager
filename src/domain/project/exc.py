@@ -9,10 +9,5 @@ class ProjectNotFoundError(BaseAppError):
 
 
 @dataclass(eq=False, frozen=True, slots=True)
-class ProjectCreateError(BaseAppError):
-    pass
-
-
-@dataclass(eq=False, frozen=True, slots=True)
-class ProjectPatchError(BaseAppError):
+class ProjectInvalidDataError(BaseAppError):
     pass
