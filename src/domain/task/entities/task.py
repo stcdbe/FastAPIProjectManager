@@ -20,7 +20,6 @@ class TaskCreateData:
     title: str
     description: str
     is_completed: bool
-    project_guid: UUID
     executor_guid: UUID
 
 
@@ -29,5 +28,4 @@ class TaskPatchData:
     title: str | None
     description: str | None
     is_completed: bool | None
-    project_guid: UUID | None
     executor_guid: UUID | None

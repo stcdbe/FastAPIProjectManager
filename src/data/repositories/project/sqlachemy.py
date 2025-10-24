@@ -9,7 +9,7 @@ from src.data.models.project.project_model import ProjectModel
 from src.data.repositories.project.base import AbstractProjectRepository
 from src.data.repositories.sqlalchemy_base import SQLAlchemyRepository
 from src.domain.project.entities.project import Project
-from src.domain.project.exceptions import ProjectCreateError, ProjectNotFoundError
+from src.domain.project.exc import ProjectInvalidDataError, ProjectNotFoundError
 
 # from sqlalchemy.orm import selectinload
 
@@ -61,7 +61,7 @@ class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepositor
 
         except IntegrityError as e:
             msg = f"Error while adding project: {e!r}"
-            raise ProjectCreateError(msg) from e
+            raise ProjectInvalidDataError(msg) from e
 
     async def patch_one(self, project: Project) -> UUID:
         stmt = (
@@ -79,7 +79,7 @@ class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepositor
 
         except IntegrityError as e:
             msg = f"Error while pathcing project: {e!r}"
-            raise ProjectCreateError(msg) from e
+            raise ProjectInvalidDataError(msg) from e
 
     async def delete_one(self, project: Project) -> UUID:
         stmt = delete(ProjectModel).where(ProjectModel.guid == project.guid).returning(ProjectModel.guid)
@@ -92,4 +92,4 @@ class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepositor
 
         except IntegrityError as e:
             msg = f"Error while deleting project: {e!r}"
-            raise ProjectCreateError(msg) from e
+            raise ProjectInvalidDataError(msg) from e

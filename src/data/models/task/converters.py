@@ -2,7 +2,7 @@ from src.data.models.task.task_model import TaskModel
 from src.domain.task.entities.task import Task
 
 
-def convert_project_model_to_entity(
+def convert_task_model_to_entity(
     model: TaskModel,
 ) -> Task:
     return Task(

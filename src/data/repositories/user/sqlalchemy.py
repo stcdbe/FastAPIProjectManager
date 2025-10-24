@@ -9,7 +9,7 @@ from src.data.models.user.user_model import UserModel
 from src.data.repositories.sqlalchemy_base import SQLAlchemyRepository
 from src.data.repositories.user.base import AbstractUserRepository
 from src.domain.user.entities.user import User
-from src.domain.user.exc import UserCreateError, UserNotFoundError, UserPatchError
+from src.domain.user.exc import UserInvalidDataError, UserNotFoundError
 
 
 class SQLAlchemyUserRepository(AbstractUserRepository, SQLAlchemyRepository):
@@ -69,7 +69,7 @@ class SQLAlchemyUserRepository(AbstractUserRepository, SQLAlchemyRepository):
 
         except IntegrityError as e:
             msg = f"Error while adding user {user.username}: {e!r}"
-            raise UserCreateError(msg) from e
+            raise UserInvalidDataError(msg) from e
 
     async def patch_one(self, user: User) -> UUID:
         stmt = update(UserModel).where(UserModel.guid == user.guid).values(asdict(user)).returning(UserModel.guid)
@@ -82,4 +82,4 @@ class SQLAlchemyUserRepository(AbstractUserRepository, SQLAlchemyRepository):
 
         except IntegrityError as e:
             msg = f"Error while patching user {user.guid}: {e!r}"
-            raise UserPatchError(msg) from e
+            raise UserInvalidDataError(msg) from e
