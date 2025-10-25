@@ -1,6 +1,6 @@
 from src.data.models.user.user_model import UserModel
-from src.domain.user.entities.enums import UserGender
-from src.domain.user.entities.user import User
+from src.domain.user.entities import User
+from src.domain.user.enums import UserGender
 
 
 def convert_user_model_to_entity(user_model: UserModel) -> User:

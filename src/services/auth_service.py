@@ -5,7 +5,7 @@ from uuid import UUID
 import jwt
 
 from src.config import get_settings
-from src.domain.user.entities.enums import AuthTokenTyp
+from src.domain.user.enums import AuthTokenTyp
 from src.domain.user.exc import UserInvalidTokenError
 
 logger = getLogger()

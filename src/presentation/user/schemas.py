@@ -3,7 +3,7 @@ from typing import Annotated
 
 from pydantic import UUID4, BaseModel, EmailStr, Field
 
-from src.domain.user.entities.enums import UserGender
+from src.domain.user.enums import UserGender
 
 
 class _UserBaseScheme(BaseModel):
@@ -23,9 +23,9 @@ class UserCreateScheme(_UserBaseScheme):
 
 
 class UserPatchScheme(UserCreateScheme):
-    username: Annotated[str | None, Field(min_length=5, max_length=128, pattern=r"^[a-z0-9_-]*$")]
-    email: EmailStr | None
-    password: Annotated[str | None, Field(min_length=8, max_length=72)]
+    username: Annotated[str | None, Field(min_length=5, max_length=128, pattern=r"^[a-z0-9_-]*$")]  # type: ignore
+    email: EmailStr | None  # type: ignore
+    password: Annotated[str | None, Field(min_length=8, max_length=72)]  # type: ignore
 
 
 class UserGetScheme(_UserBaseScheme):

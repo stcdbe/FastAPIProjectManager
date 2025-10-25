@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import UUID4
 
 from src.common.exc import BaseAppError
-from src.domain.user.entities.user import User
+from src.domain.user.entities import User
 from src.domain.user.exc import UserNotFoundError
 from src.domain.user.use_cases.create_user import CreateUserUseCase
 from src.domain.user.use_cases.delete_user_by_guid import DeleteUserByGUIDUseCase

@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from src.domain.user.entities.user import UserCreateData
+from src.domain.user.entities import UserCreateData
 from src.services.user_service import UserService
 
 

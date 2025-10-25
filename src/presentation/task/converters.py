@@ -1,4 +1,4 @@
-from src.domain.task.entities.task import TaskCreateData, TaskPatchData
+from src.domain.task.entities import TaskCreateData, TaskPatchData
 from src.presentation.task.schemas import TaskCreateScheme, TaskPatchScheme
 
 

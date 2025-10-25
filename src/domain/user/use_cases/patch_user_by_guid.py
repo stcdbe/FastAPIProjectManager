@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from src.domain.user.entities.user import UserPatchData
+from src.domain.user.entities import UserPatchData
 from src.services.user_service import UserService
 
 

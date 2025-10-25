@@ -2,7 +2,14 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from uuid import UUID
 
-from src.domain.user.entities.enums import UserGender
+from src.domain.user.enums import UserGender
+
+
+@dataclass(slots=True)
+class AuthToken:
+    access_token: str
+    refresh_token: str | None
+    token_type: str
 
 
 @dataclass(slots=True)
@@ -22,12 +29,6 @@ class User:
     updated_at: datetime
     is_deleted: bool
     deleted_at: datetime | None
-
-    def __str__(self) -> str:
-        return f"{self.__class__.__name__}(guid={self.guid})"
-
-    def __repr__(self) -> str:
-        return self.__str__()
 
 
 @dataclass(slots=True)

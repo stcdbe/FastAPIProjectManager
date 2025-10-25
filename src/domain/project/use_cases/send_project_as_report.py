@@ -1,9 +1,5 @@
-from src.domain.project.entities.project import ProjectReportSendData
+from src.domain.project.entities import ProjectReportData
 
 
 class SendProjectAsReportUseCase:
-    __slots__ = ()
-
-    def __init__(self) -> None: ...
-
-    async def execute(self, send_data: ProjectReportSendData) -> None: ...
+    async def execute(self, send_data: ProjectReportData) -> None: ...

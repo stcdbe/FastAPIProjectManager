@@ -1,5 +1,5 @@
 from src.data.models.project.project_model import ProjectModel
-from src.domain.project.entities.project import Project
+from src.domain.project.entities import Project
 
 
 def convert_project_model_to_entity(model: ProjectModel) -> Project:

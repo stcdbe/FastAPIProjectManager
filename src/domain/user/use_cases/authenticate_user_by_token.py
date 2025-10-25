@@ -1,4 +1,4 @@
-from src.domain.user.entities.user import User
+from src.domain.user.entities import User
 from src.services.auth_service import AuthService
 from src.services.user_service import UserService
 

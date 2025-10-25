@@ -4,14 +4,12 @@ from uuid import UUID
 from sqlalchemy import delete, desc, insert, select, update
 from sqlalchemy.exc import IntegrityError, NoResultFound
 
-from src.data.models.project.converters import convert_project_model_to_entity
 from src.data.models.project.project_model import ProjectModel
 from src.data.repositories.project.base import AbstractProjectRepository
+from src.data.repositories.project.converters import convert_project_model_to_entity
 from src.data.repositories.sqlalchemy_base import SQLAlchemyRepository
-from src.domain.project.entities.project import Project
+from src.domain.project.entities import Project
 from src.domain.project.exc import ProjectInvalidDataError, ProjectNotFoundError
-
-# from sqlalchemy.orm import selectinload
 
 
 class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepository):
@@ -34,11 +32,8 @@ class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepositor
             project_models_seq = res.scalars().all()
             return [convert_project_model_to_entity(model) for model in project_models_seq]
 
-    async def get_one_by_guid(self, guid: UUID, with_tasks: bool = False) -> Project:
+    async def get_one_by_guid(self, guid: UUID) -> Project:
         stmt = select(ProjectModel).where(ProjectModel.guid == guid)
-
-        # if with_tasks:
-        #     stmt = stmt.options(selectinload(ProjectModel.tasks))
 
         try:
             async with self._get_session() as session:
