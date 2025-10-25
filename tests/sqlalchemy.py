@@ -55,23 +55,23 @@ MOCK_PROJECT_DELETE_GUID: Final[UUID] = uuid4()
 
 MOCK_TASK_GET_GUID: Final[UUID] = uuid4()
 MOCK_TASK_PATCH_GUID: Final[UUID] = uuid4()
-MOC_TASK_DELETE_GUID: Final[UUID] = uuid4()
+MOCK_TASK_DELETE_GUID: Final[UUID] = uuid4()
 
-_mock_users_data = (
+_mock_users_data: Final = (
     (MOCK_USER_AUTH_GUID, "auth_username", "auth@email.com"),
     (MOCK_USER_GET_GUID, "get_username", "get@email.com"),
     (MOCK_USER_PATCH_GUID, "patch_username", "patch@email.com"),
     (MOCK_USER_DELETE_GUID, "delete_username", "delete@email.com"),
 )
-_mock_projets_data = (
+_mock_projets_data: Final = (
     (MOCK_PROJECT_GET_GUID, "get_title"),
     (MOCK_PROJECT_PATCH_GUID, "patch_title"),
     (MOCK_PROJECT_DELETE_GUID, "delete_title"),
 )
-_mock_tasks_data = (
+_mock_tasks_data: Final = (
     (MOCK_TASK_GET_GUID, "get_title"),
     (MOCK_TASK_PATCH_GUID, "patch_title"),
-    (MOC_TASK_DELETE_GUID, "delete_title"),
+    (MOCK_TASK_DELETE_GUID, "delete_title"),
 )
 
 
@@ -115,6 +115,8 @@ async def insert_mock_data() -> None:
     mock_task_models = (
         TaskModel(
             guid=guid,
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
             title=title,
             description=token_urlsafe(16),
             is_completed=False,

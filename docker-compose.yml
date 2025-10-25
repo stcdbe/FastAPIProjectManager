@@ -12,7 +12,7 @@ services:
     ports:
         - 5432:${PG_PORT}
     # volumes:
-    #   - local_pgdata:/var/lib/postgresql/data
+    #   - pgdata:/var/lib/postgresql/data
     networks:
       - custom
 

@@ -1,15 +1,14 @@
-# from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import ForeignKey, String, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-# , relationship
 from src.data.models.sqlalchemy_timed_base import SQLAlchemyTimedBaseModel
 
-# if TYPE_CHECKING:
-#     from src.data.models.project.project_model import ProjectModel
-#     from src.data.models.user.user_model import UserModel
+if TYPE_CHECKING:
+    from src.data.models.project.project_model import ProjectModel
+    from src.data.models.user.user_model import UserModel
 
 
 class TaskModel(SQLAlchemyTimedBaseModel):
@@ -22,5 +21,5 @@ class TaskModel(SQLAlchemyTimedBaseModel):
     project_guid: Mapped[UUID] = mapped_column(ForeignKey("project.guid"))
     executor_guid: Mapped[UUID] = mapped_column(ForeignKey("user.guid"))
     # relations
-    # project: Mapped["ProjectModel"] = relationship(back_populates="tasks")
-    # executor: Mapped["UserModel"] = relationship(back_populates="tasks")
+    project: Mapped["ProjectModel"] = relationship(back_populates="tasks")
+    executor: Mapped["UserModel"] = relationship(back_populates="tasks")
