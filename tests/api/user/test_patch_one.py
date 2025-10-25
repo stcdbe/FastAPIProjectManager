@@ -6,7 +6,7 @@ import pytest
 from fastapi import FastAPI, status
 from httpx import AsyncClient
 
-from src.domain.user.entities.enums import UserGender
+from src.domain.user.enums import UserGender
 from src.presentation.user.schemas import UserPatchScheme
 from tests.sqlalchemy import MOCK_USER_PATCH_GUID
 

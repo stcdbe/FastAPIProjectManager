@@ -1,5 +1,5 @@
 from src.data.models.task.task_model import TaskModel
-from src.domain.task.entities.task import Task
+from src.domain.task.entities import Task
 
 
 def convert_task_model_to_entity(

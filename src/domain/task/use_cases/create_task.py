@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from src.domain.task.entities.task import TaskCreateData
+from src.domain.task.entities import TaskCreateData
 from src.services.task_service import TaskService
 
 

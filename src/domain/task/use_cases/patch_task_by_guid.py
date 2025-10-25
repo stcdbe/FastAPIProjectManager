@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from src.domain.task.entities.task import TaskPatchData
+from src.domain.task.entities import TaskPatchData
 from src.domain.task.exc import TaskInvalidDataError
 from src.services.task_service import TaskService
 

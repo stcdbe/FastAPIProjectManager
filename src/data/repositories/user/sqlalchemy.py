@@ -4,11 +4,11 @@ from uuid import UUID
 from sqlalchemy import desc, insert, select, update
 from sqlalchemy.exc import IntegrityError, NoResultFound
 
-from src.data.models.user.converters import convert_user_model_to_entity
 from src.data.models.user.user_model import UserModel
 from src.data.repositories.sqlalchemy_base import SQLAlchemyRepository
 from src.data.repositories.user.base import AbstractUserRepository
-from src.domain.user.entities.user import User
+from src.data.repositories.user.converters import convert_user_model_to_entity
+from src.domain.user.entities import User
 from src.domain.user.exc import UserInvalidDataError, UserNotFoundError
 
 

@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from src.domain.user.entities.user import User
+from src.domain.user.entities import User
 from src.services.user_service import UserService
 
 

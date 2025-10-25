@@ -4,8 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 
 from src.common.exc import BaseAppError
-from src.domain.user.entities.auth_token import AuthToken
-from src.domain.user.entities.user import User
+from src.domain.user.entities import AuthToken, User
 from src.domain.user.exc import UserInvalidCredentialsError, UserNotFoundError
 from src.domain.user.use_cases.generate_user_token import GenerateUserTokenUseCase
 from src.domain.user.use_cases.refresh_user_token import RefreshUserTokenUseCase

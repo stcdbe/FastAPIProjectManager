@@ -7,7 +7,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from src.config import get_settings
 
 _templates_env = Environment(
-    loader=FileSystemLoader(get_settings().EMAIL_TEMPLATES_DIR),
+    loader=FileSystemLoader(get_settings().TEMPLATES_DIR),
     autoescape=select_autoescape(default=True),
     enable_async=True,
 )
@@ -32,9 +32,10 @@ class SMTPNotificationClient:
         self,
         recipient_email: str,
         subject: str,
+        template_name: str,
         **entities_for_render: Any,
     ) -> None:
-        body = await self._render_email_body(**entities_for_render)
+        body = await self._render_email_body(template_name, **entities_for_render)
         message = self._generate_email_message(recipient_email, subject, body)
         await aiosmtplib.send(
             message,

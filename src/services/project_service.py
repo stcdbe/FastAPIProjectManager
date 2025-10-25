@@ -25,8 +25,8 @@ class ProjectService:
             reverse=reverse,
         )
 
-    async def get_one_by_guid(self, guid: UUID, with_tasks: bool = False) -> Project:
-        return await self._project_repository.get_one_by_guid(guid=guid, with_tasks=with_tasks)
+    async def get_one_by_guid(self, guid: UUID) -> Project:
+        return await self._project_repository.get_one_by_guid(guid=guid)
 
     async def create_one(self, creator_guid: UUID, project_create_data: ProjectCreateData) -> UUID:
         project = Project(

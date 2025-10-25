@@ -1,4 +1,4 @@
-from src.domain.user.entities.user import UserCreateData, UserPatchData
+from src.domain.user.entities import UserCreateData, UserPatchData
 from src.presentation.user.schemas import UserCreateScheme, UserPatchScheme
 
 

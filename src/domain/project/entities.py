@@ -17,7 +17,6 @@ class Project:
     mentor_guid: UUID | None
     created_at: datetime
     updated_at: datetime
-    # tasks: list["Task"] | None
 
 
 @dataclass(slots=True)
@@ -43,6 +42,6 @@ class ProjectPatchData:
 
 
 @dataclass(slots=True)
-class ProjectReportSendData:
+class ProjectReportData:
     project_guid: UUID
     email: str

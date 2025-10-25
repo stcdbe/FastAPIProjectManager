@@ -1,6 +1,4 @@
-from uuid import UUID
-
-from src.domain.project.entities.project import ProjectCreateData, ProjectPatchData, ProjectReportSendData
+from src.domain.project.entities import ProjectCreateData, ProjectPatchData, ProjectReportData
 from src.presentation.project.schemas import ProjectCreateScheme, ProjectPatchScheme, ProjectReportSendDataScheme
 
 
@@ -39,8 +37,8 @@ def convert_project_patch_scheme_to_entity(
 
 def convert_project_report_send_data_scheme_to_entity(
     scheme: ProjectReportSendDataScheme,
-) -> ProjectReportSendData:
-    return ProjectReportSendData(
+) -> ProjectReportData:
+    return ProjectReportData(
         project_guid=scheme.project_guid,
         email=scheme.email,
     )

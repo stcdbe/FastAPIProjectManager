@@ -1,5 +1,5 @@
-from src.domain.user.entities.auth_token import AuthToken
-from src.domain.user.entities.enums import AuthTokenTyp
+from src.domain.user.entities import AuthToken
+from src.domain.user.enums import AuthTokenTyp
 from src.services.auth_service import AuthService
 
 

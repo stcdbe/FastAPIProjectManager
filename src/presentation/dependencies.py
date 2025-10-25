@@ -4,7 +4,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
 from src.common.exc import BaseAppError
-from src.domain.user.entities.user import User
+from src.domain.user.entities import User
 from src.domain.user.use_cases.authenticate_user_by_token import AuthenticateUserByTokenUseCase
 
 oauth2_scheme = OAuth2PasswordBearer(
