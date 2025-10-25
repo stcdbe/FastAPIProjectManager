@@ -1,7 +1,7 @@
 from uuid import UUID
 
-from src.domain.project.entities.project import ProjectCreateData
-from src.domain.user.entities.user import User
+from src.domain.project.entities import ProjectCreateData
+from src.domain.user.entities import User
 from src.services.project_service import ProjectService
 
 

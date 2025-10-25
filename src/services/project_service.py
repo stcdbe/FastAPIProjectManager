@@ -2,7 +2,7 @@ from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 from src.data.repositories.project.sqlachemy import SQLAlchemyProjectRepository
-from src.domain.project.entities.project import Project, ProjectCreateData, ProjectPatchData
+from src.domain.project.entities import Project, ProjectCreateData, ProjectPatchData
 
 
 class ProjectService:

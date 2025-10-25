@@ -2,7 +2,7 @@ from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 from src.data.repositories.task.sqlalchemy import SQLAlchemyTaskRepository
-from src.domain.task.entities.task import Task, TaskCreateData, TaskPatchData
+from src.domain.task.entities import Task, TaskCreateData, TaskPatchData
 
 
 class TaskService:
