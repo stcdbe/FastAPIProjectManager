@@ -1,4 +1,4 @@
-from src.data.models.task.task_model import TaskModel
+from src.data.models.task_model import TaskModel
 from src.domain.task.entities import Task
 
 

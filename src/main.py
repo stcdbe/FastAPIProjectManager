@@ -7,9 +7,7 @@ from fastapi.responses import ORJSONResponse
 from fastapi.routing import APIRouter
 
 from src.config import get_settings
-from src.data.repositories.sqlalchemy_base import create_tables, drop_tables
-
-# , drop_tables
+from src.infra.broker.rabbitmq_broker import broker
 from src.presentation.auth.routes import auth_v1_router
 from src.presentation.project.routes import project_v1_router
 from src.presentation.user.routes import user_v1_router
@@ -20,11 +18,12 @@ logger = getLogger()
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Web app %s %s starting up...", app.title, app.version)
-    await drop_tables()
-    await create_tables()
+    await broker.start()
+
     yield
+
+    await broker.stop()
     logger.info("Web app %s %s shutting down...", app.title, app.version)
-    await drop_tables()
 
 
 def get_api_v1_router() -> APIRouter:

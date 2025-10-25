@@ -4,7 +4,7 @@ from uuid import UUID
 from sqlalchemy import delete, desc, insert, select, update
 from sqlalchemy.exc import IntegrityError, NoResultFound
 
-from src.data.models.project.project_model import ProjectModel
+from src.data.models.project_model import ProjectModel
 from src.data.repositories.project.base import AbstractProjectRepository
 from src.data.repositories.project.converters import convert_project_model_to_entity
 from src.data.repositories.sqlalchemy_base import SQLAlchemyRepository
