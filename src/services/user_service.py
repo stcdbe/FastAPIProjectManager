@@ -3,7 +3,7 @@ from logging import getLogger
 from uuid import UUID, uuid4
 
 from src.data.repositories.user.sqlalchemy import SQLAlchemyUserRepository
-from src.domain.user.entities.user import User, UserCreateData, UserPatchData
+from src.domain.user.entities import User, UserCreateData, UserPatchData
 from src.domain.user.exc import UserIsSoftDeletedError
 from src.services.hasher_service import Hasher
 

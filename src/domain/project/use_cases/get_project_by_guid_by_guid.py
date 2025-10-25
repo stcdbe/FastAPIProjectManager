@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from src.domain.project.entities.project import Project
+from src.domain.project.entities import Project
 from src.services.project_service import ProjectService
 
 

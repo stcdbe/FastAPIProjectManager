@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from src.domain.task.entities.task import Task
+from src.domain.task.entities import Task
 
 
 class AbstractTaskRepository(ABC):
