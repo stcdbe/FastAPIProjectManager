@@ -6,8 +6,10 @@ from src.domain.project.entities.project import Project, ProjectCreateData, Proj
 
 
 class ProjectService:
+    __slots__ = ("_project_repository",)
+
     def __init__(self) -> None:
-        self._repository = SQLAlchemyProjectRepository()
+        self._project_repository = SQLAlchemyProjectRepository()
 
     async def get_list(
         self,
@@ -16,7 +18,7 @@ class ProjectService:
         order_by: str,
         reverse: bool,
     ) -> list[Project]:
-        return await self._repository.get_list(
+        return await self._project_repository.get_list(
             limit=limit,
             offset=offset,
             order_by=order_by,
@@ -24,7 +26,7 @@ class ProjectService:
         )
 
     async def get_one_by_guid(self, guid: UUID, with_tasks: bool = False) -> Project:
-        return await self._repository.get_one_by_guid(guid=guid, with_tasks=with_tasks)
+        return await self._project_repository.get_one_by_guid(guid=guid, with_tasks=with_tasks)
 
     async def create_one(self, creator_guid: UUID, project_create_data: ProjectCreateData) -> UUID:
         project = Project(
@@ -40,7 +42,7 @@ class ProjectService:
             created_at=datetime.now(UTC),
             updated_at=datetime.now(UTC),
         )
-        return await self._repository.create_one(project=project)
+        return await self._project_repository.create_one(project=project)
 
     async def patch_one(self, project: Project, project_patch_data: ProjectPatchData) -> UUID:
         if project_patch_data.title is not None:
@@ -64,7 +66,7 @@ class ProjectService:
         project.mentor_guid = project_patch_data.mentor_guid
         project.updated_at = datetime.now(UTC)
 
-        return await self._repository.patch_one(project=project)
+        return await self._project_repository.patch_one(project=project)
 
     async def delete_one(self, project: Project) -> UUID:
-        return await self._repository.delete_one(project=project)
+        return await self._project_repository.delete_one(project=project)

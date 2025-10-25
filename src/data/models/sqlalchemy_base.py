@@ -21,7 +21,7 @@ class SQLAlchemyBaseModel(DeclarativeBase, AsyncAttrs):
     guid: Mapped[UUID] = mapped_column(primary_key=True)
 
     def __str__(self) -> str:
-        return f"SQL Record (Table: {self.__tablename__!r} GUID:{self.guid})"
+        return f"SQL Record (Table: {self.__tablename__!r} GUID: {self.guid})"
 
     def __repr__(self) -> str:
         return self.__str__()

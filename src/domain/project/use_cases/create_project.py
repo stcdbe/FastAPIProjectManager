@@ -6,6 +6,8 @@ from src.services.project_service import ProjectService
 
 
 class CreateProjectUseCase:
+    __slots__ = ("_project_service",)
+
     def __init__(self) -> None:
         self._project_service = ProjectService()
 

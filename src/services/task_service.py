@@ -6,14 +6,16 @@ from src.domain.task.entities.task import Task, TaskCreateData, TaskPatchData
 
 
 class TaskService:
+    __slots__ = ("_task_repository",)
+
     def __init__(self) -> None:
-        self._repository = SQLAlchemyTaskRepository()
+        self._task_repository = SQLAlchemyTaskRepository()
 
     async def get_list_by_project_guid(self, project_guid: UUID) -> list[Task]:
-        return await self._repository.get_list_by_project_guid(project_guid)
+        return await self._task_repository.get_list_by_project_guid(project_guid)
 
     async def get_one_by_guid(self, guid: UUID) -> Task:
-        return await self._repository.get_one_by_guid(guid)
+        return await self._task_repository.get_one_by_guid(guid)
 
     async def create_one(self, project_guid: UUID, task_create_data: TaskCreateData) -> UUID:
         task = Task(
@@ -26,7 +28,7 @@ class TaskService:
             project_guid=project_guid,
             executor_guid=task_create_data.executor_guid,
         )
-        return await self._repository.create_one(task)
+        return await self._task_repository.create_one(task)
 
     async def patch_one(self, task: Task, task_patch_data: TaskPatchData) -> UUID:
         if task_patch_data.title is not None:
@@ -42,7 +44,7 @@ class TaskService:
             task.executor_guid = task_patch_data.executor_guid
 
         task.updated_at = datetime.now(UTC)
-        return await self._repository.patch_one(task)
+        return await self._task_repository.patch_one(task)
 
     async def delete_one(self, task: Task) -> UUID:
-        return await self._repository.delete_one(task)
+        return await self._task_repository.delete_one(task)

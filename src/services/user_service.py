@@ -11,9 +11,9 @@ logger = getLogger()
 
 
 class UserService:
-    def __init__(
-        self,
-    ) -> None:
+    __slots__ = ("_hasher", "_user_repository")
+
+    def __init__(self) -> None:
         self._user_repository = SQLAlchemyUserRepository()
         self._hasher = Hasher()
 
