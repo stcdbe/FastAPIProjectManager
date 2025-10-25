@@ -39,7 +39,7 @@ class SMTPNotificationClient:
         message = self._generate_email_message(recipient_email, subject, body)
         await aiosmtplib.send(
             message,
-            hostname="127.0.0.1",
+            hostname=get_settings().EMAIL_HOST,
             port=get_settings().EMAIL_PORT,
             username=get_settings().EMAIL_USERNAME,
             password=get_settings().EMAIL_PASSWORD,

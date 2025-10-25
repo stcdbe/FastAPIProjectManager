@@ -13,6 +13,7 @@ from src.domain.project.use_cases.get_project_list import GetProjectListUseCase
 from src.domain.project.use_cases.patch_project_by_guid import PatchProjectByGUIDUseCase
 
 # from src.domain.project.use_cases.send_project_as_report import SendProjectAsReportUseCase
+from src.domain.project.use_cases.send_project_as_report import SendProjectAsReportUseCase
 from src.domain.project_task_aggregation.flows.send_project_report_notification import SendProjectReportNotificationFlow
 from src.domain.task.entities import Task
 from src.domain.task.use_cases.create_task import CreateTaskUseCase
@@ -185,8 +186,7 @@ async def send_project_report(
     _: Annotated[User, Depends(get_current_user)],
     scheme_data: ProjectReportSendDataScheme,
 ) -> None:
-    # use_case = SendProjectAsReportUseCase()
-    use_case = SendProjectReportNotificationFlow()
+    use_case = SendProjectAsReportUseCase()
     send_data = convert_project_report_send_data_scheme_to_entity(scheme_data)
     try:
         await use_case.execute(send_data)

@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Annotated, Any, Final
 
 import yaml
-from pydantic import DirectoryPath, EmailStr, Field, PostgresDsn
+from pydantic import AmqpDsn, DirectoryPath, EmailStr, Field, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 _ENCODING: Final[str] = "utf-8"
@@ -44,10 +44,11 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRES: int
 
     PG_URL: PostgresDsn
-
     PG_URL_TEST: PostgresDsn
 
-    EMAIL_SMTP_SERVER: str
+    RMQ_URL: AmqpDsn
+
+    EMAIL_HOST: str
     EMAIL_PORT: int
     EMAIL_USERNAME: str
     EMAIL_PASSWORD: str

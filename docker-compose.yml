@@ -34,6 +34,33 @@ services:
     networks:
       - custom
 
+  rabbitmq:
+    container_name: fpm-rabbitmq
+    image: rabbitmq:4-management-alpine
+    hostname: rabbitmq
+    env_file:
+      - .env
+    ports:
+      - "${RMQ_PORT}:5672"
+      - "${RMQ_ADMINISTRATION_PORT}:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RMQ_PASSWORD}
+    # volumes:
+      # - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - custom
+
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: fpm-mail-server
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - custom
+
   # web:
   #   container_name: fpm-web
   #   build: .

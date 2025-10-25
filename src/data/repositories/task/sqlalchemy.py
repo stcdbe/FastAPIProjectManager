@@ -4,7 +4,7 @@ from uuid import UUID
 from sqlalchemy import delete, insert, select, update
 from sqlalchemy.exc import IntegrityError, NoResultFound
 
-from src.data.models.task.task_model import TaskModel
+from src.data.models.task_model import TaskModel
 from src.data.repositories.sqlalchemy_base import SQLAlchemyRepository
 from src.data.repositories.task.base import AbstractTaskRepository
 from src.data.repositories.task.converters import convert_task_model_to_entity

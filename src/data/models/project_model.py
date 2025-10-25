@@ -9,8 +9,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.data.models.sqlalchemy_timed_base import SQLAlchemyTimedBaseModel
 
 if TYPE_CHECKING:
-    from src.data.models.task.task_model import TaskModel
-    from src.data.models.user.user_model import UserModel
+    from src.data.models.task_model import TaskModel
+    from src.data.models.user_model import UserModel
 
 
 class ProjectModel(SQLAlchemyTimedBaseModel):

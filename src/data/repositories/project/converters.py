@@ -1,4 +1,4 @@
-from src.data.models.project.project_model import ProjectModel
+from src.data.models.project_model import ProjectModel
 from src.domain.project.entities import Project
 
 

@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import selectinload
 
-from src.data.models.project.project_model import ProjectModel
+from src.data.models.project_model import ProjectModel
 from src.data.repositories.project_task_aggregation.base import AbstractProjectTaskAggregationRepository
 from src.data.repositories.project_task_aggregation.converters import convert_project_task_aggregation_model_to_entity
 from src.data.repositories.sqlalchemy_base import SQLAlchemyRepository

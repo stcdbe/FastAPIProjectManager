@@ -7,10 +7,10 @@ from uuid import UUID, uuid4
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from src.config import get_settings
-from src.data.models.project.project_model import ProjectModel
+from src.data.models.project_model import ProjectModel
 from src.data.models.sqlalchemy_base import SQLAlchemyBaseModel
-from src.data.models.task.task_model import TaskModel
-from src.data.models.user.user_model import UserModel
+from src.data.models.task_model import TaskModel
+from src.data.models.user_model import UserModel
 from src.services.hasher_service import Hasher
 
 test_async_engine = create_async_engine(
