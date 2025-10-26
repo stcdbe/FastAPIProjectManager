@@ -1,5 +1,5 @@
 from datetime import UTC, datetime
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import orjson
 import pytest
@@ -8,7 +8,7 @@ from httpx import AsyncClient
 
 from src.domain.user.enums import UserGender
 from src.presentation.user.schemas import UserPatchScheme
-from tests.sqlalchemy import MOCK_USER_PATCH_GUID
+from tests.mock_data import MOCK_USER_PATCH_GUID
 
 
 @pytest.mark.asyncio
@@ -40,3 +40,31 @@ async def test_patch_user(
 
     res_json = orjson.loads(res.content)
     assert UUID(res_json["guid"])
+
+
+@pytest.mark.asyncio
+async def test_patch_user_failed(
+    app: FastAPI,
+    client: AsyncClient,
+    auth_token_headers: dict[str, str],
+) -> None:
+    url = app.url_path_for("patch_user", user_guid=str(uuid4()))
+    data = UserPatchScheme(
+        username=None,
+        email=None,
+        password=None,
+        first_name="first_name",
+        second_name="second_name",
+        gender=UserGender.M,
+        company="company",
+        join_date=datetime.now(UTC).date(),
+        job_title="job_title",
+        date_of_birth=datetime.now(UTC).date(),
+    )
+
+    res = await client.patch(
+        url,
+        json=data.model_dump(mode="json"),
+        headers=auth_token_headers,
+    )
+    assert res.status_code == status.HTTP_404_NOT_FOUND

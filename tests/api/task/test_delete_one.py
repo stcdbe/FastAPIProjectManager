@@ -2,7 +2,7 @@ import pytest
 from fastapi import FastAPI, status
 from httpx import AsyncClient
 
-from tests.sqlalchemy import MOCK_PROJECT_GET_GUID, MOCK_TASK_DELETE_GUID
+from tests.mock_data import MOCK_PROJECT_GET_GUID, MOCK_TASK_DELETE_GUID
 
 
 @pytest.mark.asyncio

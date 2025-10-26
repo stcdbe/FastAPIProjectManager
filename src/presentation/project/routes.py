@@ -7,6 +7,7 @@ from pydantic import UUID4
 
 from src.common.exc import BaseAppError
 from src.domain.project.entities import Project
+from src.domain.project.exc import ProjectNotFoundError
 from src.domain.project.use_cases.create_project import CreateProjectUseCase
 from src.domain.project.use_cases.delete_project_by_guid import DeleteProjectByGUIDUseCase
 from src.domain.project.use_cases.get_project_by_guid_by_guid import GetProjectByGUIDUseCase
@@ -117,6 +118,9 @@ async def get_project(
     try:
         return await use_case.execute(project_guid)
 
+    except ProjectNotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.msg) from e
+
     except BaseAppError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.msg) from e
 
@@ -144,6 +148,9 @@ async def patch_project(
     try:
         guid = await use_case.execute(project_guid, project_patch_data)
 
+    except ProjectNotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.msg) from e
+
     except BaseAppError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.msg) from e
 
@@ -170,6 +177,9 @@ async def delete_project(
     use_case: DeleteProjectByGUIDUseCase = container.resolve(DeleteProjectByGUIDUseCase)  # type: ignore
     try:
         await use_case.execute(project_guid)
+
+    except ProjectNotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.msg) from e
 
     except BaseAppError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.msg) from e

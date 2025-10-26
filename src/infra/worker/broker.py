@@ -1,18 +1,7 @@
-from logging import getLogger
-
 from faststream.rabbit import QueueType, RabbitBroker, RabbitExchange, RabbitQueue
 from faststream.rabbit.types import AioPikaSendableMessage
 
-from src.config import get_settings
 from src.infra.worker.enums import RabbitMQExchangeName, RabbitMQQueueName
-from src.infra.worker.worker_routes import worker_router
-
-logger = getLogger()
-rabbimq_broker = RabbitBroker(
-    url=get_settings().RMQ_URL.unicode_string(),
-    logger=logger,
-)
-rabbimq_broker.include_router(worker_router)
 
 
 class RabbitMQMessageBroker:

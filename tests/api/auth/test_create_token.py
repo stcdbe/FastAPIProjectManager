@@ -20,10 +20,10 @@ async def test_create_token(
     res = await client.post(url, data=auth_form_data)
     assert res.status_code == status.HTTP_201_CREATED
 
-    token = orjson.loads(res.content)
-    assert token["access_token"]
-    assert token["refresh_token"]
-    assert token["token_type"] == "bearer"  # noqa: S105
+    res_json = orjson.loads(res.content)
+    assert res_json["access_token"]
+    assert res_json["refresh_token"]
+    assert res_json["token_type"] == "bearer"  # noqa: S105
 
 
 @pytest.mark.asyncio

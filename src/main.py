@@ -19,13 +19,16 @@ logger = getLogger()
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Web app %s %s starting up...", app.title, app.version)
+
     container = get_api_di_container()
+
     message_broker: RabbitMQMessageBroker = container.resolve(RabbitMQMessageBroker)  # type: ignore
     await message_broker.start_broker()
 
     yield
 
     await message_broker.stop_broker()
+
     logger.info("Web app %s %s shutting down...", app.title, app.version)
 
 

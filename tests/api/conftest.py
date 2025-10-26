@@ -5,30 +5,16 @@ import pytest_asyncio
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 
-from src.main import create_app, lifespan
-from tests.sqlalchemy import insert_mock_data
-
-# , drop_tables, insert_mock_data
+from src.logic.api_di_container import get_api_di_container
+from src.main import create_app
+from tests.logic.mock_api_di_container import get_mock_api_di_container
 
 
 @pytest_asyncio.fixture(scope="session")
 async def app() -> AsyncGenerator[FastAPI, None]:
     app = create_app()
-    # app.dependency_overrides[get_session] = get_test_session
-    async with lifespan(app):
-        yield app
-
-
-@pytest_asyncio.fixture(autouse=True, scope="session")
-async def prepare_test_db() -> AsyncGenerator[None, None]:
-    # await drop_tables()
-    # await create_tables()
-    await insert_mock_data()
-    # test_broker = TestRabbitBroker(broker, with_real=True)
-    # await test_broker
-    yield
-    # await test_broker
-    # await drop_tables()
+    app.dependency_overrides[get_api_di_container] = get_mock_api_di_container
+    yield app
 
 
 @pytest_asyncio.fixture(scope="session")
