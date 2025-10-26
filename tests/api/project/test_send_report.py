@@ -4,7 +4,7 @@ from httpx import AsyncClient
 
 from src.config import get_settings
 from src.presentation.project.schemas import ProjectReportSendDataScheme
-from tests.sqlalchemy import MOCK_PROJECT_GET_GUID
+from tests.mock_data import MOCK_PROJECT_GET_GUID
 
 
 @pytest.mark.asyncio

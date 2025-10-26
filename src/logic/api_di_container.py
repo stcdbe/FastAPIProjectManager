@@ -1,10 +1,13 @@
 from functools import lru_cache
+from logging import getLogger
 
+from faststream.rabbit import RabbitBroker
 from punq import Container, Scope
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+from src.config import get_settings
 from src.data.repositories.project.base import AbstractProjectRepository
 from src.data.repositories.project.sqlachemy import SQLAlchemyProjectRepository
-from src.data.repositories.sqlalchemy_base import async_session_factory
 from src.data.repositories.task.base import AbstractTaskRepository
 from src.data.repositories.task.sqlalchemy import SQLAlchemyTaskRepository
 from src.data.repositories.user.base import AbstractUserRepository
@@ -27,7 +30,8 @@ from src.domain.user.use_cases.get_one_user_by_guid import GetOneUserByGUIDUseCa
 from src.domain.user.use_cases.get_user_list import GetUserListUseCase
 from src.domain.user.use_cases.patch_user_by_guid import PatchUserByGUIDUseCase
 from src.domain.user.use_cases.refresh_user_token import RefreshUserTokenUseCase
-from src.infra.worker.broker import RabbitMQMessageBroker, rabbimq_broker
+from src.infra.worker.broker import RabbitMQMessageBroker
+from src.infra.worker.worker_routes import worker_router
 from src.services.auth_service import AuthService
 from src.services.hasher_service import HasherService
 from src.services.project_service import ProjectService
@@ -38,19 +42,19 @@ from src.services.user_service import UserService
 def _get_api_di_container() -> Container:
     container = Container()
     # sqlalchemy engine and sessionmaker
-    # async_engine = create_async_engine(
-    #     url=get_settings().PG_URL.unicode_string(),
-    #     echo=False,
-    #     pool_pre_ping=True,
-    #     pool_size=10,
-    #     pool_recycle=3600,
-    # )
-    # async_session_factory = async_sessionmaker(
-    #     bind=async_engine,
-    #     expire_on_commit=False,
-    #     autoflush=False,
-    #     autocommit=False,
-    # )
+    async_engine = create_async_engine(
+        url=get_settings().PG_URL.unicode_string(),
+        echo=False,
+        pool_pre_ping=True,
+        pool_size=10,
+        pool_recycle=3600,
+    )
+    async_session_factory = async_sessionmaker(
+        bind=async_engine,
+        expire_on_commit=False,
+        autoflush=False,
+        autocommit=False,
+    )
     # repos
     container.register(
         AbstractUserRepository,
@@ -68,11 +72,11 @@ def _get_api_di_container() -> Container:
         scope=Scope.singleton,
     )
     # infra
-    # rabbimq_broker = RabbitBroker(
-    #     url=get_settings().RMQ_URL.unicode_string(),
-    #     logger=logger,
-    # )
-    # rabbimq_broker.include_router(worker_router)
+    rabbimq_broker = RabbitBroker(
+        url=get_settings().RMQ_URL.unicode_string(),
+        logger=getLogger(),
+    )
+    rabbimq_broker.include_router(worker_router)
     container.register(
         RabbitMQMessageBroker,
         factory=lambda: RabbitMQMessageBroker(rabbimq_broker),

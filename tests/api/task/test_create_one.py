@@ -7,7 +7,7 @@ from fastapi import FastAPI, status
 from httpx import AsyncClient
 
 from src.presentation.task.schemas import TaskCreateScheme
-from tests.sqlalchemy import MOCK_PROJECT_GET_GUID, MOCK_USER_AUTH_GUID
+from tests.mock_data import MOCK_PROJECT_GET_GUID, MOCK_USER_AUTH_GUID
 
 
 @pytest.mark.asyncio
