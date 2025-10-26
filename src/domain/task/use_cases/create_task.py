@@ -5,8 +5,10 @@ from src.services.task_service import TaskService
 
 
 class CreateTaskUseCase:
-    def __init__(self) -> None:
-        self._task_service = TaskService()
+    __slots__ = ("_task_service",)
+
+    def __init__(self, task_service: TaskService) -> None:
+        self._task_service = task_service
 
     async def execute(self, project_guid: UUID, task_create_data: TaskCreateData) -> UUID:
         return await self._task_service.create_one(project_guid, task_create_data)

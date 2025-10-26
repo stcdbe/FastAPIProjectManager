@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.params import Query
+from punq import Container
 from pydantic import UUID4
 
 from src.common.exc import BaseAppError
@@ -11,16 +12,14 @@ from src.domain.project.use_cases.delete_project_by_guid import DeleteProjectByG
 from src.domain.project.use_cases.get_project_by_guid_by_guid import GetProjectByGUIDUseCase
 from src.domain.project.use_cases.get_project_list import GetProjectListUseCase
 from src.domain.project.use_cases.patch_project_by_guid import PatchProjectByGUIDUseCase
-
-# from src.domain.project.use_cases.send_project_as_report import SendProjectAsReportUseCase
-from src.domain.project.use_cases.send_project_as_report import SendProjectAsReportUseCase
-from src.domain.project_task_aggregation.flows.send_project_report_notification import SendProjectReportNotificationFlow
+from src.domain.project_task_aggregation.use_cases.send_project_report import SendProjectReportUseCase
 from src.domain.task.entities import Task
 from src.domain.task.use_cases.create_task import CreateTaskUseCase
 from src.domain.task.use_cases.delete_task_by_guid import DeleteTaskByGUIDUseCase
 from src.domain.task.use_cases.get_list import GetTaskListByProjectGUIDUseCase
 from src.domain.task.use_cases.patch_task_by_guid import PatchTaskByGUIDUseCase
 from src.domain.user.entities import User
+from src.logic.api_di_container import get_api_di_container
 from src.presentation.common.schemas import ErrorResponse, GUIDResponse
 from src.presentation.dependencies import get_current_user
 from src.presentation.project.converters import (
@@ -53,13 +52,14 @@ project_v1_router = APIRouter(prefix="/projects", tags=["Projects"])
     description="Get project list",
 )
 async def get_project_list(
+    container: Annotated[Container, Depends(get_api_di_container)],
     _: Annotated[User, Depends(get_current_user)],
     offset: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(gt=0, le=10)] = 5,
     order_by: Annotated[str, Query(enum=tuple(ProjectGetScheme.model_fields))] = "created_at",
     reverse: Annotated[bool, Query()] = False,
 ) -> dict[str, list[Project]]:
-    use_case = GetProjectListUseCase()
+    use_case: GetProjectListUseCase = container.resolve(GetProjectListUseCase)  # type: ignore
     try:
         projects = await use_case.execute(offset, limit, order_by, reverse)
 
@@ -81,10 +81,11 @@ async def get_project_list(
     description="Crete a new project",
 )
 async def create_project(
+    container: Annotated[Container, Depends(get_api_di_container)],
     current_user: Annotated[User, Depends(get_current_user)],
     scheme_data: ProjectCreateScheme,
 ) -> dict[str, UUID4]:
-    use_case = CreateProjectUseCase()
+    use_case: CreateProjectUseCase = container.resolve(CreateProjectUseCase)  # type: ignore
     project_create_data = convert_project_create_scheme_to_entity(scheme_data)
     try:
         guid = await use_case.execute(current_user, project_create_data)
@@ -108,10 +109,11 @@ async def create_project(
     description="Get the project",
 )
 async def get_project(
+    container: Annotated[Container, Depends(get_api_di_container)],
     _: Annotated[User, Depends(get_current_user)],
     project_guid: UUID4,
 ) -> Project:
-    use_case = GetProjectByGUIDUseCase()
+    use_case: GetProjectByGUIDUseCase = container.resolve(GetProjectByGUIDUseCase)  # type: ignore
     try:
         return await use_case.execute(project_guid)
 
@@ -132,11 +134,12 @@ async def get_project(
     description="Patch the project",
 )
 async def patch_project(
+    container: Annotated[Container, Depends(get_api_di_container)],
     _: Annotated[User, Depends(get_current_user)],
     project_guid: UUID4,
     scheme_data: ProjectPatchScheme,
 ) -> dict[str, UUID4]:
-    use_case = PatchProjectByGUIDUseCase()
+    use_case: PatchProjectByGUIDUseCase = container.resolve(PatchProjectByGUIDUseCase)  # type: ignore
     project_patch_data = convert_project_patch_scheme_to_entity(scheme_data)
     try:
         guid = await use_case.execute(project_guid, project_patch_data)
@@ -160,10 +163,11 @@ async def patch_project(
     description="Delete the project",
 )
 async def delete_project(
+    container: Annotated[Container, Depends(get_api_di_container)],
     _: Annotated[User, Depends(get_current_user)],
     project_guid: UUID4,
 ) -> None:
-    use_case = DeleteProjectByGUIDUseCase()
+    use_case: DeleteProjectByGUIDUseCase = container.resolve(DeleteProjectByGUIDUseCase)  # type: ignore
     try:
         await use_case.execute(project_guid)
 
@@ -183,10 +187,11 @@ async def delete_project(
     description="Send the project report by email",
 )
 async def send_project_report(
+    container: Annotated[Container, Depends(get_api_di_container)],
     _: Annotated[User, Depends(get_current_user)],
     scheme_data: ProjectReportSendDataScheme,
 ) -> None:
-    use_case = SendProjectAsReportUseCase()
+    use_case: SendProjectReportUseCase = container.resolve(SendProjectReportUseCase)  # type: ignore
     send_data = convert_project_report_send_data_scheme_to_entity(scheme_data)
     try:
         await use_case.execute(send_data)
@@ -207,10 +212,11 @@ async def send_project_report(
     description="Get project tasks",
 )
 async def get_task_list(
+    container: Annotated[Container, Depends(get_api_di_container)],
     _: Annotated[User, Depends(get_current_user)],
     project_guid: UUID4,
 ) -> dict[str, list[Task]]:
-    use_case = GetTaskListByProjectGUIDUseCase()
+    use_case: GetTaskListByProjectGUIDUseCase = container.resolve(GetTaskListByProjectGUIDUseCase)  # type: ignore
     try:
         res = await use_case.execute(project_guid)
 
@@ -232,11 +238,12 @@ async def get_task_list(
     description="Add a task to the project",
 )
 async def create_task(
+    container: Annotated[Container, Depends(get_api_di_container)],
     _: Annotated[User, Depends(get_current_user)],
     project_guid: UUID4,
     scheme_data: TaskCreateScheme,
 ) -> dict[str, UUID4]:
-    use_case = CreateTaskUseCase()
+    use_case: CreateTaskUseCase = container.resolve(CreateTaskUseCase)  # type: ignore
     task_create_data = convert_task_create_scheme_to_entity(scheme_data)
     try:
         res = await use_case.execute(project_guid, task_create_data)
@@ -259,12 +266,13 @@ async def create_task(
     description="Patch the project task",
 )
 async def patch_task(
+    container: Annotated[Container, Depends(get_api_di_container)],
     _: Annotated[User, Depends(get_current_user)],
     project_guid: UUID4,
     task_guid: UUID4,
     scheme_data: TaskPatchScheme,
 ) -> dict[str, UUID4]:
-    use_case = PatchTaskByGUIDUseCase()
+    use_case: PatchTaskByGUIDUseCase = container.resolve(PatchTaskByGUIDUseCase)  # type: ignore
     task_patch_data = convert_task_patch_scheme_to_entity(scheme_data)
     try:
         res = await use_case.execute(project_guid, task_guid, task_patch_data)
@@ -287,11 +295,12 @@ async def patch_task(
     description="Delete the project task",
 )
 async def delete_task(
+    container: Annotated[Container, Depends(get_api_di_container)],
     _: Annotated[User, Depends(get_current_user)],
     project_guid: UUID4,
     task_guid: UUID4,
 ) -> None:
-    use_case = DeleteTaskByGUIDUseCase()
+    use_case: DeleteTaskByGUIDUseCase = container.resolve(DeleteTaskByGUIDUseCase)  # type: ignore
     try:
         await use_case.execute(project_guid, task_guid)
 

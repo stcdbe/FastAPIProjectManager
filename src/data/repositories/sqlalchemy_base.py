@@ -4,7 +4,6 @@ from contextlib import asynccontextmanager
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from src.config import get_settings
-from src.data.models.sqlalchemy_base import SQLAlchemyBaseModel
 
 async_engine = create_async_engine(
     url=get_settings().PG_URL.unicode_string(),
@@ -22,24 +21,11 @@ async_session_factory = async_sessionmaker(
 )
 
 
-async def create_tables() -> None:
-    async with async_engine.begin() as conn:
-        await conn.run_sync(SQLAlchemyBaseModel.metadata.create_all)
-
-
-async def drop_tables() -> None:
-    async with async_engine.begin() as conn:
-        await conn.run_sync(SQLAlchemyBaseModel.metadata.drop_all)
-
-
 class SQLAlchemyRepository:
-    # def __init__(self, session_factory: async_sessionmaker[AsyncSession]) -> None:
-    #     self._session_factory = session_factory
+    def __init__(self, session_factory: async_sessionmaker[AsyncSession]) -> None:
+        self._session_factory = session_factory
 
     @asynccontextmanager
     async def _get_session(self) -> AsyncGenerator[AsyncSession, None]:
-        # async with self._session_factory() as session:
-        #     yield session
-
-        async with async_session_factory() as session:
+        async with self._session_factory() as session:
             yield session

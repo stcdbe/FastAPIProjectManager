@@ -4,9 +4,13 @@ from src.services.project_task_aggregation_service import ProjectTaskAggregation
 
 
 class SendProjectReportNotificationFlow:
-    def __init__(self) -> None:
-        self._notification_client = SMTPNotificationClient()
-        self._project_task_aggregation_service = ProjectTaskAggregationService()
+    def __init__(
+        self,
+        notification_client: SMTPNotificationClient,
+        project_task_aggregation_service: ProjectTaskAggregationService,
+    ) -> None:
+        self._notification_client = notification_client
+        self._project_task_aggregation_service = project_task_aggregation_service
 
     async def execute(self, project_report_data: ProjectReportData) -> None:
         aggregation = await self._project_task_aggregation_service.get_one_project_with_tasks_by_guid(

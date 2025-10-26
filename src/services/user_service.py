@@ -2,20 +2,24 @@ from datetime import UTC, datetime
 from logging import getLogger
 from uuid import UUID, uuid4
 
-from src.data.repositories.user.sqlalchemy import SQLAlchemyUserRepository
+from src.data.repositories.user.base import AbstractUserRepository
 from src.domain.user.entities import User, UserCreateData, UserPatchData
 from src.domain.user.exc import UserIsSoftDeletedError
-from src.services.hasher_service import Hasher
+from src.services.hasher_service import HasherService
 
 logger = getLogger()
 
 
 class UserService:
-    __slots__ = ("_hasher", "_user_repository")
+    __slots__ = ("_hasher_service", "_user_repository")
 
-    def __init__(self) -> None:
-        self._user_repository = SQLAlchemyUserRepository()
-        self._hasher = Hasher()
+    def __init__(
+        self,
+        user_repository: AbstractUserRepository,
+        hasher_service: HasherService,
+    ) -> None:
+        self._user_repository = user_repository
+        self._hasher_service = hasher_service
 
     async def get_list(
         self,
@@ -56,7 +60,7 @@ class UserService:
             guid=uuid4(),
             username=user_create_data.username,
             email=user_create_data.email,
-            password=self._hasher.get_psw_hash(user_create_data.password),
+            password=self._hasher_service.get_psw_hash(user_create_data.password),
             first_name=user_create_data.first_name,
             second_name=user_create_data.second_name,
             gender=user_create_data.gender,
@@ -79,7 +83,7 @@ class UserService:
             user.email = user_patch_data.email
 
         if user_patch_data.password is not None:
-            user.password = self._hasher.get_psw_hash(user.password)
+            user.password = self._hasher_service.get_psw_hash(user.password)
 
         user.first_name = user_patch_data.first_name
         user.second_name = user_patch_data.second_name

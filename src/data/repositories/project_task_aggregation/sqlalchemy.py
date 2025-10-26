@@ -13,6 +13,8 @@ from src.domain.project_task_aggregation.entities import ProjectTaskAggregation
 
 
 class SQLAlchemyProjectTaskAggregationRepository(AbstractProjectTaskAggregationRepository, SQLAlchemyRepository):
+    __slots__ = ("_session_factory",)
+
     async def get_one_project_with_tasks_by_guid(self, project_guid: UUID) -> ProjectTaskAggregation:
         stmt = select(ProjectModel).where(ProjectModel.guid == project_guid).options(selectinload(ProjectModel.tasks))
         try:

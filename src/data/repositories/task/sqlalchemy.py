@@ -13,6 +13,8 @@ from src.domain.task.exc import TaskInvalidDataError, TaskNotFoundError
 
 
 class SQLAlchemyTaskRepository(AbstractTaskRepository, SQLAlchemyRepository):
+    __slots__ = ("_session_factory",)
+
     async def get_list_by_project_guid(self, project_guid: UUID) -> list[Task]:
         stmt = select(TaskModel).where(TaskModel.project_guid == project_guid)
 

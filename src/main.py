@@ -7,7 +7,8 @@ from fastapi.responses import ORJSONResponse
 from fastapi.routing import APIRouter
 
 from src.config import get_settings
-from src.infra.broker.rabbitmq_broker import broker
+from src.infra.worker.broker import RabbitMQMessageBroker
+from src.logic.api_di_container import get_api_di_container
 from src.presentation.auth.routes import auth_v1_router
 from src.presentation.project.routes import project_v1_router
 from src.presentation.user.routes import user_v1_router
@@ -18,11 +19,13 @@ logger = getLogger()
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Web app %s %s starting up...", app.title, app.version)
-    await broker.start()
+    container = get_api_di_container()
+    message_broker: RabbitMQMessageBroker = container.resolve(RabbitMQMessageBroker)  # type: ignore
+    await message_broker.start_broker()
 
     yield
 
-    await broker.stop()
+    await message_broker.stop_broker()
     logger.info("Web app %s %s shutting down...", app.title, app.version)
 
 

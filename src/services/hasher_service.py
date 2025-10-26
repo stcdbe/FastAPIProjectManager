@@ -1,7 +1,7 @@
 import bcrypt
 
 
-class Hasher:
+class HasherService:
     __slots__ = ()
 
     def get_psw_hash(self, psw: str) -> str:

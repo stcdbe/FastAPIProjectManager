@@ -6,18 +6,19 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from src.config import get_settings
 
-_templates_env = Environment(
-    loader=FileSystemLoader(get_settings().TEMPLATES_DIR),
-    autoescape=select_autoescape(default=True),
-    enable_async=True,
-)
-
 
 class SMTPNotificationClient:
-    __slots__ = ()
+    __slots__ = ("_templates_env",)
+
+    def __init__(self) -> None:
+        self._templates_env = Environment(
+            loader=FileSystemLoader(get_settings().TEMPLATES_DIR),
+            autoescape=select_autoescape(default=True),
+            enable_async=True,
+        )
 
     async def _render_email_body(self, template_name: str, **entities_for_render: Any) -> str:
-        template = _templates_env.get_template(template_name)
+        template = self._templates_env.get_template(template_name)
         return await template.render_async(**entities_for_render)
 
     def _generate_email_message(self, recipient_email: str, subject: str, html_body: str) -> EmailMessage:

@@ -13,6 +13,8 @@ from src.domain.project.exc import ProjectInvalidDataError, ProjectNotFoundError
 
 
 class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepository):
+    __slots__ = ("_session_factory",)
+
     async def get_list(
         self,
         limit: int,

@@ -2,12 +2,14 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from punq import Container
 
 from src.common.exc import BaseAppError
 from src.domain.user.entities import AuthToken, User
 from src.domain.user.exc import UserInvalidCredentialsError, UserNotFoundError
 from src.domain.user.use_cases.generate_user_token import GenerateUserTokenUseCase
 from src.domain.user.use_cases.refresh_user_token import RefreshUserTokenUseCase
+from src.logic.api_di_container import get_api_di_container
 from src.presentation.auth.schemas import AuthTokenScheme, RefreshTokenInputScheme
 from src.presentation.common.schemas import ErrorResponse
 from src.presentation.dependencies import get_current_user
@@ -27,9 +29,10 @@ auth_v1_router = APIRouter(prefix="/auth", tags=["Auth"])
     },
 )
 async def create_token(
+    container: Annotated[Container, Depends(get_api_di_container)],
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> AuthToken:
-    use_case = GenerateUserTokenUseCase()
+    use_case: GenerateUserTokenUseCase = container.resolve(GenerateUserTokenUseCase)  # type: ignore
     try:
         return await use_case.execute(username=form_data.username, password=form_data.password)
 
@@ -56,10 +59,11 @@ async def create_token(
     },
 )
 async def refresh_token(
+    container: Annotated[Container, Depends(get_api_di_container)],
     _: Annotated[User, Depends(get_current_user)],
     sheme_data: RefreshTokenInputScheme,
 ) -> AuthToken:
-    use_case = RefreshUserTokenUseCase()
+    use_case: RefreshUserTokenUseCase = container.resolve(RefreshUserTokenUseCase)  # type: ignore
     try:
         return use_case.execute(sheme_data.refresh_token)
 

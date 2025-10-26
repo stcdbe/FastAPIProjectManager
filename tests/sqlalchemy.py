@@ -11,7 +11,7 @@ from src.data.models.project_model import ProjectModel
 from src.data.models.sqlalchemy_base import SQLAlchemyBaseModel
 from src.data.models.task_model import TaskModel
 from src.data.models.user_model import UserModel
-from src.services.hasher_service import Hasher
+from src.services.hasher_service import HasherService
 
 test_async_engine = create_async_engine(
     url=get_settings().PG_URL_TEST.unicode_string(),
@@ -83,7 +83,7 @@ async def insert_mock_data() -> None:
             updated_at=datetime.now(UTC),
             username=username,
             email=email,
-            password=Hasher().get_psw_hash("passwordpassword"),
+            password=HasherService().get_psw_hash("passwordpassword"),
             first_name=None,
             second_name=None,
             gender=None,

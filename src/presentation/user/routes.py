@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from punq import Container
 from pydantic import UUID4
 
 from src.common.exc import BaseAppError
@@ -11,6 +12,7 @@ from src.domain.user.use_cases.delete_user_by_guid import DeleteUserByGUIDUseCas
 from src.domain.user.use_cases.get_one_user_by_guid import GetOneUserByGUIDUseCase
 from src.domain.user.use_cases.get_user_list import GetUserListUseCase
 from src.domain.user.use_cases.patch_user_by_guid import PatchUserByGUIDUseCase
+from src.logic.api_di_container import get_api_di_container
 from src.presentation.common.schemas import ErrorResponse, GUIDResponse
 from src.presentation.dependencies import get_current_user
 from src.presentation.user.converters import (
@@ -34,13 +36,14 @@ user_v1_router = APIRouter(prefix="/users", tags=["Users"])
     description="Get user list",
 )
 async def get_user_list(
+    container: Annotated[Container, Depends(get_api_di_container)],
     _: Annotated[User, Depends(get_current_user)],
     offset: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(gt=0, le=10)] = 5,
     order_by: Annotated[str, Query(enum=tuple(UserGetScheme.model_fields))] = "created_at",
     reverse: Annotated[bool, Query()] = False,
 ) -> dict[str, list[User]]:
-    use_case = GetUserListUseCase()
+    use_case: GetUserListUseCase = container.resolve(GetUserListUseCase)  # type: ignore
     try:
         users = await use_case.execute(offset, limit, order_by, reverse)
 
@@ -62,10 +65,11 @@ async def get_user_list(
     description="Create a new user",
 )
 async def create_user(
-    _: Annotated[User, Depends(get_current_user)],
+    container: Annotated[Container, Depends(get_api_di_container)],
+    # _: Annotated[User, Depends(get_current_user)],
     scheme_data: UserCreateScheme,
 ) -> dict[str, UUID4]:
-    use_case = CreateUserUseCase()
+    use_case: CreateUserUseCase = container.resolve(CreateUserUseCase)  # type: ignore
     user_create_data = convert_user_create_data_scheme_to_entity(scheme_data)
     try:
         guid = await use_case.execute(user_create_data)
@@ -89,10 +93,11 @@ async def create_user(
     description="Get user by guid",
 )
 async def get_user(
+    container: Annotated[Container, Depends(get_api_di_container)],
     _: Annotated[User, Depends(get_current_user)],
     user_guid: UUID4,
 ) -> User:
-    use_case = GetOneUserByGUIDUseCase()
+    use_case: GetOneUserByGUIDUseCase = container.resolve(GetOneUserByGUIDUseCase)  # type: ignore
     try:
         return await use_case.execute(guid=user_guid)
 
@@ -116,11 +121,12 @@ async def get_user(
     description="Patch user by guid",
 )
 async def patch_user(
+    container: Annotated[Container, Depends(get_api_di_container)],
     _: Annotated[User, Depends(get_current_user)],
     user_guid: UUID4,
     scheme_data: UserPatchScheme,
 ) -> dict[str, UUID4]:
-    use_case = PatchUserByGUIDUseCase()
+    use_case: PatchUserByGUIDUseCase = container.resolve(PatchUserByGUIDUseCase)  # type: ignore
     user_patch_data = convert_user_patch_data_scheme_to_entity(scheme_data)
     try:
         guid = await use_case.execute(user_guid, user_patch_data)
@@ -147,10 +153,11 @@ async def patch_user(
     description="Delete user by guid",
 )
 async def delete_user(
+    container: Annotated[Container, Depends(get_api_di_container)],
     _: Annotated[User, Depends(get_current_user)],
     user_guid: UUID4,
 ) -> None:
-    use_case = DeleteUserByGUIDUseCase()
+    use_case: DeleteUserByGUIDUseCase = container.resolve(DeleteUserByGUIDUseCase)  # type: ignore
     try:
         await use_case.execute(guid=user_guid)
 
