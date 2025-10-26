@@ -247,6 +247,7 @@ dependencies = [
     { name = "pyyaml" },
     { name = "sqlalchemy" },
     { name = "uvicorn" },
+    { name = "uvicorn-worker" },
 ]
 
 [package.dev-dependencies]
@@ -274,6 +275,7 @@ requires-dist = [
     { name = "pyyaml", specifier = ">=6.0.3" },
     { name = "sqlalchemy", specifier = ">=2.0.44" },
     { name = "uvicorn", specifier = ">=0.37.0" },
+    { name = "uvicorn-worker", specifier = ">=0.4.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -1104,6 +1106,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/71/57/1616c8274c3442d802621abf5deb230771c7a0fec9414cb6763900eb3868/uvicorn-0.37.0.tar.gz", hash = "sha256:4115c8add6d3fd536c8ee77f0e14a7fd2ebba939fed9b02583a97f80648f9e13", size = 80367, upload-time = "2025-09-23T13:33:47.486Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/85/cd/584a2ceb5532af99dd09e50919e3615ba99aa127e9850eafe5f31ddfdb9a/uvicorn-0.37.0-py3-none-any.whl", hash = "sha256:913b2b88672343739927ce381ff9e2ad62541f9f8289664fa1d1d3803fa2ce6c", size = 67976, upload-time = "2025-09-23T13:33:45.842Z" },
+]
+
+[[package]]
+name = "uvicorn-worker"
+version = "0.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "gunicorn" },
+    { name = "uvicorn" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/80/59/9101b9c0680fd80e9d26c07deb822a5d18a324339fcf9cd017885ee808ad/uvicorn_worker-0.4.0.tar.gz", hash = "sha256:8ee5306070d8f38dce124adce488c3c0b50f20cf0c0222b12c66188da7214493", size = 9361, upload-time = "2025-09-20T10:47:01.218Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/90/25/09cd7a90c8bb7fb693be0d6704fccd5f9778d5513214b7a01cc4a94ff314/uvicorn_worker-0.4.0-py3-none-any.whl", hash = "sha256:e2ed952cef976f5e9e429d7269640bbcafbd36c80aa80f1003c8c77a6797abde", size = 5364, upload-time = "2025-09-20T10:46:59.776Z" },
 ]
 
 [[package]]
