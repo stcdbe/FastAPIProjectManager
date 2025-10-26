@@ -13,6 +13,8 @@ from src.domain.user.exc import UserInvalidDataError, UserNotFoundError
 
 
 class SQLAlchemyUserRepository(AbstractUserRepository, SQLAlchemyRepository):
+    __slots__ = ("_session_factory",)
+
     async def get_list(
         self,
         offset: int,

@@ -4,8 +4,10 @@ from src.services.auth_service import AuthService
 
 
 class RefreshUserTokenUseCase:
-    def __init__(self) -> None:
-        self._auth_service = AuthService()
+    __slots__ = ("_auth_service",)
+
+    def __init__(self, auth_service: AuthService) -> None:
+        self._auth_service = auth_service
 
     def execute(self, token: str) -> AuthToken:
         user_guid = self._auth_service.validate_token_and_extract_user_guid(token, AuthTokenTyp.REFRESH)

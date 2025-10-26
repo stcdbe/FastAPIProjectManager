@@ -5,8 +5,10 @@ from src.services.task_service import TaskService
 
 
 class DeleteTaskByGUIDUseCase:
-    def __init__(self) -> None:
-        self._task_service = TaskService()
+    __slots__ = ("_task_service",)
+
+    def __init__(self, task_service: TaskService) -> None:
+        self._task_service = task_service
 
     async def execute(self, project_guid: UUID, task_guid: UUID) -> UUID:
         task = await self._task_service.get_one_by_guid(task_guid)

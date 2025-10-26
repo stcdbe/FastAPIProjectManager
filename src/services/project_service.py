@@ -1,15 +1,15 @@
 from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
-from src.data.repositories.project.sqlachemy import SQLAlchemyProjectRepository
+from src.data.repositories.project.base import AbstractProjectRepository
 from src.domain.project.entities import Project, ProjectCreateData, ProjectPatchData
 
 
 class ProjectService:
     __slots__ = ("_project_repository",)
 
-    def __init__(self) -> None:
-        self._project_repository = SQLAlchemyProjectRepository()
+    def __init__(self, project_repository: AbstractProjectRepository) -> None:
+        self._project_repository = project_repository
 
     async def get_list(
         self,

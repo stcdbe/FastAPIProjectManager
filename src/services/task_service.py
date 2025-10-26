@@ -1,15 +1,15 @@
 from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
-from src.data.repositories.task.sqlalchemy import SQLAlchemyTaskRepository
+from src.data.repositories.task.base import AbstractTaskRepository
 from src.domain.task.entities import Task, TaskCreateData, TaskPatchData
 
 
 class TaskService:
     __slots__ = ("_task_repository",)
 
-    def __init__(self) -> None:
-        self._task_repository = SQLAlchemyTaskRepository()
+    def __init__(self, task_repository: AbstractTaskRepository) -> None:
+        self._task_repository = task_repository
 
     async def get_list_by_project_guid(self, project_guid: UUID) -> list[Task]:
         return await self._task_repository.get_list_by_project_guid(project_guid)

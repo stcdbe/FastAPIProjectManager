@@ -5,8 +5,10 @@ from src.services.task_service import TaskService
 
 
 class GetTaskListByProjectGUIDUseCase:
-    def __init__(self) -> None:
-        self._task_service = TaskService()
+    __slots__ = ("_task_service",)
+
+    def __init__(self, task_service: TaskService) -> None:
+        self._task_service = task_service
 
     async def execute(self, project_guid: UUID) -> list[Task]:
         return await self._task_service.get_list_by_project_guid(project_guid)
