@@ -41,8 +41,8 @@ services:
     env_file:
       - .env
     ports:
-      - "${RMQ_PORT}:5672"
-      - "${RMQ_ADMINISTRATION_PORT}:15672"
+      - 5672:${RMQ_PORT}
+      - 15672:${RMQ_ADMINISTRATION_PORT}
     environment:
       RABBITMQ_DEFAULT_USER: ${RMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RMQ_PASSWORD}
