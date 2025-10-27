@@ -4,7 +4,7 @@ Revision ID: 5158edd5a8d9
 Revises:
 Create Date: 2025-10-25 21:06:39.898941
 
-"""
+"""  # noqa: D400, D415, INP001
 
 from collections.abc import Sequence
 

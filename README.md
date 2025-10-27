@@ -15,13 +15,14 @@ The goal of the application is to develop a scalable and high-performance web ap
 #### 3. Task management:
 - Within each project, can be created tasks that need to be completed.
 - The creator and mentor of the project can indicate the title, description, executor and status (completed/not completed) of each task.
-![](img/docs.png)
+---
+![](img/swagger.png)
 ___
 ### Getting Started
 #### Running on Local Machine
-+ install dependencies using Poetry
++ install dependencies using uv
 ````
-$ poetry install --no-root
+$ uv sync --all-groups
 ````
 + configure environment variables in `.env` file
 + create migration in db
@@ -44,36 +45,46 @@ $ docker compose up -d
 ````
 ____
 #### Environment variables
-| variables                | description                                      |
-|:-------------------------|:-------------------------------------------------|
-| `DEBUG`                  | debug mode, only allowed 1(True)/0(False)        |
-| `PORT`                   | app port                                         |
-| `DOCS_URL`               | docs url, undefined by default                   |
-| `REDOC_URL`              | redoc url, undefined by default                  |
-| `JWT_SECRET_KEY`         | a secret key for jwt encoding                    |
-| `JWT_ALGORITHM`          | jwt encoding algorithm                           |
-| `ACCESS_TOKEN_EXPIRES`   | access token lifetime in minutes                 |
-| `REFRESH_TOKEN_EXPIRES`  | refresh token lifetime in minutes                |
-| `PG_USER`                | PGSQL user                                       |
-| `PG_PASSWORD`            | PGSQL user password                              |
-| `PG_HOST`                | hostname or an IP address of PGSQL database      |
-| `PG_PORT`                | port from PG database                            |
-| `PG_DB`                  | PGSQL database                                   |
-| `PG_USERT_EST`           | PGSQL test user                                  |
-| `PG_PASSWORD_TEST`       | PGSQL test user password                         |
-| `PG_HOST_TEST`           | hostname or an IP address of PGSQL test database |
-| `PG_PORT_TEST`           | port from PGSQL test database                    |
-| `PG_DB_TEST`             | PGSQL test database                              |
-| `EMAIL_SMTP_SERVER`      | email SMTP server                                |
-| `EMAIL_PORT`             | email port                                       |
-| `EMAIL_USERNAME`         | email address                                    |
-| `EMAIL_PASSWORD`         | email password                                   |
-| `EMAIL_SENDER`           | email sender                                     |
-| `TEST_EMAIL_RECEIVER`    | test email receiver                              |
+| variables                  | description                                      |
+|:---------------------------|:-------------------------------------------------|
+| `DEBUG`                    | debug mode, only allowed 1(True)/0(False)        |
+| `TESTING`                  | testing mode, only allowed 1(True)/0(False)      |
+| `HOST`                     | app host                                         |
+| `PORT`                     | app port                                         |
+| `DOCS_URL`                 | docs url, undefined by default                   |
+| `REDOC_URL`                | redoc url, undefined by default                  |
+| `JWT_SECRET_KEY`           | a secret key for jwt encoding                    |
+| `JWT_ALGORITHM`            | jwt encoding algorithm                           |
+| `ACCESS_TOKEN_EXPIRES`     | access token lifetime in minutes                 |
+| `REFRESH_TOKEN_EXPIRES`    | refresh token lifetime in minutes                |
+| `PG_USER`                  | PGSQL user                                       |
+| `PG_PASSWORD`              | PGSQL user password                              |
+| `PG_HOST`                  | hostname or an IP address of PGSQL database      |
+| `PG_PORT`                  | port from PG database                            |
+| `PG_DB`                    | PGSQL database                                   |
+| `PG_USER_TEST`             | PGSQL test user                                  |
+| `PG_PASSWORD_TEST`         | PGSQL test user password                         |
+| `PG_HOST_TEST`             | hostname or an IP address of PGSQL test database |
+| `PG_PORT_TEST`             | port from PGSQL test database                    |
+| `PG_DB_TEST`               | PGSQL test database                              |
+| `PGADMIN_DEFAULT_EMAIL`    | PGAdmin default email                            |
+| `PGADMIN_DEFAULT_PASSWORD` | PGAdmin default pssword                          |
+| `RMQ_HOST`                 | RMQ host                                         |
+| `RMQ_PORT`                 | RMQ port                                         |
+| `RMQ_ADMINISTRATION_PORT`  | RMQ admin port                                   |
+| `RMQ_USER`                 | RMQ user                                         |
+| `RMQ_PASSWORD`             | RMQ password                                     |
+| `EMAIL_HOST`               | email host                                       |
+| `EMAIL_PORT`               | email port                                       |
+| `EMAIL_USERNAME`           | email username                                   |
+| `EMAIL_PASSWORD`           | email password                                   |
+| `EMAIL_SENDER`             | email sender                                     |
+
 ____
 #### Tech Stack
 + `FastAPI`
-+ `SQLAlchemy` and `Alembic`
-+ `gunicorn`
-+ `pytest-asyncio` and `httpx` for tests
++ `PostgreSQL`, `SQLAlchemy` and `Alembic`
++ `Faststream` and `RabbitMQ`
++ `uvicorn` and `gunicorn`
++ `pytest-asyncio`
 + `docker` and `docker-compose`

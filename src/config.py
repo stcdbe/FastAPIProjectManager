@@ -54,7 +54,6 @@ class Settings(BaseSettings):
     EMAIL_USERNAME: str
     EMAIL_PASSWORD: str
     EMAIL_SENDER: EmailStr
-    TEST_EMAIL_RECEIVER: EmailStr
 
 
 @lru_cache(maxsize=1)
