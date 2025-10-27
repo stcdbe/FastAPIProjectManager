@@ -42,7 +42,7 @@ async def test_create_user(
 
 
 @pytest.mark.asyncio
-async def test_create_user_failed(
+async def test_create_user_failed_with_existing_user(
     app: FastAPI,
     client: AsyncClient,
     auth_token_headers: dict[str, str],

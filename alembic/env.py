@@ -31,7 +31,10 @@ target_metadata = SQLAlchemyBaseModel.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-config.set_main_option("sqlalchemy.url", get_settings().PG_URL.unicode_string())
+if get_settings().TESTING:
+    config.set_main_option("sqlalchemy.url", get_settings().PG_URL_TEST.unicode_string())
+else:
+    config.set_main_option("sqlalchemy.url", get_settings().PG_URL.unicode_string())
 
 
 def run_migrations_offline() -> None:

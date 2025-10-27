@@ -1,8 +1,11 @@
+from logging import getLogger
 from uuid import UUID
 
 from src.domain.task.entities import TaskPatchData
 from src.domain.task.exc import TaskInvalidDataError
 from src.services.task_service import TaskService
+
+logger = getLogger()
 
 
 class PatchTaskByGUIDUseCase:
@@ -12,6 +15,8 @@ class PatchTaskByGUIDUseCase:
         self._task_service = task_service
 
     async def execute(self, project_guid: UUID, task_guid: UUID, task_patch_data: TaskPatchData) -> UUID:
+        logger.info("Patching task %s for project %s", task_guid, project_guid)
+
         task = await self._task_service.get_one_by_guid(task_guid)
 
         if task.project_guid != project_guid:

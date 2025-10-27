@@ -1,5 +1,9 @@
+from logging import getLogger
+
 from src.domain.user.entities import User
 from src.services.user_service import UserService
+
+logger = getLogger()
 
 
 class GetUserListUseCase:
@@ -15,4 +19,5 @@ class GetUserListUseCase:
         order_by: str,
         reverse: bool,
     ) -> list[User]:
+        logger.info("Getting user list with offset=%i and limit=%i", offset, limit)
         return await self._user_service.get_list(offset, limit, order_by, reverse)

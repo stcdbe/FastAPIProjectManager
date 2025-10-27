@@ -24,7 +24,7 @@ async def test_get_project(
 
 
 @pytest.mark.asyncio
-async def test_get_project_failed(
+async def test_get_project_failed_with_non_existong_project(
     app: FastAPI,
     client: AsyncClient,
     auth_token_headers: dict[str, str],

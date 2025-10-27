@@ -15,6 +15,7 @@ from src.domain.project.use_cases.get_project_list import GetProjectListUseCase
 from src.domain.project.use_cases.patch_project_by_guid import PatchProjectByGUIDUseCase
 from src.domain.project_task_aggregation.use_cases.send_project_report import SendProjectReportUseCase
 from src.domain.task.entities import Task
+from src.domain.task.exc import TaskNotFoundError
 from src.domain.task.use_cases.create_task import CreateTaskUseCase
 from src.domain.task.use_cases.delete_task_by_guid import DeleteTaskByGUIDUseCase
 from src.domain.task.use_cases.get_list import GetTaskListByProjectGUIDUseCase
@@ -89,7 +90,7 @@ async def create_project(
     use_case: CreateProjectUseCase = container.resolve(CreateProjectUseCase)  # type: ignore
     project_create_data = convert_project_create_scheme_to_entity(scheme_data)
     try:
-        guid = await use_case.execute(current_user, project_create_data)
+        guid = await use_case.execute(current_user.guid, project_create_data)
 
     except BaseAppError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.msg) from e
@@ -287,6 +288,9 @@ async def patch_task(
     try:
         res = await use_case.execute(project_guid, task_guid, task_patch_data)
 
+    except TaskNotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.msg) from e
+
     except BaseAppError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.msg) from e
 
@@ -313,6 +317,9 @@ async def delete_task(
     use_case: DeleteTaskByGUIDUseCase = container.resolve(DeleteTaskByGUIDUseCase)  # type: ignore
     try:
         await use_case.execute(project_guid, task_guid)
+
+    except TaskNotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.msg) from e
 
     except BaseAppError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.msg) from e

@@ -1,7 +1,10 @@
+from logging import getLogger
 from uuid import UUID
 
 from src.domain.project.entities import ProjectPatchData
 from src.services.project_service import ProjectService
+
+logger = getLogger()
 
 
 class PatchProjectByGUIDUseCase:
@@ -12,8 +15,9 @@ class PatchProjectByGUIDUseCase:
 
     async def execute(
         self,
-        guid: UUID,
+        project_guid: UUID,
         project_patch_data: ProjectPatchData,
     ) -> UUID:
-        project = await self._project_service.get_one_by_guid(guid)
+        logger.info("Patching project %s", project_guid)
+        project = await self._project_service.get_one_by_guid(project_guid)
         return await self._project_service.patch_one(project, project_patch_data)

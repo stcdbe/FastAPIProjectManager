@@ -1,10 +1,10 @@
 from faststream.rabbit import QueueType, RabbitBroker, RabbitExchange, RabbitQueue
 from faststream.rabbit.types import AioPikaSendableMessage
 
-from src.infra.worker.enums import RabbitMQExchangeName, RabbitMQQueueName
+from src.infra.worker.enum import RabbitExchangeName, RabbitQueueName
 
 
-class RabbitMQMessageBroker:
+class RabbitMessageBroker:
     def __init__(self, broker: RabbitBroker) -> None:
         self._broker = broker
 
@@ -13,18 +13,18 @@ class RabbitMQMessageBroker:
         # declare dlq
         dlq = await self._broker.declare_queue(
             queue=RabbitQueue(
-                name=RabbitMQQueueName.DEAD_LETTER,
+                name=RabbitQueueName.DLQ,
                 queue_type=QueueType.QUORUM,
                 durable=True,
                 arguments={
-                    "x-message-ttl": 60 * 60 * 1000,
+                    "x-message-ttl": 60 * 60 * 1000,  # 1 hour in ms
                     "x-delivery-limit": 5,
                 },
             ),
         )
         # declare dlx
         dlx = await self._broker.declare_exchange(
-            exchange=RabbitExchange(name=RabbitMQExchangeName.DEAD_LETTER, durable=True),
+            exchange=RabbitExchange(name=RabbitExchangeName.DLX, durable=True),
         )
         # bind dlq to dlx
         await dlq.bind(exchange=dlx, routing_key=dlq.name)
@@ -32,7 +32,7 @@ class RabbitMQMessageBroker:
     async def stop_broker(self) -> None:
         await self._broker.stop()
 
-    async def send_message(self, queue_name: RabbitMQQueueName, send_data: AioPikaSendableMessage) -> None:
+    async def send_message(self, queue_name: RabbitQueueName, send_data: AioPikaSendableMessage) -> None:
         queue = RabbitQueue(
             name=queue_name,
             queue_type=QueueType.QUORUM,
@@ -40,8 +40,8 @@ class RabbitMQMessageBroker:
             arguments={
                 "x-message-ttl": 60 * 60 * 1000,  # 1 hour in ms
                 "x-delivery-limit": 5,
-                "x-dead-letter-exchange": RabbitMQExchangeName.DEAD_LETTER,
-                "x-dead-letter-routing-key": RabbitMQExchangeName.DEAD_LETTER,
+                "x-dead-letter-exchange": RabbitExchangeName.DLX,
+                "x-dead-letter-routing-key": RabbitQueueName.DLQ,
                 "x-dead-letter-strategy": "at-least-once",
             },
         )

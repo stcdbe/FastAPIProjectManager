@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     LOG_CONFIG: Annotated[dict[str, Any], Field(default_factory=_parse_log_config)]
 
     DEBUG: Annotated[bool, Field(default=False)]
+    TESTING: Annotated[bool, Field(default=False)]
     HOST: Annotated[str, Field(default="localhost")]
     PORT: Annotated[int, Field(default=8000)]
     DOCS_URL: Annotated[str | None, Field(default=None)]

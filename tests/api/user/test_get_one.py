@@ -26,7 +26,7 @@ async def test_get_user(
 
 
 @pytest.mark.asyncio
-async def test_get_user_failed(
+async def test_get_user_failed_with_non_existing_user(
     app: FastAPI,
     client: AsyncClient,
     auth_token_headers: dict[str, str],

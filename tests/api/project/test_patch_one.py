@@ -40,7 +40,7 @@ async def test_patch_project(
 
 
 @pytest.mark.asyncio
-async def test_patch_project_failed(
+async def test_patch_project_failed_with_non_existing_project(
     app: FastAPI,
     client: AsyncClient,
     auth_token_headers: dict[str, str],
@@ -65,7 +65,7 @@ async def test_patch_project_failed(
 
 
 @pytest.mark.asyncio
-async def test_patch_project_with_invalid_mentor_guid(
+async def test_patch_project_failed_with_invalid_mentor_guid(
     app: FastAPI,
     client: AsyncClient,
     auth_token_headers: dict[str, str],
