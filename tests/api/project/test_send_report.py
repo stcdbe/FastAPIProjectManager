@@ -2,7 +2,6 @@ import pytest
 from fastapi import FastAPI, status
 from httpx import AsyncClient
 
-from src.config import get_settings
 from src.presentation.project.schemas import ProjectReportSendDataScheme
 from tests.mock_data import MOCK_PROJECT_GET_GUID
 
@@ -16,7 +15,7 @@ async def test_send_project_report(
     url = app.url_path_for("send_project_report")
     data = ProjectReportSendDataScheme(
         project_guid=MOCK_PROJECT_GET_GUID,
-        email=get_settings().TEST_EMAIL_RECEIVER,
+        email="test@email.com",
     )
 
     res = await client.post(
