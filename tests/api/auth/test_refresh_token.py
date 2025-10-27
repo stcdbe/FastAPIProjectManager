@@ -34,7 +34,7 @@ async def test_refresh_token(
 
 
 @pytest.mark.asyncio
-async def test_refresh_token_failed(
+async def test_refresh_token_failed_with_invalid_token(
     app: FastAPI,
     client: AsyncClient,
     auth_token_headers: dict[str, str],

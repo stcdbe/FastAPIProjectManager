@@ -1,5 +1,9 @@
+from logging import getLogger
+
 from src.domain.project.entities import Project
 from src.services.project_service import ProjectService
+
+logger = getLogger()
 
 
 class GetProjectListUseCase:
@@ -15,4 +19,5 @@ class GetProjectListUseCase:
         order_by: str,
         reverse: bool,
     ) -> list[Project]:
+        logger.info("Getting project list with offset=%i and limit=%i", offset, limit)
         return await self._project_service.get_list(limit, offset, order_by, reverse)

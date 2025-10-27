@@ -24,10 +24,12 @@ class GenerateUserTokenUseCase:
         self._hasher_service = hasher_service
 
     async def execute(self, username: str, password: str) -> AuthToken:
+        logger.info("Generating token for username %s", username)
+
         user = await self._user_service.get_one_by_username(username)
 
         if not self._hasher_service.verify_psw(password, user.password):
-            logger.warning("Failed attempt to generate access token for username: %s", username)
+            logger.warning("Failed attempt to generate access token for username %s", username)
             msg = "Invalid username or password"
             raise UserInvalidCredentialsError(msg)
 

@@ -10,7 +10,7 @@ from src.data.repositories.task.base import AbstractTaskRepository
 from src.data.repositories.task.sqlalchemy import SQLAlchemyTaskRepository
 from src.data.repositories.user.base import AbstractUserRepository
 from src.data.repositories.user.sqlalchemy import SQLAlchemyUserRepository
-from src.infra.worker.broker import RabbitMQMessageBroker
+from src.infra.worker.broker import RabbitMessageBroker
 from src.logic.api_di_container import _get_api_di_container
 from tests.infra.mock_broker import MockRabbitMQMessageBroker
 
@@ -51,7 +51,7 @@ def get_mock_api_di_container() -> Container:
     )
     # infra
     container.register(
-        RabbitMQMessageBroker,
+        RabbitMessageBroker,
         factory=MockRabbitMQMessageBroker,
         scope=Scope.singleton,
     )

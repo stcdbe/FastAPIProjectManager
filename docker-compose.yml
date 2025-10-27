@@ -53,8 +53,8 @@ services:
 
 
   mailhog:
-    image: mailhog/mailhog
     container_name: fpm-mail-server
+    image: mailhog/mailhog
     ports:
       - "8025:8025"
       - "1025:1025"
@@ -64,7 +64,7 @@ services:
   # web:
   #   container_name: fpm-web
   #   build: .
-  #   command: "sh -c 'python3 asgi.py'"
+  #   command: "sh -c 'alembic upgrade head && python3 asgi.py'"
   #   restart: always
   #   env_file:
   #     - .env
@@ -72,6 +72,7 @@ services:
   #     - 8000:${PORT}
   #   depends_on:
   #     - postgres
+  #     - rabbitmq
   #   networks:
   #     - custom
 

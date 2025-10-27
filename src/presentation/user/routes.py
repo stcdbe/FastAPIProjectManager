@@ -99,7 +99,7 @@ async def get_user(
 ) -> User:
     use_case: GetOneUserByGUIDUseCase = container.resolve(GetOneUserByGUIDUseCase)  # type: ignore
     try:
-        return await use_case.execute(guid=user_guid)
+        return await use_case.execute(user_guid=user_guid)
 
     except UserNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.msg) from e
@@ -159,7 +159,7 @@ async def delete_user(
 ) -> None:
     use_case: DeleteUserByGUIDUseCase = container.resolve(DeleteUserByGUIDUseCase)  # type: ignore
     try:
-        await use_case.execute(guid=user_guid)
+        await use_case.execute(user_guid=user_guid)
 
     except UserNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.msg) from e

@@ -27,7 +27,7 @@ async def test_create_token(
 
 
 @pytest.mark.asyncio
-async def test_create_token_failed(
+async def test_create_token_failed_with_invalid_form_data(
     app: FastAPI,
     client: AsyncClient,
 ) -> None:

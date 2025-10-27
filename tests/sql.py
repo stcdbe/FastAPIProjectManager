@@ -161,7 +161,7 @@ async def get_con() -> AsyncGenerator[AsyncConnection, None]:
         yield con
 
 
-async def create_tables() -> None:
+async def create_sql_tables() -> None:
     async with get_con() as conn, conn.cursor() as cur:
         await cur.execute(_CREATE_USER_TABLE_SQL)
         await cur.execute(_CREATE_USER_USERNAME_INDEX_SQL)
@@ -170,7 +170,7 @@ async def create_tables() -> None:
         await cur.execute(_CREATE_TASK_TABLE_SQL)
 
 
-async def drop_tables() -> None:
+async def drop_sql_tables() -> None:
     async with get_con() as conn, conn.cursor() as cur:
         await cur.execute(_DROP_TASK_TABLE_SQL)
         await cur.execute(_DROP_PROJECT_TABLE_SQL)
@@ -179,13 +179,15 @@ async def drop_tables() -> None:
         await cur.execute(_DROP_USER_TABLE_SQL)
 
 
-def _modyfy_project_dict_for_insertion(project: dict[str, Any]) -> dict[str, Any]:
+def _modyfy_project_dict_for_insertion(
+    project: dict[str, Any],
+) -> dict[str, Any]:
     project["tech_stack"] = list(project["tech_stack"])
     project["additional_metadata"] = Jsonb(project["additional_metadata"], orjson.dumps)
     return project
 
 
-async def insert_mock_data(
+async def insert_mock_sql_data(
     mock_users: Iterable[User],
     mock_projects: Iterable[Project],
     mock_tasks: Iterable[Task],

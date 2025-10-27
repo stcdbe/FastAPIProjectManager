@@ -1,7 +1,10 @@
+from logging import getLogger
 from uuid import UUID
 
 from src.domain.task.entities import TaskCreateData
 from src.services.task_service import TaskService
+
+logger = getLogger()
 
 
 class CreateTaskUseCase:
@@ -11,4 +14,5 @@ class CreateTaskUseCase:
         self._task_service = task_service
 
     async def execute(self, project_guid: UUID, task_create_data: TaskCreateData) -> UUID:
+        logger.info("Creating task for project %s", project_guid)
         return await self._task_service.create_one(project_guid, task_create_data)

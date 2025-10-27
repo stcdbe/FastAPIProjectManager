@@ -20,7 +20,7 @@ async def test_delete_project(
 
 
 @pytest.mark.asyncio
-async def test_delete_project_failed(
+async def test_delete_project_failed_with_non_existing_project(
     app: FastAPI,
     client: AsyncClient,
     auth_token_headers: dict[str, str],

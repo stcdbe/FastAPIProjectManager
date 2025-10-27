@@ -1,7 +1,10 @@
+from logging import getLogger
 from uuid import UUID
 
 from src.domain.task.entities import Task
 from src.services.task_service import TaskService
+
+logger = getLogger()
 
 
 class GetTaskListByProjectGUIDUseCase:
@@ -11,4 +14,5 @@ class GetTaskListByProjectGUIDUseCase:
         self._task_service = task_service
 
     async def execute(self, project_guid: UUID) -> list[Task]:
+        logger.info("Getting tasks for project %s", project_guid)
         return await self._task_service.get_list_by_project_guid(project_guid)

@@ -1,7 +1,10 @@
+from logging import getLogger
 from uuid import UUID
 
 from src.domain.task.exc import TaskNotFoundError
 from src.services.task_service import TaskService
+
+logger = getLogger()
 
 
 class DeleteTaskByGUIDUseCase:
@@ -11,6 +14,8 @@ class DeleteTaskByGUIDUseCase:
         self._task_service = task_service
 
     async def execute(self, project_guid: UUID, task_guid: UUID) -> UUID:
+        logger.info("Deleting task %s for project %s", task_guid, project_guid)
+
         task = await self._task_service.get_one_by_guid(task_guid)
 
         if task.project_guid != project_guid:

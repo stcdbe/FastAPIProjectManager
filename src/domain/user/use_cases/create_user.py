@@ -1,7 +1,10 @@
+from logging import getLogger
 from uuid import UUID
 
 from src.domain.user.entities import UserCreateData
 from src.services.user_service import UserService
+
+logger = getLogger()
 
 
 class CreateUserUseCase:
@@ -11,4 +14,5 @@ class CreateUserUseCase:
         self._user_service = user_service
 
     async def execute(self, user_create_data: UserCreateData) -> UUID:
+        logger.info("Creating user %s %s", user_create_data.username, user_create_data.email)
         return await self._user_service.create_one(user_create_data)

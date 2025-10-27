@@ -14,20 +14,24 @@ handlers:
     stream: "ext://sys.stdout"
 
   # fileInfo:
+  #   class: "logging.handlers.TimedRotatingFileHandler"
   #   level: "INFO"
-  #   class: "logging.handlers.RotatingFileHandler"
-  #   filename: "./logs/info.log"
   #   formatter: "default"
-  #   maxBytes: 1073741824 # 1 GB in bytes
+  #   filename: "./logs/fpm_web_info.log"
+  #   when: "W0"
   #   backupCount: 0
+  #   utc: true
+  #   interval: 1
 
   # fileWarning:
+  #   class: "logging.handlers.TimedRotatingFileHandler"
   #   level: "WARNING"
-  #   class: "logging.handlers.RotatingFileHandler"
-  #   filename: "./logs/warn.log"
   #   formatter: "default"
-  #   maxBytes: 1073741824 # 1 GB in bytes
+  #   filename: "./logs/fpm_web_warn.log"
+  #   when: "W0"
   #   backupCount: 0
+  #   utc: true
+  #   interval: 1
 
   queueHandler:
     level: "INFO"

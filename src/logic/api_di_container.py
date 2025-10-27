@@ -30,7 +30,7 @@ from src.domain.user.use_cases.get_one_user_by_guid import GetOneUserByGUIDUseCa
 from src.domain.user.use_cases.get_user_list import GetUserListUseCase
 from src.domain.user.use_cases.patch_user_by_guid import PatchUserByGUIDUseCase
 from src.domain.user.use_cases.refresh_user_token import RefreshUserTokenUseCase
-from src.infra.worker.broker import RabbitMQMessageBroker
+from src.infra.worker.broker import RabbitMessageBroker
 from src.infra.worker.worker_routes import worker_router
 from src.services.auth_service import AuthService
 from src.services.hasher_service import HasherService
@@ -78,8 +78,8 @@ def _get_api_di_container() -> Container:
     )
     rabbimq_broker.include_router(worker_router)
     container.register(
-        RabbitMQMessageBroker,
-        factory=lambda: RabbitMQMessageBroker(rabbimq_broker),
+        RabbitMessageBroker,
+        factory=lambda: RabbitMessageBroker(rabbimq_broker),
         scope=Scope.singleton,
     )
     # services
