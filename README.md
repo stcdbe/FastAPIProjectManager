@@ -67,6 +67,7 @@ ____
 | `PG_HOST_TEST`             | hostname or an IP address of PGSQL test database |
 | `PG_PORT_TEST`             | port from PGSQL test database                    |
 | `PG_DB_TEST`               | PGSQL test database                              |
+| `PGADMIN_PORT`             | PGAdmin port                                     |
 | `PGADMIN_DEFAULT_EMAIL`    | PGAdmin default email                            |
 | `PGADMIN_DEFAULT_PASSWORD` | PGAdmin default pssword                          |
 | `RMQ_HOST`                 | RMQ host                                         |

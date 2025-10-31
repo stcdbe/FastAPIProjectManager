@@ -10,15 +10,15 @@ services:
       - POSTGRES_USER=${PG_USER}
       - POSTGRES_DB=${PG_DB}
     ports:
-        - 5432:${PG_PORT}
+        - ${PG_PORT}:5432
     # volumes:
-    #   - pgdata:/var/lib/postgresql/data
+    #   - pg-data:/var/lib/postgresql/data
     networks:
       - custom
 
   pgadmin:
-    image: dpage/pgadmin4:latest
     container_name: fpm-postgres-admin
+    image: dpage/pgadmin4:latest
     restart: always
     env_file:
       - .env
@@ -26,7 +26,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     ports:
-      - "8888:80"
+      - ${PGADMIN_PORT}:80
     depends_on:
       - postgres
     # volumes:
@@ -38,11 +38,12 @@ services:
     container_name: fpm-rabbitmq
     image: rabbitmq:4-management-alpine
     hostname: rabbitmq
+    restart: always
     env_file:
       - .env
     ports:
-      - 5672:${RMQ_PORT}
-      - 15672:${RMQ_ADMINISTRATION_PORT}
+      - ${RMQ_PORT}:5672
+      - ${RMQ_ADMINISTRATION_PORT}:15672
     environment:
       RABBITMQ_DEFAULT_USER: ${RMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RMQ_PASSWORD}
@@ -51,13 +52,15 @@ services:
     networks:
       - custom
 
-
   mailhog:
     container_name: fpm-mail-server
     image: mailhog/mailhog
+    restart: always
+    env_file:
+    - .env
     ports:
-      - "8025:8025"
-      - "1025:1025"
+      - 8025:8025
+      - ${EMAIL_PORT}:1025
     networks:
       - custom
 
@@ -69,12 +72,17 @@ services:
   #   env_file:
   #     - .env
   #   ports:
-  #     - 8000:${PORT}
+  #     - ${PORT}:${PORT}
   #   depends_on:
   #     - postgres
   #     - rabbitmq
   #   networks:
   #     - custom
+
+# volumes:
+#   pg-data:
+#   pgadmin-data:
+#   rabbitmq-data:
 
 networks:
   custom:
