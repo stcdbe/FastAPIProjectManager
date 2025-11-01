@@ -3,6 +3,7 @@ from logging import getLogger
 
 from faststream.rabbit import RabbitBroker
 from punq import Container, Scope
+from redis.asyncio import Redis as AsyncRedis
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from src.config import get_settings
@@ -11,6 +12,8 @@ from src.data.repositories.project.sqlachemy import SQLAlchemyProjectRepository
 from src.data.repositories.task.base import AbstractTaskRepository
 from src.data.repositories.task.sqlalchemy import SQLAlchemyTaskRepository
 from src.data.repositories.user.base import AbstractUserRepository
+from src.data.repositories.user.cache_redis import RedisUserCasheRepository
+from src.data.repositories.user.cashe_base import AbstractUserCacheRepository
 from src.data.repositories.user.sqlalchemy import SQLAlchemyUserRepository
 from src.domain.project.use_cases.create_project import CreateProjectUseCase
 from src.domain.project.use_cases.delete_project_by_guid import DeleteProjectByGUIDUseCase
@@ -55,10 +58,17 @@ def _get_api_di_container() -> Container:
         autoflush=False,
         autocommit=False,
     )
+    # redis
+    redis = AsyncRedis.from_url(get_settings().REDIS_URL.unicode_string())
     # repos
     container.register(
         AbstractUserRepository,
         factory=lambda: SQLAlchemyUserRepository(async_session_factory),
+        scope=Scope.singleton,
+    )
+    container.register(
+        AbstractUserCacheRepository,
+        factory=lambda: RedisUserCasheRepository(redis),
         scope=Scope.singleton,
     )
     container.register(
