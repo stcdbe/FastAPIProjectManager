@@ -11,7 +11,7 @@ from src.presentation.user.schemas import UserPatchScheme
 from tests.mock_data import MOCK_USER_PATCH_GUID
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_patch_user(
     app: FastAPI,
     client: AsyncClient,
@@ -42,7 +42,7 @@ async def test_patch_user(
     assert UUID(res_json["guid"])
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_patch_user_failed_with_non_existing_user(
     app: FastAPI,
     client: AsyncClient,

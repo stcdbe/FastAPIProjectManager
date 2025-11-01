@@ -59,7 +59,10 @@ def _get_api_di_container() -> Container:
         autocommit=False,
     )
     # redis
-    redis = AsyncRedis.from_url(get_settings().REDIS_URL.unicode_string())
+    redis = AsyncRedis.from_url(
+        get_settings().REDIS_URL.unicode_string(),
+        decode_responses=False,
+    )
     # repos
     container.register(
         AbstractUserRepository,

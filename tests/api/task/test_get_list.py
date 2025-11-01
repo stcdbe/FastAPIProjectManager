@@ -8,7 +8,7 @@ from httpx import AsyncClient
 from tests.mock_data import MOCK_PROJECT_GET_GUID
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_get_task_list(
     app: FastAPI,
     client: AsyncClient,

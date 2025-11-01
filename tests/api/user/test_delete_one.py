@@ -7,7 +7,7 @@ from httpx import AsyncClient
 from tests.mock_data import MOCK_USER_DELETE_GUID
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_delete_user(
     app: FastAPI,
     client: AsyncClient,
@@ -19,7 +19,7 @@ async def test_delete_user(
     assert res.status_code == status.HTTP_204_NO_CONTENT
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_delete_user_failed_with_non_existing_user(
     app: FastAPI,
     client: AsyncClient,

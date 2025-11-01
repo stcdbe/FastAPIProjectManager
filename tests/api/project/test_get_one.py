@@ -8,7 +8,7 @@ from httpx import AsyncClient
 from tests.mock_data import MOCK_PROJECT_GET_GUID
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_get_project(
     app: FastAPI,
     client: AsyncClient,
@@ -23,7 +23,7 @@ async def test_get_project(
     assert res_json["title"]
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_get_project_failed_with_non_existong_project(
     app: FastAPI,
     client: AsyncClient,

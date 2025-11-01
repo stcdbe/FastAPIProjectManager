@@ -10,10 +10,10 @@ from src.domain.user.enums import UserGender
 def convert_user_model_to_entity(
     user_model: UserModel,
 ) -> User:
-    if user_model.gender is None:
-        gender = None
-    else:
+    if user_model.gender is not None:
         gender = UserGender(user_model.gender)
+    else:
+        gender = None
 
     return User(
         guid=user_model.guid,
@@ -37,15 +37,20 @@ def convert_user_model_to_entity(
 def convert_user_map_to_entity(
     user_map: Mapping[str, Any],
 ) -> User:
-    if user_map.get("gender") is None:
-        gender = None
-    else:
+    if user_map.get("gender") is not None:
         gender = UserGender(user_map["gender"])
+    else:
+        gender = None
 
     if user_map.get("join_date") is not None:
         join_date = date.fromisoformat(user_map["join_date"])
     else:
         join_date = None
+
+    if user_map.get("deleted_at") is not None:
+        deleted_at = datetime.fromisoformat(user_map["deleted_at"])
+    else:
+        deleted_at = None
 
     return User(
         guid=user_map["guid"],
@@ -62,5 +67,5 @@ def convert_user_map_to_entity(
         created_at=datetime.fromisoformat(user_map["created_at"]),
         updated_at=datetime.fromisoformat(user_map["updated_at"]),
         is_deleted=user_map["is_deleted"],
-        deleted_at=datetime.fromisoformat(user_map["deleted_at"]),
+        deleted_at=deleted_at,
     )

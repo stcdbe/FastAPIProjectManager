@@ -6,7 +6,7 @@ from src.presentation.project.schemas import ProjectReportSendDataScheme
 from tests.mock_data import MOCK_PROJECT_GET_GUID
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_send_project_report(
     app: FastAPI,
     client: AsyncClient,

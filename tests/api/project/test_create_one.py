@@ -10,7 +10,7 @@ from httpx import AsyncClient
 from src.presentation.project.schemas import ProjectCreateScheme
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_create_project(
     app: FastAPI,
     client: AsyncClient,
@@ -38,7 +38,7 @@ async def test_create_project(
     assert UUID(res_json["guid"])
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_create_project_failed_with_invalid_mentor_guid(
     app: FastAPI,
     client: AsyncClient,
