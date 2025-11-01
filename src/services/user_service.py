@@ -45,10 +45,10 @@ class UserService:
     async def get_one_by_guid(self, guid: UUID) -> User:
         user_from_cashe = await self._user_cache_repository.get_one(guid)
 
-        if user_from_cashe is None:
-            user = await self._user_repository.get_one_by_guid(guid)
-        else:
+        if user_from_cashe is not None:
             user = user_from_cashe
+        else:
+            user = await self._user_repository.get_one_by_guid(guid)
 
         if user.is_deleted:
             logger.warning("Attempt to fetch soft deleted user by guid %s", guid)

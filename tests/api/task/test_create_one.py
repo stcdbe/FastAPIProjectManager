@@ -10,7 +10,7 @@ from src.presentation.task.schemas import TaskCreateScheme
 from tests.mock_data import MOCK_PROJECT_GET_GUID, MOCK_USER_AUTH_GUID
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_create_task(
     app: FastAPI,
     client: AsyncClient,
@@ -31,7 +31,7 @@ async def test_create_task(
     assert UUID(res_json["guid"])
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_create_task_failed_with_non_existing_project(
     app: FastAPI,
     client: AsyncClient,
@@ -49,7 +49,7 @@ async def test_create_task_failed_with_non_existing_project(
     assert res.status_code == status.HTTP_400_BAD_REQUEST
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_create_task_failed_with_non_existing_executor(
     app: FastAPI,
     client: AsyncClient,

@@ -10,7 +10,7 @@ from src.presentation.task.schemas import TaskPatchScheme
 from tests.mock_data import MOCK_PROJECT_GET_GUID, MOCK_TASK_PATCH_GUID, MOCK_USER_GET_GUID
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_patch_task(
     app: FastAPI,
     client: AsyncClient,
@@ -35,7 +35,7 @@ async def test_patch_task(
     assert UUID(res_json["guid"])
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_patch_task_failed_with_non_existing_project(
     app: FastAPI,
     client: AsyncClient,
@@ -57,7 +57,7 @@ async def test_patch_task_failed_with_non_existing_project(
     assert res.status_code == status.HTTP_400_BAD_REQUEST
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_patch_task_failed_with_non_existing_task(
     app: FastAPI,
     client: AsyncClient,
@@ -79,7 +79,7 @@ async def test_patch_task_failed_with_non_existing_task(
     assert res.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_patch_task_failed_with_non_existing_executor(
     app: FastAPI,
     client: AsyncClient,

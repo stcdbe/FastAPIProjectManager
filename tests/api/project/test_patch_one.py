@@ -11,7 +11,7 @@ from src.presentation.project.schemas import ProjectPatchScheme
 from tests.mock_data import MOCK_PROJECT_PATCH_GUID
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_patch_project(
     app: FastAPI,
     client: AsyncClient,
@@ -39,7 +39,7 @@ async def test_patch_project(
     assert UUID(res_json["guid"])
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_patch_project_failed_with_non_existing_project(
     app: FastAPI,
     client: AsyncClient,
@@ -64,7 +64,7 @@ async def test_patch_project_failed_with_non_existing_project(
     assert res.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_patch_project_failed_with_invalid_mentor_guid(
     app: FastAPI,
     client: AsyncClient,

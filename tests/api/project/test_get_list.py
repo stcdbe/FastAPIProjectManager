@@ -4,7 +4,7 @@ from fastapi import FastAPI, status
 from httpx import AsyncClient
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_get_project_list(
     app: FastAPI,
     client: AsyncClient,

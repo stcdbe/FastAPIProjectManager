@@ -8,7 +8,7 @@ from httpx import AsyncClient
 from tests.mock_data import MOCK_USER_GET_GUID
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_get_user(
     app: FastAPI,
     client: AsyncClient,
@@ -25,7 +25,7 @@ async def test_get_user(
     assert res_json.get("password") is None
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_get_user_failed_with_non_existing_user(
     app: FastAPI,
     client: AsyncClient,

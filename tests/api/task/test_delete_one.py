@@ -7,7 +7,7 @@ from httpx import AsyncClient
 from tests.mock_data import MOCK_PROJECT_GET_GUID, MOCK_TASK_DELETE_GUID
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_delete_task(
     app: FastAPI,
     client: AsyncClient,
@@ -23,7 +23,7 @@ async def test_delete_task(
     assert res.status_code == status.HTTP_204_NO_CONTENT
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_delete_task_failed_with_non_existing_project(
     app: FastAPI,
     client: AsyncClient,
@@ -39,7 +39,7 @@ async def test_delete_task_failed_with_non_existing_project(
     assert res.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_delete_task_failed_with_non_existing_task(
     app: FastAPI,
     client: AsyncClient,

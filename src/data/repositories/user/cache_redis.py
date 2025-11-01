@@ -15,17 +15,17 @@ class RedisUserCasheRepository(AbstractUserCacheRepository):
 
     def __init__(self, redis: AsyncRedis) -> None:
         self._redis = redis
-        self._key = "cache:user:{}"
+        self._key = "cache:user:{guid}"
 
     async def add_one(self, user: User) -> None:
         await self._redis.set(
-            self._key.format(user.guid),
+            self._key.format(guid=user.guid),
             zlib.compress(orjson.dumps(user)),
             ex=timedelta(seconds=60),
         )
 
     async def get_one(self, guid: UUID) -> User | None:
-        res: bytes | None = await self._redis.get(self._key.format(guid))  # type: ignore
+        res: bytes | None = await self._redis.get(self._key.format(guid=guid))  # type: ignore
 
         if res is None:
             return None
@@ -33,4 +33,4 @@ class RedisUserCasheRepository(AbstractUserCacheRepository):
         return convert_user_map_to_entity(orjson.loads(zlib.decompress(res)))
 
     async def delete_one(self, guid: UUID) -> None:
-        await self._redis.delete(self._key.format(guid))
+        await self._redis.delete(self._key.format(guid=guid))

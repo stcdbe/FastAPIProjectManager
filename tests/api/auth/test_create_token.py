@@ -6,7 +6,7 @@ from fastapi import FastAPI, status
 from httpx import AsyncClient
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_create_token(
     app: FastAPI,
     client: AsyncClient,
@@ -26,7 +26,7 @@ async def test_create_token(
     assert res_json["token_type"] == "bearer"  # noqa: S105
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_create_token_failed_with_invalid_form_data(
     app: FastAPI,
     client: AsyncClient,

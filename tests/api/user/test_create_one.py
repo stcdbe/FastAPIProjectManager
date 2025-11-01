@@ -10,7 +10,7 @@ from src.domain.user.enums import UserGender
 from src.presentation.user.schemas import UserCreateScheme
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_create_user(
     app: FastAPI,
     client: AsyncClient,
@@ -41,7 +41,7 @@ async def test_create_user(
     assert UUID(res_json["guid"])
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_create_user_failed_with_existing_user(
     app: FastAPI,
     client: AsyncClient,
