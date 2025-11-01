@@ -75,6 +75,9 @@ ____
 | `RMQ_ADMINISTRATION_PORT`  | RMQ admin port                                   |
 | `RMQ_USER`                 | RMQ user                                         |
 | `RMQ_PASSWORD`             | RMQ password                                     |
+| `REDIS_HOST`               | redis host                                       |
+| `REDIS_PORT`               | redis port                                       |
+| `REDIS_DB`                 | redis db                                         |
 | `EMAIL_HOST`               | email host                                       |
 | `EMAIL_PORT`               | email port                                       |
 | `EMAIL_USERNAME`           | email username                                   |

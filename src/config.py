@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Annotated, Any, Final
 
 import yaml
-from pydantic import AmqpDsn, DirectoryPath, EmailStr, Field, PostgresDsn
+from pydantic import AmqpDsn, DirectoryPath, EmailStr, Field, PostgresDsn, RedisDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 _ENCODING: Final[str] = "utf-8"
@@ -48,6 +48,8 @@ class Settings(BaseSettings):
     PG_URL_TEST: PostgresDsn
 
     RMQ_URL: AmqpDsn
+
+    REDIS_URL: RedisDsn
 
     EMAIL_HOST: str
     EMAIL_PORT: int
