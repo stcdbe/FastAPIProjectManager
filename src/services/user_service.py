@@ -3,6 +3,7 @@ from logging import getLogger
 from uuid import UUID, uuid4
 
 from src.data.repositories.user.base import AbstractUserRepository
+from src.data.repositories.user.cashe_base import AbstractUserCacheRepository
 from src.domain.user.entities import User, UserCreateData, UserPatchData
 from src.domain.user.exc import UserIsSoftDeletedError
 from src.services.hasher_service import HasherService
@@ -11,13 +12,19 @@ logger = getLogger()
 
 
 class UserService:
-    __slots__ = ("_hasher_service", "_user_repository")
+    __slots__ = (
+        "_hasher_service",
+        "_user_cache_repository",
+        "_user_repository",
+    )
 
     def __init__(
         self,
+        user_cache_repository: AbstractUserCacheRepository,
         user_repository: AbstractUserRepository,
         hasher_service: HasherService,
     ) -> None:
+        self._user_cache_repository = user_cache_repository
         self._user_repository = user_repository
         self._hasher_service = hasher_service
 
@@ -36,12 +43,20 @@ class UserService:
         )
 
     async def get_one_by_guid(self, guid: UUID) -> User:
-        user = await self._user_repository.get_one_by_guid(guid)
+        user_from_cashe = await self._user_cache_repository.get_one(guid)
+
+        if user_from_cashe is None:
+            user = await self._user_repository.get_one_by_guid(guid)
+        else:
+            user = user_from_cashe
 
         if user.is_deleted:
             logger.warning("Attempt to fetch soft deleted user by guid %s", guid)
-            msg = f"User {guid} is not found"
+            msg = f"User {guid} not found"
             raise UserIsSoftDeletedError(msg)
+
+        if user_from_cashe is None:
+            await self._user_cache_repository.add_one(user)
 
         return user
 
@@ -50,7 +65,7 @@ class UserService:
 
         if user.is_deleted:
             logger.warning("Attempt to fetch soft deleted user by username %s", username)
-            msg = f"User {username} is not found"
+            msg = f"User {username} not found"
             raise UserIsSoftDeletedError(msg)
 
         return user
@@ -73,7 +88,11 @@ class UserService:
             is_deleted=False,
             deleted_at=None,
         )
-        return await self._user_repository.create_one(user=user)
+        user_guid = await self._user_repository.create_one(user=user)
+
+        await self._user_cache_repository.delete_one(user_guid)
+
+        return user_guid
 
     async def patch_one(self, user: User, user_patch_data: UserPatchData) -> UUID:
         if user_patch_data.username is not None:
@@ -92,11 +111,19 @@ class UserService:
         user.join_date = user_patch_data.join_date
         user.job_title = user_patch_data.job_title
         user.date_of_birth = user_patch_data.date_of_birth
-
         user.updated_at = datetime.now(UTC)
-        return await self._user_repository.patch_one(user=user)
+
+        user_guid = await self._user_repository.patch_one(user=user)
+
+        await self._user_cache_repository.delete_one(user_guid)
+
+        return user_guid
 
     async def soft_delete_one_by_guid(self, user: User) -> UUID:
         user.is_deleted = True
         user.deleted_at = datetime.now(UTC)
-        return await self._user_repository.patch_one(user)
+
+        user_guid = await self._user_repository.patch_one(user)
+        await self._user_cache_repository.delete_one(user_guid)
+
+        return user_guid
