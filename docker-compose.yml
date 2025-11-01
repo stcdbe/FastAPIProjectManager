@@ -30,14 +30,13 @@ services:
     depends_on:
       - postgres
     # volumes:
-      # - pgadmin-data:/var/lib/pgadmin
+    #   - pgadmin-data:/var/lib/pgadmin
     networks:
       - custom
 
   rabbitmq:
     container_name: fpm-rabbitmq
     image: rabbitmq:4-management-alpine
-    hostname: rabbitmq
     restart: always
     env_file:
       - .env
@@ -48,7 +47,20 @@ services:
       RABBITMQ_DEFAULT_USER: ${RMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RMQ_PASSWORD}
     # volumes:
-      # - rabbitmq-data:/var/lib/rabbitmq
+    #   - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - custom
+
+  redis:
+    container_name: fpm-redis
+    image: redis:8-alpine
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - ${REDIS_PORT}:6379
+    # volumes:
+    #   - redis-data:/data
     networks:
       - custom
 
@@ -83,6 +95,7 @@ services:
 #   pg-data:
 #   pgadmin-data:
 #   rabbitmq-data:
+#   redis_data:
 
 networks:
   custom:
