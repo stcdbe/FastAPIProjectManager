@@ -1,23 +1,16 @@
 from collections.abc import AsyncGenerator, Iterable
 from contextlib import asynccontextmanager
 from dataclasses import asdict
-from os import getenv
 from typing import Any
 
 import orjson
 from psycopg import AsyncConnection
 from psycopg.types.json import Jsonb
 
+from src.config import get_settings
 from src.domain.project.entities import Project
 from src.domain.task.entities import Task
 from src.domain.user.entities import User
-
-_HOST = getenv("PG_HOST_TEST", "localhost")
-_PORT = int(getenv("PG_PORT_TEST", "5432"))
-_USERNAME = getenv("PG_USER_TEST", "pgadmin")
-_PASSWORD = getenv("PG_PASSWORD_TEST", "pgadmin")
-_DB = getenv("PG_DB_TEST", "test_db")
-
 
 _DROP_USER_TABLE_SQL = """DROP TABLE IF EXISTS "user" CASCADE;"""
 _DROP_USER_EMAIL_INDEX_SQL = """DROP INDEX IF EXISTS ix_user_email;"""
@@ -154,15 +147,17 @@ _INSERT_TAKS_DATA_SQL = """INSERT INTO "task" (
 
 
 @asynccontextmanager
-async def get_con() -> AsyncGenerator[AsyncConnection, None]:
+async def get_pg_conn() -> AsyncGenerator[AsyncConnection, None]:
+    host, *_ = get_settings().PG_URL_TEST.hosts()
+    *_, db = get_settings().PG_URL_TEST.unicode_string().split("/")
     async with await AsyncConnection.connect(
-        f"dbname={_DB} user={_USERNAME} password={_PASSWORD} host={_HOST} port={_PORT}",
-    ) as con:
-        yield con
+        f"dbname={db} user={host['username']} password={host['password']} host={host['host']} port={host['port']}",
+    ) as conn:
+        yield conn
 
 
-async def create_sql_tables() -> None:
-    async with get_con() as conn, conn.cursor() as cur:
+async def create_sql_tables(conn: AsyncConnection) -> None:
+    async with conn.cursor() as cur:
         await cur.execute(_CREATE_USER_TABLE_SQL)
         await cur.execute(_CREATE_USER_USERNAME_INDEX_SQL)
         await cur.execute(_CREATE_USER_EMAIL_INDEX_SQL)
@@ -170,8 +165,8 @@ async def create_sql_tables() -> None:
         await cur.execute(_CREATE_TASK_TABLE_SQL)
 
 
-async def drop_sql_tables() -> None:
-    async with get_con() as conn, conn.cursor() as cur:
+async def drop_sql_tables(conn: AsyncConnection) -> None:
+    async with conn.cursor() as cur:
         await cur.execute(_DROP_TASK_TABLE_SQL)
         await cur.execute(_DROP_PROJECT_TABLE_SQL)
         await cur.execute(_DROP_USER_USERNAME_INDEX_SQL)
@@ -188,11 +183,12 @@ def _modyfy_project_dict_for_insertion(
 
 
 async def insert_mock_sql_data(
+    conn: AsyncConnection,
     mock_users: Iterable[User],
     mock_projects: Iterable[Project],
     mock_tasks: Iterable[Task],
 ) -> None:
-    async with get_con() as conn, conn.cursor() as cur:
+    async with conn.cursor() as cur:
         await cur.executemany(_INSERT_USER_DATA_SQL, (asdict(entity) for entity in mock_users))
         await cur.executemany(
             _INSERT_PROJECT_DATA_SQL,
