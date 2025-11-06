@@ -19,7 +19,6 @@ _DROP_PROJECT_TABLE_SQL = """DROP TABLE IF EXISTS "project" CASCADE;"""
 _DROP_TASK_TABLE_SQL = """DROP TABLE IF EXISTS "task" CASCADE;"""
 
 _CREATE_USER_TABLE_SQL = """CREATE TABLE "user" (
-    guid UUID PRIMARY KEY,
     username VARCHAR(128) NOT NULL,
     email VARCHAR(128) NOT NULL,
     password VARCHAR(128) NOT NULL,
@@ -31,38 +30,42 @@ _CREATE_USER_TABLE_SQL = """CREATE TABLE "user" (
     job_title VARCHAR(128),
     date_of_birth DATE,
     is_deleted BOOLEAN NOT NULL,
-    deleted_at TIMESTAMP,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL
+    deleted_at TIMESTAMP WITHOUT TIME ZONE,
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    guid UUID NOT NULL,
+    CONSTRAINT pk_user PRIMARY KEY (guid)
 );"""
-_CREATE_USER_EMAIL_INDEX_SQL = """CREATE UNIQUE INDEX ix_user_email ON "user"(email);"""
-_CREATE_USER_USERNAME_INDEX_SQL = """CREATE UNIQUE INDEX ix_user_username ON "user"(username);"""
+_CREATE_USER_EMAIL_INDEX_SQL = """CREATE UNIQUE INDEX ix_user_email ON "user" (email);"""
+_CREATE_USER_USERNAME_INDEX_SQL = """CREATE UNIQUE INDEX ix_user_username ON "user" (username);"""
 _CREATE_PROJECT_TABLE_SQL = """CREATE TABLE "project" (
-    guid UUID PRIMARY KEY,
     title VARCHAR(256) NOT NULL,
     description TEXT NOT NULL,
-    tech_stack TEXT[] NOT NULL,
+    tech_stack VARCHAR[] NOT NULL,
     additional_metadata JSONB NOT NULL,
     start_date DATE NOT NULL,
     constraint_date DATE NOT NULL,
     creator_guid UUID NOT NULL,
     mentor_guid UUID,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL,
-    CONSTRAINT fk_project_creator_guid_user FOREIGN KEY (creator_guid) REFERENCES "user" (guid),
-    CONSTRAINT fk_project_mentor_guid_user FOREIGN KEY (mentor_guid) REFERENCES "user" (guid)
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    guid UUID NOT NULL,
+    CONSTRAINT pk_project PRIMARY KEY (guid),
+    CONSTRAINT fk_project_creator_guid_user FOREIGN KEY(creator_guid) REFERENCES "user" (guid),
+    CONSTRAINT fk_project_mentor_guid_user FOREIGN KEY(mentor_guid) REFERENCES "user" (guid)
 );"""
 _CREATE_TASK_TABLE_SQL = """CREATE TABLE "task" (
-    guid UUID PRIMARY KEY,
     title VARCHAR(256) NOT NULL,
     description TEXT NOT NULL,
     is_completed BOOLEAN NOT NULL,
     project_guid UUID NOT NULL,
     executor_guid UUID NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL,
-    CONSTRAINT fk_task_executor_guid_user FOREIGN KEY (executor_guid) REFERENCES "user" (guid),
-    CONSTRAINT fk_task_project_guid_project FOREIGN KEY (project_guid) REFERENCES project (guid)
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    guid UUID NOT NULL,
+    CONSTRAINT pk_task PRIMARY KEY (guid),
+    CONSTRAINT fk_task_executor_guid_user FOREIGN KEY(executor_guid) REFERENCES "user" (guid),
+    CONSTRAINT fk_task_project_guid_project FOREIGN KEY(project_guid) REFERENCES "project" (guid)
 );"""
 
 _INSERT_USER_DATA_SQL = """INSERT INTO "user" (
