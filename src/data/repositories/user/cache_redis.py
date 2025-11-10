@@ -1,3 +1,4 @@
+import asyncio
 import zlib
 from datetime import timedelta
 from uuid import UUID
@@ -20,7 +21,7 @@ class RedisUserCasheRepository(AbstractUserCacheRepository):
     async def add_one(self, user: User) -> None:
         await self._redis.set(
             self._key.format(guid=user.guid),
-            zlib.compress(orjson.dumps(user)),
+            await asyncio.to_thread(zlib.compress, orjson.dumps(user)),
             ex=timedelta(seconds=60),
         )
 
@@ -30,7 +31,9 @@ class RedisUserCasheRepository(AbstractUserCacheRepository):
         if res is None:
             return None
 
-        return convert_user_map_to_entity(orjson.loads(zlib.decompress(res)))
+        decompressed_user_dict_str = await asyncio.to_thread(zlib.decompress, res)
+        user_dict = orjson.loads(decompressed_user_dict_str)
+        return convert_user_map_to_entity(user_dict)
 
     async def delete_one(self, guid: UUID) -> None:
         await self._redis.delete(self._key.format(guid=guid))
