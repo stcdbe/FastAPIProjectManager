@@ -14,5 +14,4 @@ if __name__ == "__main__":
         host=get_settings().HOST,
         port=get_settings().PORT,
         reload=get_settings().DEBUG,
-        log_config=get_settings().LOG_CONFIG,
     )
