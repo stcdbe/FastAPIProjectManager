@@ -76,20 +76,21 @@ services:
     networks:
       - custom
 
-  # web:
-  #   container_name: fpm-web
-  #   build: .
-  #   command: "sh -c 'alembic upgrade head && python3 asgi.py'"
-  #   restart: always
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - ${PORT}:${PORT}
-  #   depends_on:
-  #     - postgres
-  #     - rabbitmq
-  #   networks:
-  #     - custom
+  web:
+    container_name: fpm-web
+    build: .
+    command: "sh -c 'alembic upgrade head && python3 asgi.py'"
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - ${PORT}:${PORT}
+    depends_on:
+      - postgres
+      - rabbitmq
+      - redis
+    networks:
+      - custom
 
 # volumes:
 #   pg-data:
