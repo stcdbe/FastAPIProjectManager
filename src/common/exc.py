@@ -9,4 +9,4 @@ class BaseAppError(Exception):
         return self.msg
 
     def __repr__(self) -> str:
-        return self.__str__()
+        return f"{self.__class__.__name__}: {self.msg}"
