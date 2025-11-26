@@ -5,12 +5,15 @@ from typing import Any
 
 import orjson
 from psycopg import AsyncConnection
-from psycopg.types.json import Jsonb
+from psycopg.types.json import Jsonb, set_json_dumps, set_json_loads
 
 from src.config import get_settings
 from src.domain.project.entities import Project
 from src.domain.task.entities import Task
 from src.domain.user.entities import User
+
+set_json_dumps(orjson.dumps)
+set_json_loads(orjson.loads)
 
 _DROP_USER_TABLE_SQL = """DROP TABLE IF EXISTS "user" CASCADE;"""
 _DROP_USER_EMAIL_INDEX_SQL = """DROP INDEX IF EXISTS ix_user_email;"""
