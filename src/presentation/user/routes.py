@@ -66,7 +66,7 @@ async def get_user_list(
 )
 async def create_user(
     container: Annotated[Container, Depends(get_api_di_container)],
-    # _: Annotated[User, Depends(get_current_user)],
+    _: Annotated[User, Depends(get_current_user)],
     scheme_data: UserCreateScheme,
 ) -> dict[str, UUID4]:
     use_case: CreateUserUseCase = container.resolve(CreateUserUseCase)  # type: ignore
