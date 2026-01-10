@@ -33,7 +33,7 @@ handlers:
   #   utc: true
   #   interval: 1
 
-  queueHandler:
+  queue:
     level: "INFO"
     class: "logging.handlers.QueueHandler"
     listener: "src.common.local_logging.listener.AutoStartQueueListener"
@@ -53,5 +53,5 @@ loggers:
       # - "console"
       # - "fileInfo"
       # - "fileWarning"
-      - "queueHandler"
+      - "queue"
 
