@@ -16,6 +16,6 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 COPY --from=builder requirements.prod.txt /app
 
 RUN pip install --no-cache-dir -U pip setuptools && \
-    pip install --no-cache-dir -r requirements.dev.txt
+    pip install --no-cache-dir -r requirements.prod.txt
 
 COPY . .
