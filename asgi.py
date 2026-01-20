@@ -1,14 +1,14 @@
 from logging.config import dictConfig as loggingDictConfig
 
-import uvicorn
-
 from src.config import get_settings
 from src.main import create_app
 
+loggingDictConfig(get_settings().LOG_CONFIG)
 app = create_app()
 
 if __name__ == "__main__":
-    loggingDictConfig(get_settings().LOG_CONFIG)
+    import uvicorn
+
     uvicorn.run(
         app="asgi:app",
         host=get_settings().HOST,
