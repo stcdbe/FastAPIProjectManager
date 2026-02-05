@@ -18,7 +18,7 @@ class SQLAlchemyProjectTaskAggregationRepository(AbstractProjectTaskAggregationR
     async def get_one_project_with_tasks_by_guid(self, project_guid: UUID) -> ProjectTaskAggregation:
         stmt = select(ProjectModel).where(ProjectModel.guid == project_guid).options(selectinload(ProjectModel.tasks))
         try:
-            async with self._get_session() as session:
+            async with self._get_read_only_session() as session:
                 res = await session.execute(stmt)
                 project_model = res.scalars().one()
                 return convert_project_task_aggregation_model_to_entity(project_model)

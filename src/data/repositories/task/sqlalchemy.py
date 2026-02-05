@@ -18,7 +18,7 @@ class SQLAlchemyTaskRepository(AbstractTaskRepository, SQLAlchemyRepository):
     async def get_list_by_project_guid(self, project_guid: UUID) -> list[Task]:
         stmt = select(TaskModel).where(TaskModel.project_guid == project_guid)
 
-        async with self._get_session() as session:
+        async with self._get_read_only_session() as session:
             res = await session.execute(stmt)
             task_model_seq = res.scalars().all()
             return [convert_task_model_to_entity(task_model) for task_model in task_model_seq]
@@ -27,7 +27,7 @@ class SQLAlchemyTaskRepository(AbstractTaskRepository, SQLAlchemyRepository):
         stmt = select(TaskModel).where(TaskModel.guid == guid)
 
         try:
-            async with self._get_session() as session:
+            async with self._get_read_only_session() as session:
                 res = await session.execute(stmt)
                 task_model = res.scalars().one()
                 return convert_task_model_to_entity(task_model)

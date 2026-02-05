@@ -1,19 +1,30 @@
+from logging import getLogger
+
 from faststream.rabbit import QueueType, RabbitBroker, RabbitExchange, RabbitQueue
-from faststream.rabbit.types import AioPikaSendableMessage
 
-from src.infra.worker.enum import RabbitExchangeName, RabbitQueueName
+from src.infra.brokers.base import AbstractMessageBroker, DataclassInstance
+from src.infra.brokers.enums import ExchangeName, QueueName
+from src.infra.brokers.rabbitmq.worker_routes import worker_router
 
 
-class RabbitMessageBroker:
-    def __init__(self, broker: RabbitBroker) -> None:
-        self._broker = broker
+class RabbitMQMessageBroker(AbstractMessageBroker):
+    __slots__ = ("_broker",)
+
+    _broker: RabbitBroker
+
+    def __init__(self, broker_url: str) -> None:
+        self._broker = RabbitBroker(
+            url=broker_url,
+            logger=getLogger(),
+        )
+        self._broker.include_router(worker_router)
 
     async def start_broker(self) -> None:
         await self._broker.start()
         # declare dlq
         dlq = await self._broker.declare_queue(
             queue=RabbitQueue(
-                name=RabbitQueueName.DLQ,
+                name=QueueName.DLQ,
                 queue_type=QueueType.QUORUM,
                 durable=True,
                 arguments={
@@ -23,16 +34,14 @@ class RabbitMessageBroker:
             ),
         )
         # declare dlx
-        dlx = await self._broker.declare_exchange(
-            exchange=RabbitExchange(name=RabbitExchangeName.DLX, durable=True),
-        )
+        dlx = await self._broker.declare_exchange(exchange=RabbitExchange(name=ExchangeName.DLX, durable=True))
         # bind dlq to dlx
         await dlq.bind(exchange=dlx, routing_key=dlq.name)
 
     async def stop_broker(self) -> None:
         await self._broker.stop()
 
-    async def send_message(self, queue_name: RabbitQueueName, send_data: AioPikaSendableMessage) -> None:
+    async def send_message(self, queue_name: QueueName, send_data: DataclassInstance) -> None:
         queue = RabbitQueue(
             name=queue_name,
             queue_type=QueueType.QUORUM,
@@ -40,8 +49,8 @@ class RabbitMessageBroker:
             arguments={
                 "x-message-ttl": 60 * 60 * 1000,  # 1 hour in ms
                 "x-delivery-limit": 5,
-                "x-dead-letter-exchange": RabbitExchangeName.DLX,
-                "x-dead-letter-routing-key": RabbitQueueName.DLQ,
+                "x-dead-letter-exchange": ExchangeName.DLX,
+                "x-dead-letter-routing-key": QueueName.DLQ,
                 "x-dead-letter-strategy": "at-least-once",
             },
         )

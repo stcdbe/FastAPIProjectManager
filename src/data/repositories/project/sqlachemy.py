@@ -29,7 +29,7 @@ class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepositor
         else:
             stmt = stmt.order_by(order_by)
 
-        async with self._get_session() as session:
+        async with self._get_read_only_session() as session:
             res = await session.execute(stmt)
             project_models_seq = res.scalars().all()
             return [convert_project_model_to_entity(model) for model in project_models_seq]
@@ -38,7 +38,7 @@ class SQLAlchemyProjectRepository(AbstractProjectRepository, SQLAlchemyRepositor
         stmt = select(ProjectModel).where(ProjectModel.guid == guid)
 
         try:
-            async with self._get_session() as session:
+            async with self._get_read_only_session() as session:
                 res = await session.execute(stmt)
                 project_model = res.scalars().one()
                 return convert_project_model_to_entity(project_model)

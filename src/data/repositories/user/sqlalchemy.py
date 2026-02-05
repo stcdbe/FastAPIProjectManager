@@ -29,7 +29,7 @@ class SQLAlchemyUserRepository(AbstractUserRepository, SQLAlchemyRepository):
         else:
             stmt = stmt.order_by(order_by)
 
-        async with self._get_session() as session:
+        async with self._get_read_only_session() as session:
             res = await session.execute(stmt)
             user_model_seq = res.scalars().all()
             return [convert_user_model_to_entity(user_model) for user_model in user_model_seq]
@@ -38,7 +38,7 @@ class SQLAlchemyUserRepository(AbstractUserRepository, SQLAlchemyRepository):
         stmt = select(UserModel).where(UserModel.guid == guid)
 
         try:
-            async with self._get_session() as session:
+            async with self._get_read_only_session() as session:
                 res = await session.execute(stmt)
                 user_model = res.scalars().one()
                 return convert_user_model_to_entity(user_model)
@@ -51,7 +51,7 @@ class SQLAlchemyUserRepository(AbstractUserRepository, SQLAlchemyRepository):
         stmt = select(UserModel).where(UserModel.username == username)
 
         try:
-            async with self._get_session() as session:
+            async with self._get_read_only_session() as session:
                 res = await session.execute(stmt)
                 user_model = res.scalars().one()
                 return convert_user_model_to_entity(user_model)

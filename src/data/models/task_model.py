@@ -4,7 +4,7 @@ from uuid import UUID
 from sqlalchemy import ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.data.models.sqlalchemy_timed_base import SQLAlchemyTimedBaseModel
+from src.data.models.sqlalchemy_base import SQLAlchemyTimedBaseModel
 
 if TYPE_CHECKING:
     from src.data.models.project_model import ProjectModel

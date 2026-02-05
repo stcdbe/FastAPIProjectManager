@@ -8,7 +8,7 @@ from src.domain.project.entities import ProjectReportData
 from src.domain.project_task_aggregation.flows.send_project_report_notification import (
     SendProjectReportNotificationFlow,
 )
-from src.infra.worker.enum import RabbitExchangeName, RabbitQueueName
+from src.infra.brokers.enums import ExchangeName, QueueName
 from src.logic.worker_di_container import get_worker_di_container
 
 worker_router = RabbitRouter()
@@ -16,7 +16,7 @@ worker_router = RabbitRouter()
 
 @worker_router.subscriber(
     queue=RabbitQueue(
-        name=RabbitQueueName.DLQ,
+        name=QueueName.DLQ,
         queue_type=QueueType.QUORUM,
         durable=True,
         arguments={
@@ -32,14 +32,14 @@ async def dlq_handler(body: dict[str, Any], logger: Logger) -> None:
 
 @worker_router.subscriber(
     queue=RabbitQueue(
-        name=RabbitQueueName.PROJECT_REPORT_NOTIFICATION,
+        name=QueueName.PROJECT_REPORT_NOTIFICATION,
         queue_type=QueueType.QUORUM,
         durable=True,
         arguments={
             "x-message-ttl": 60 * 60 * 1000,  # 1 hour in ms
             "x-delivery-limit": 5,
-            "x-dead-letter-exchange": RabbitExchangeName.DLX,
-            "x-dead-letter-routing-key": RabbitQueueName.DLQ,
+            "x-dead-letter-exchange": ExchangeName.DLX,
+            "x-dead-letter-routing-key": QueueName.DLQ,
             "x-dead-letter-strategy": "at-least-once",
         },
     ),

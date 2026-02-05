@@ -1,10 +1,6 @@
 from functools import lru_cache
-from logging import getLogger
 
-from faststream.rabbit import RabbitBroker
 from punq import Container, Scope
-from redis.asyncio import Redis as AsyncRedis
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from src.config import get_settings
 from src.data.repositories.project.base import AbstractProjectRepository
@@ -33,8 +29,8 @@ from src.domain.user.use_cases.get_one_user_by_guid import GetOneUserByGUIDUseCa
 from src.domain.user.use_cases.get_user_list import GetUserListUseCase
 from src.domain.user.use_cases.patch_user_by_guid import PatchUserByGUIDUseCase
 from src.domain.user.use_cases.refresh_user_token import RefreshUserTokenUseCase
-from src.infra.worker.broker import RabbitMessageBroker
-from src.infra.worker.worker_routes import worker_router
+from src.infra.brokers.base import AbstractMessageBroker
+from src.infra.brokers.rabbitmq.broker import RabbitMQMessageBroker
 from src.services.auth_service import AuthService
 from src.services.hasher_service import HasherService
 from src.services.project_service import ProjectService
@@ -44,55 +40,31 @@ from src.services.user_service import UserService
 
 def _get_api_di_container() -> Container:
     container = Container()
-    # sqlalchemy engine and sessionmaker
-    async_engine = create_async_engine(
-        url=get_settings().PG_URL.unicode_string(),
-        echo=False,
-        pool_pre_ping=True,
-        pool_size=10,
-        pool_recycle=3600,
-    )
-    async_session_factory = async_sessionmaker(
-        bind=async_engine,
-        expire_on_commit=False,
-        autoflush=False,
-        autocommit=False,
-    )
-    # redis
-    redis = AsyncRedis.from_url(
-        get_settings().REDIS_URL.unicode_string(),
-        decode_responses=False,
-    )
     # repos
     container.register(
         AbstractUserRepository,
-        factory=lambda: SQLAlchemyUserRepository(async_session_factory),
+        factory=lambda: SQLAlchemyUserRepository(get_settings().PG_URL.unicode_string()),
         scope=Scope.singleton,
     )
     container.register(
         AbstractUserCacheRepository,
-        factory=lambda: RedisUserCasheRepository(redis),
+        factory=lambda: RedisUserCasheRepository(get_settings().REDIS_URL.unicode_string()),
         scope=Scope.singleton,
     )
     container.register(
         AbstractProjectRepository,
-        factory=lambda: SQLAlchemyProjectRepository(async_session_factory),
+        factory=lambda: SQLAlchemyProjectRepository(get_settings().PG_URL.unicode_string()),
         scope=Scope.singleton,
     )
     container.register(
         AbstractTaskRepository,
-        factory=lambda: SQLAlchemyTaskRepository(async_session_factory),
+        factory=lambda: SQLAlchemyTaskRepository(get_settings().PG_URL.unicode_string()),
         scope=Scope.singleton,
     )
     # infra
-    rabbimq_broker = RabbitBroker(
-        url=get_settings().RMQ_URL.unicode_string(),
-        logger=getLogger(),
-    )
-    rabbimq_broker.include_router(worker_router)
     container.register(
-        RabbitMessageBroker,
-        factory=lambda: RabbitMessageBroker(rabbimq_broker),
+        AbstractMessageBroker,
+        factory=lambda: RabbitMQMessageBroker(get_settings().RMQ_URL.unicode_string()),
         scope=Scope.singleton,
     )
     # services

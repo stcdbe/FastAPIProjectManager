@@ -14,8 +14,11 @@ from src.domain.user.entities import User
 class RedisUserCasheRepository(AbstractUserCacheRepository):
     __slots__ = ("_key", "_redis")
 
-    def __init__(self, redis: AsyncRedis) -> None:
-        self._redis = redis
+    def __init__(self, redis_url: str) -> None:
+        self._redis = AsyncRedis.from_url(
+            redis_url,
+            decode_responses=False,
+        )
         self._key = "cache:user:{guid}"
 
     async def add_one(self, user: User) -> None:
