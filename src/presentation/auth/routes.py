@@ -32,7 +32,7 @@ async def create_token(
     container: Annotated[Container, Depends(get_api_di_container)],
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> AuthToken:
-    use_case: GenerateUserTokenUseCase = container.resolve(GenerateUserTokenUseCase)  # type: ignore
+    use_case: GenerateUserTokenUseCase = container.resolve(GenerateUserTokenUseCase)
     try:
         return await use_case.execute(username=form_data.username, password=form_data.password)
 
@@ -63,7 +63,7 @@ async def refresh_token(
     _: Annotated[User, Depends(get_current_user)],
     sheme_data: RefreshTokenInputScheme,
 ) -> AuthToken:
-    use_case: RefreshUserTokenUseCase = container.resolve(RefreshUserTokenUseCase)  # type: ignore
+    use_case: RefreshUserTokenUseCase = container.resolve(RefreshUserTokenUseCase)
     try:
         return use_case.execute(sheme_data.refresh_token)
 

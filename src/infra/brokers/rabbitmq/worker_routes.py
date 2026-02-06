@@ -48,5 +48,5 @@ async def send_project_report_notification(
     body: ProjectReportData,
     container: Container = Depends(get_worker_di_container),  # noqa: B008
 ) -> None:
-    flow: SendProjectReportNotificationFlow = container.resolve(SendProjectReportNotificationFlow)  # type: ignore
+    flow: SendProjectReportNotificationFlow = container.resolve(SendProjectReportNotificationFlow)
     return await flow.execute(body)

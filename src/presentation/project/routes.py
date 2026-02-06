@@ -61,7 +61,7 @@ async def get_project_list(
     order_by: Annotated[str, Query(enum=tuple(ProjectGetScheme.model_fields))] = "created_at",
     reverse: Annotated[bool, Query()] = False,
 ) -> dict[str, list[Project]]:
-    use_case: GetProjectListUseCase = container.resolve(GetProjectListUseCase)  # type: ignore
+    use_case: GetProjectListUseCase = container.resolve(GetProjectListUseCase)
     try:
         projects = await use_case.execute(offset, limit, order_by, reverse)
 
@@ -87,7 +87,7 @@ async def create_project(
     current_user: Annotated[User, Depends(get_current_user)],
     scheme_data: ProjectCreateScheme,
 ) -> dict[str, UUID4]:
-    use_case: CreateProjectUseCase = container.resolve(CreateProjectUseCase)  # type: ignore
+    use_case: CreateProjectUseCase = container.resolve(CreateProjectUseCase)
     project_create_data = convert_project_create_scheme_to_entity(scheme_data)
     try:
         guid = await use_case.execute(current_user.guid, project_create_data)
@@ -115,7 +115,7 @@ async def get_project(
     _: Annotated[User, Depends(get_current_user)],
     project_guid: UUID4,
 ) -> Project:
-    use_case: GetProjectByGUIDUseCase = container.resolve(GetProjectByGUIDUseCase)  # type: ignore
+    use_case: GetProjectByGUIDUseCase = container.resolve(GetProjectByGUIDUseCase)
     try:
         return await use_case.execute(project_guid)
 
@@ -144,7 +144,7 @@ async def patch_project(
     project_guid: UUID4,
     scheme_data: ProjectPatchScheme,
 ) -> dict[str, UUID4]:
-    use_case: PatchProjectByGUIDUseCase = container.resolve(PatchProjectByGUIDUseCase)  # type: ignore
+    use_case: PatchProjectByGUIDUseCase = container.resolve(PatchProjectByGUIDUseCase)
     project_patch_data = convert_project_patch_scheme_to_entity(scheme_data)
     try:
         guid = await use_case.execute(project_guid, project_patch_data)
@@ -175,7 +175,7 @@ async def delete_project(
     _: Annotated[User, Depends(get_current_user)],
     project_guid: UUID4,
 ) -> None:
-    use_case: DeleteProjectByGUIDUseCase = container.resolve(DeleteProjectByGUIDUseCase)  # type: ignore
+    use_case: DeleteProjectByGUIDUseCase = container.resolve(DeleteProjectByGUIDUseCase)
     try:
         await use_case.execute(project_guid)
 
@@ -202,7 +202,7 @@ async def send_project_report(
     _: Annotated[User, Depends(get_current_user)],
     scheme_data: ProjectReportSendDataScheme,
 ) -> None:
-    use_case: SendProjectReportUseCase = container.resolve(SendProjectReportUseCase)  # type: ignore
+    use_case: SendProjectReportUseCase = container.resolve(SendProjectReportUseCase)
     send_data = convert_project_report_send_data_scheme_to_entity(scheme_data)
     try:
         await use_case.execute(send_data)
@@ -227,7 +227,7 @@ async def get_task_list(
     _: Annotated[User, Depends(get_current_user)],
     project_guid: UUID4,
 ) -> dict[str, list[Task]]:
-    use_case: GetTaskListByProjectGUIDUseCase = container.resolve(GetTaskListByProjectGUIDUseCase)  # type: ignore
+    use_case: GetTaskListByProjectGUIDUseCase = container.resolve(GetTaskListByProjectGUIDUseCase)
     try:
         res = await use_case.execute(project_guid)
 
@@ -254,7 +254,7 @@ async def create_task(
     project_guid: UUID4,
     scheme_data: TaskCreateScheme,
 ) -> dict[str, UUID4]:
-    use_case: CreateTaskUseCase = container.resolve(CreateTaskUseCase)  # type: ignore
+    use_case: CreateTaskUseCase = container.resolve(CreateTaskUseCase)
     task_create_data = convert_task_create_scheme_to_entity(scheme_data)
     try:
         res = await use_case.execute(project_guid, task_create_data)
@@ -283,7 +283,7 @@ async def patch_task(
     task_guid: UUID4,
     scheme_data: TaskPatchScheme,
 ) -> dict[str, UUID4]:
-    use_case: PatchTaskByGUIDUseCase = container.resolve(PatchTaskByGUIDUseCase)  # type: ignore
+    use_case: PatchTaskByGUIDUseCase = container.resolve(PatchTaskByGUIDUseCase)
     task_patch_data = convert_task_patch_scheme_to_entity(scheme_data)
     try:
         res = await use_case.execute(project_guid, task_guid, task_patch_data)
@@ -314,7 +314,7 @@ async def delete_task(
     project_guid: UUID4,
     task_guid: UUID4,
 ) -> None:
-    use_case: DeleteTaskByGUIDUseCase = container.resolve(DeleteTaskByGUIDUseCase)  # type: ignore
+    use_case: DeleteTaskByGUIDUseCase = container.resolve(DeleteTaskByGUIDUseCase)
     try:
         await use_case.execute(project_guid, task_guid)
 

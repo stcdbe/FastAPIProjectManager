@@ -43,7 +43,7 @@ async def get_user_list(
     order_by: Annotated[str, Query(enum=tuple(UserGetScheme.model_fields))] = "created_at",
     reverse: Annotated[bool, Query()] = False,
 ) -> dict[str, list[User]]:
-    use_case: GetUserListUseCase = container.resolve(GetUserListUseCase)  # type: ignore
+    use_case: GetUserListUseCase = container.resolve(GetUserListUseCase)
     try:
         users = await use_case.execute(offset, limit, order_by, reverse)
 
@@ -69,7 +69,7 @@ async def create_user(
     _: Annotated[User, Depends(get_current_user)],
     scheme_data: UserCreateScheme,
 ) -> dict[str, UUID4]:
-    use_case: CreateUserUseCase = container.resolve(CreateUserUseCase)  # type: ignore
+    use_case: CreateUserUseCase = container.resolve(CreateUserUseCase)
     user_create_data = convert_user_create_data_scheme_to_entity(scheme_data)
     try:
         guid = await use_case.execute(user_create_data)
@@ -97,7 +97,7 @@ async def get_user(
     _: Annotated[User, Depends(get_current_user)],
     user_guid: UUID4,
 ) -> User:
-    use_case: GetOneUserByGUIDUseCase = container.resolve(GetOneUserByGUIDUseCase)  # type: ignore
+    use_case: GetOneUserByGUIDUseCase = container.resolve(GetOneUserByGUIDUseCase)
     try:
         return await use_case.execute(user_guid=user_guid)
 
@@ -126,7 +126,7 @@ async def patch_user(
     user_guid: UUID4,
     scheme_data: UserPatchScheme,
 ) -> dict[str, UUID4]:
-    use_case: PatchUserByGUIDUseCase = container.resolve(PatchUserByGUIDUseCase)  # type: ignore
+    use_case: PatchUserByGUIDUseCase = container.resolve(PatchUserByGUIDUseCase)
     user_patch_data = convert_user_patch_data_scheme_to_entity(scheme_data)
     try:
         guid = await use_case.execute(user_guid, user_patch_data)
@@ -157,7 +157,7 @@ async def delete_user(
     _: Annotated[User, Depends(get_current_user)],
     user_guid: UUID4,
 ) -> None:
-    use_case: DeleteUserByGUIDUseCase = container.resolve(DeleteUserByGUIDUseCase)  # type: ignore
+    use_case: DeleteUserByGUIDUseCase = container.resolve(DeleteUserByGUIDUseCase)
     try:
         await use_case.execute(user_guid=user_guid)
 
