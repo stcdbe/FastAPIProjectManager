@@ -1,14 +1,14 @@
 from datetime import date, datetime
 from typing import Annotated
 
-from pydantic import UUID4, BaseModel, EmailStr, Field
+from pydantic import AfterValidator, UUID4, BaseModel, EmailStr, Field
 
 from src.domain.user.enums import UserGender
 
 
 class _UserBaseScheme(BaseModel):
     username: Annotated[str, Field(min_length=5, max_length=128, pattern=r"^[a-z0-9_-]*$")]
-    email: EmailStr
+    email: Annotated[EmailStr, AfterValidator(str.lower)]
     first_name: Annotated[str | None, Field(max_length=64)]
     second_name: Annotated[str | None, Field(max_length=64)]
     gender: UserGender | None
